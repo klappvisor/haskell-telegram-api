@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Telegram.API.Bot, Telegram.API.Bot.Data
+  exposed-modules:     Telegram.API.Bot, Telegram.API.Bot.Data, Telegram.API.Bot.Responses
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , servant
@@ -42,6 +42,8 @@ test-suite telegram-api-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
+                     , text
+                     , hspec
                      , telegram-api
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
