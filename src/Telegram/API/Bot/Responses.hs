@@ -21,6 +21,7 @@ import qualified Data.Text as T
 import           GHC.Generics
 import           GHC.TypeLits
 import           Telegram.API.Bot.Data
+import           Telegram.API.Bot.JsonExt
 
 data GetMeResponse = GetMeResponse
   {
@@ -28,10 +29,10 @@ data GetMeResponse = GetMeResponse
   } deriving (Show, Generic)
 
 instance ToJSON GetMeResponse where
-  toJSON = toJson 5
+  toJSON = toJsonDrop 5
 
 instance FromJSON GetMeResponse where
-  parseJSON = parseJson 5
+  parseJSON = parseJsonDrop 5
 
 data SendMessageResponse = SendMessageResponse
   {
@@ -39,11 +40,7 @@ data SendMessageResponse = SendMessageResponse
   } deriving (Show, Generic)
 
 instance ToJSON SendMessageResponse where
-  toJSON = toJson 8
+  toJSON = toJsonDrop 8
 
 instance FromJSON SendMessageResponse where
-  parseJSON = parseJson 8
-
-toJson prefix = genericToJSON defaultOptions { fieldLabelModifier = drop prefix }
-
-parseJson prefix = genericParseJSON defaultOptions { fieldLabelModifier = drop prefix }
+  parseJSON = parseJsonDrop 8

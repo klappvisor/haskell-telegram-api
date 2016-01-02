@@ -28,6 +28,7 @@ import           Servant.API
 import           Servant.Client
 import           Telegram.API.Bot.Data
 import           Telegram.API.Bot.Responses
+import           Telegram.API.Bot.Requests
 
 newtype Token = Token Text
   deriving (Show, Eq, Ord)
@@ -38,19 +39,26 @@ instance ToText Token where
 instance FromText Token where
   fromText x = Just (Token (x))
 
-type TelegramBotsAPI = Capture ":token" Token :> "getMe" :> Get '[JSON] GetMeResponse
-                  :<|> Capture ":token" Token :> "sendMessage" :> QueryParam "chat_id" Int :> QueryParam "text" Text :> Get '[JSON] SendMessageResponse
+type TelegramToken = Capture ":token" Token
+
+type TelegramBotsAPI =
+         TelegramToken :> "getMe"
+         :> Get '[JSON] GetMeResponse
+    :<|> TelegramToken :> "sendMessage"
+         :> ReqBody '[JSON] SendMessageRequest
+         :> Post '[JSON] SendMessageResponse
 
 api :: Proxy TelegramBotsAPI
 api = Proxy
 
-getMe' :: Token -> EitherT ServantError IO GetMeResponse
-sendMessage' :: Token -> Maybe Int -> Maybe Text -> EitherT ServantError IO SendMessageResponse
---getMe' :<|> sendMessage' = client api (BaseUrl Http "localhost" 8888)
-getMe' :<|> sendMessage' = client api (BaseUrl Https "api.telegram.org" 443)
+getMe_ :: Token -> EitherT ServantError IO GetMeResponse
+sendMessage_ :: Token -> SendMessageRequest -> EitherT ServantError IO SendMessageResponse
+--getMe_ :<|> sendMessage_ = client api (BaseUrl Http "localhost" 8888)
+getMe_ :<|> sendMessage_ = client api (BaseUrl Https "api.telegram.org" 443)
 
 getMe :: Token -> IO (Either ServantError GetMeResponse)
-getMe token = runEitherT $ getMe' token
+getMe token = runEitherT $ getMe_ token
 
-sendMessage :: Token -> Int -> Text -> IO (Either ServantError SendMessageResponse)
-sendMessage token chatId text = runEitherT $ sendMessage' token (Just chatId) (Just text)
+sendMessage :: Token -> SendMessageRequest -> IO (Either ServantError SendMessageResponse)
+sendMessage token request = runEitherT $ sendMessage_ token request
+

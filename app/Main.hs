@@ -17,10 +17,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 
 main :: IO ()
-main = do
-  Right GetMeResponse { user_result = u } <- getMe (Token "bot179176211:AAGtOVb_YxcpK8FaJ-ixpdOKsEEy-7LINH0")
-  T.putStr "getMe - (first_name)"
-  T.putStrLn (first_name u)
+main = putStrLn "main"
 --main = startApp
 
 --startApp :: IO ()

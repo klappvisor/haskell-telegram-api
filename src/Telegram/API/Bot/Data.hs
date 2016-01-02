@@ -28,14 +28,21 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
 import           GHC.TypeLits
+import           Telegram.API.Bot.JsonExt
 
 data User = User
   {
-    id :: Int
-  , first_name :: Text
-  , last_name :: Maybe Text
-  , username :: Maybe Text
-  } deriving (FromJSON, ToJSON, Show, Generic)
+    user_id :: Int
+  , user_first_name :: Text
+  , user_last_name :: Maybe Text
+  , user_username :: Maybe Text
+  } deriving (Show, Generic)
+
+instance ToJSON User where
+  toJSON = toJsonDrop 5
+
+instance FromJSON User where
+  parseJSON = parseJsonDrop 5
 
 data Contact = Contact
   {
@@ -46,10 +53,10 @@ data Contact = Contact
   } deriving (Show, Generic)
 
 instance ToJSON Contact where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 8 }
+  toJSON = toJsonDrop 8
 
 instance FromJSON Contact where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 8 }
+  parseJSON = parseJsonDrop 8
 
 data Chat = Chat
   {
@@ -62,10 +69,10 @@ data Chat = Chat
   } deriving (Show, Generic)
 
 instance ToJSON Chat where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 5 }
+  toJSON = toJsonDrop 5
 
 instance FromJSON Chat where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 5 }
+  parseJSON = parseJsonDrop 5
 
 data PhotoSize = PhotoSize
   {
@@ -76,10 +83,10 @@ data PhotoSize = PhotoSize
   } deriving (Show, Generic)
 
 instance ToJSON PhotoSize where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 6 }
+  toJSON = toJsonDrop 6
 
 instance FromJSON PhotoSize where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 6 }
+  parseJSON = parseJsonDrop 6
 
 data Audio = Audio
   {
@@ -92,10 +99,10 @@ data Audio = Audio
   } deriving (Show, Generic)
 
 instance ToJSON Audio where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 6 }
+  toJSON = toJsonDrop 6
 
 instance FromJSON Audio where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 6 }
+  parseJSON = parseJsonDrop 6
 
 data Document = Document
   {
@@ -107,10 +114,10 @@ data Document = Document
   } deriving (Show, Generic)
 
 instance ToJSON Document where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 4 }
+  toJSON = toJsonDrop 4
 
 instance FromJSON Document where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 4 }
+  parseJSON = parseJsonDrop 4
 
 data Sticker = Sticker
   {
@@ -122,10 +129,10 @@ data Sticker = Sticker
   } deriving (Show, Generic)
 
 instance ToJSON Sticker where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 8 }
+  toJSON = toJsonDrop 8
 
 instance FromJSON Sticker where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 8 }
+  parseJSON = parseJsonDrop 8
 
 data Video = Video
   {
@@ -139,10 +146,10 @@ data Video = Video
   } deriving (Show, Generic)
 
 instance ToJSON Video where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 6 }
+  toJSON = toJsonDrop 6
 
 instance FromJSON Video where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 6 }
+  parseJSON = parseJsonDrop 6
 
 data Voice = Voice
   {
@@ -153,10 +160,10 @@ data Voice = Voice
   } deriving (Show, Generic)
 
 instance ToJSON Voice where
-  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 6 }
+  toJSON = toJsonDrop 6
 
 instance FromJSON Voice where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 6 }
+  parseJSON = parseJsonDrop 6
 
 data Location = Location
   {

@@ -11,6 +11,7 @@ import Control.Monad
 import Telegram.API.Bot
 import Telegram.API.Bot.Data
 import Telegram.API.Bot.Responses
+import Telegram.API.Bot.Requests
 import Data.Text
 import Test.Hspec
 
@@ -25,11 +26,16 @@ spec = do
     it "responds with correct bot's name" $ do
       Right GetMeResponse { user_result = u } <-
         getMe token
-      (first_name u) `shouldBe` "TelegramAPIBot"
+      (user_first_name u) `shouldBe` "TelegramAPIBot"
 
   describe "/sendMessage" $ do
-    it "response with correct message" $ do
+    it "should send message" $ do
+          Right SendMessageResponse { message_result = m } <-
+            sendMessage token (SendMessageRequest "3331366" "test message" Nothing Nothing Nothing)
+          (text m) `shouldBe` (Just "test message")
+
+    it "should send message markdown" $ do
       Right SendMessageResponse { message_result = m } <-
-        sendMessage token 3331366 "test message"
-      (text m) `shouldBe` (Just "test message")
+        sendMessage token (SendMessageRequest "3331366" "test *message*" (Just Markdown) Nothing Nothing)
+      (text m) `shouldBe` (Just "test *message*")
 
