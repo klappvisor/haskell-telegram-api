@@ -21,6 +21,7 @@ library
                      , servant
                      , servant-client
                      , text
+                     , either
   default-language:    Haskell2010
 
 executable telegram-api
@@ -32,6 +33,8 @@ executable telegram-api
                      , servant-server
                      , wai
                      , warp
+                     , text
+                     , aeson
   default-language:    Haskell2010
 
 test-suite telegram-api-test
