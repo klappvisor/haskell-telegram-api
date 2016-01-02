@@ -39,3 +39,8 @@ spec = do
         sendMessage token (SendMessageRequest "3331366" "test *message*" (Just Markdown) Nothing Nothing)
       (text m) `shouldBe` (Just "test *message*")
 
+  describe "/sendSticker" $ do
+      it "should send sticker" $ do
+            Right SendMessageResponse { message_result = m } <-
+              sendSticker token (SendStickerRequest "3331366" "BQADAgADGgADkWgMAAGXlYGBiM_d2wI" Nothing)
+            (text m) `shouldBe` (Just "test message")

@@ -9,6 +9,7 @@
 module Telegram.API.Bot.Requests
     (
       SendMessageRequest           (..)
+    , SendStickerRequest           (..)
     , ParseMode                    (..)
     ) where
 
@@ -44,4 +45,17 @@ instance ToJSON SendMessageRequest where
   toJSON = toJsonDrop 8
 
 instance FromJSON SendMessageRequest where
+  parseJSON = parseJsonDrop 8
+
+data SendStickerRequest = SendStickerRequest
+  {
+    sticker_chat_id                  :: Text
+  , sticker_sticker                  :: Text
+  , sticker_reply_to_message_id      :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON SendStickerRequest where
+  toJSON = toJsonDrop 8
+
+instance FromJSON SendStickerRequest where
   parseJSON = parseJsonDrop 8
