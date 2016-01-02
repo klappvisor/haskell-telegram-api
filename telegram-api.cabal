@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Telegram.API.Bots
+  exposed-modules:     Telegram.API.Bot, Telegram.API.Bot.Data
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , servant

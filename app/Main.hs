@@ -8,7 +8,7 @@
 module Main where
 
 import Control.Monad
-import Telegram.API.Bots
+import Telegram.API.Bot
 import Servant
 import Data.Text (Text)
 import qualified Data.Text.IO as T

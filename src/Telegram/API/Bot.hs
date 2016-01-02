@@ -5,12 +5,11 @@
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Telegram.API.Bots
+module Telegram.API.Bot
   (
     getMe
   , TelegramBotsAPI
   , Token             (..)
-  , User              (..)
   , GetMeResponse     (..)
   ) where
 
@@ -26,6 +25,7 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Servant.API
 import           Servant.Client
+import           Telegram.API.Bot.Data
 
 newtype Token = Token Text
   deriving (Show, Eq, Ord)
@@ -34,16 +34,10 @@ instance ToText Token where
   toText (Token x) = x
 
 instance FromText Token where
-  fromText x =Just (Token (x))
+  fromText x = Just (Token (x))
 
-data User = User {
-    id :: Int
-  , first_name :: Text
-  , last_name :: Maybe (Text)
-  , username :: Maybe (Text)
-  } deriving (FromJSON, ToJSON, Show, Generic)
-
-data GetMeResponse = GetMeResponse {
+data GetMeResponse = GetMeResponse
+  {
     result :: User
   } deriving (FromJSON, ToJSON, Show, Generic)
 
