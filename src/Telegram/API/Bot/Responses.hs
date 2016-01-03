@@ -9,7 +9,7 @@
 module Telegram.API.Bot.Responses
     (
       GetMeResponse           (..)
-    , SendMessageResponse     (..)
+    , MessageResponse     (..)
     ) where
 
 import           Data.Aeson
@@ -34,13 +34,13 @@ instance ToJSON GetMeResponse where
 instance FromJSON GetMeResponse where
   parseJSON = parseJsonDrop 5
 
-data SendMessageResponse = SendMessageResponse
+data MessageResponse = MessageResponse
   {
     message_result :: Message
   } deriving (Show, Generic)
 
-instance ToJSON SendMessageResponse where
+instance ToJSON MessageResponse where
   toJSON = toJsonDrop 8
 
-instance FromJSON SendMessageResponse where
+instance FromJSON MessageResponse where
   parseJSON = parseJsonDrop 8

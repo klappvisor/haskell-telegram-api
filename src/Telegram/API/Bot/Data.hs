@@ -186,7 +186,7 @@ data Message = Message
   , photo :: Maybe [PhotoSize]
   , sticker :: Maybe Sticker
   , video :: Maybe Video
-  , voice :: Voice
+  , voice :: Maybe Voice
   , caption :: Maybe Text
   , contact :: Maybe Contact
   , location :: Maybe Location
