@@ -11,7 +11,10 @@ module Telegram.API.Bot.Requests
       SendMessageRequest           (..)
     , SendStickerRequest           (..)
     , ForwardMessageRequest        (..)
+    , SendLocationRequest          (..)
+    , SendChatActionRequest        (..)
     , ParseMode                    (..)
+    , ChatAction                   (..)
     ) where
 
 import           Data.Aeson
@@ -93,3 +96,46 @@ instance ToJSON SendLocationRequest where
 
 instance FromJSON SendLocationRequest where
   parseJSON = parseJsonDrop 9
+
+-- Send Chat Actions
+
+data ChatAction = Typing
+                | UploadPhoto
+                | RecordVideo
+                | UploadVideo
+                | RecordAudio
+                | UploadAudio
+                | UploadDocument
+                | FindLocation deriving (Show, Generic)
+
+instance ToJSON ChatAction where
+  toJSON Typing         = "typing"
+  toJSON UploadPhoto    = "upload_photo"
+  toJSON RecordVideo    = "record_video"
+  toJSON UploadVideo    = "upload_video"
+  toJSON RecordAudio    = "record_audio"
+  toJSON UploadAudio    = "upload_audio"
+  toJSON UploadDocument = "upload_cocument"
+  toJSON FindLocation   = "find_location"
+
+instance FromJSON ChatAction where
+  parseJSON "typing"          = pure Typing
+  parseJSON "upload_photo"    = pure UploadPhoto
+  parseJSON "record_video"    = pure RecordVideo
+  parseJSON "upload_video"    = pure UploadVideo
+  parseJSON "record_audio"    = pure RecordAudio
+  parseJSON "upload_audio"    = pure UploadAudio
+  parseJSON "upload_cocument" = pure UploadDocument
+  parseJSON "find_location"   = pure FindLocation
+
+data SendChatActionRequest = SendChatActionRequest
+  {
+    action_chat_id :: Text
+  , action_action :: ChatAction
+  } deriving (Show, Generic)
+
+instance ToJSON SendChatActionRequest where
+  toJSON = toJsonDrop 7
+
+instance FromJSON SendChatActionRequest where
+  parseJSON = parseJsonDrop 7

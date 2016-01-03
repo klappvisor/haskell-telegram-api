@@ -65,16 +65,17 @@ Currently supported:
 * `forwardMessage`
 * `sendSticker` - without upload functionality
 * `sendLocation`
+* `getUpdates`
+* `sendChatAction`
 
 To be done:
 * `sendPhoto` 
 * `sendAudio`
 * `sendDocument`
+* `sendSticker` - uploading stickers
 * `sendVideo`
 * `sendVoice`
-* `sendChatAction`
 * `getUserProfilePhotos`
-* `getUpdates`
 * `setWebhook`
 * `getFile`
 * `answerInlineQuery` inline bots

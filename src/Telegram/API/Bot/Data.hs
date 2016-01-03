@@ -18,6 +18,7 @@ module Telegram.API.Bot.Data
     , Voice      (..)
     , Contact    (..)
     , Location   (..)
+    , Update     (..)
     ) where
 
 import           Data.Aeson
@@ -164,6 +165,12 @@ instance ToJSON Voice where
 
 instance FromJSON Voice where
   parseJSON = parseJsonDrop 6
+
+data Update = Update
+  {
+    update_id :: Int
+  , message :: Message
+  } deriving (FromJSON, ToJSON, Show, Generic)
 
 data Location = Location
   {

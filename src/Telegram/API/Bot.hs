@@ -10,6 +10,10 @@ module Telegram.API.Bot
     getMe
   , sendMessage
   , sendSticker
+  , forwardMessage
+  , sendLocation
+  , sendChatAction
+  , getUpdates
   , TelegramBotsAPI
   , Token             (..)
   , GetMeResponse     (..)
@@ -55,8 +59,16 @@ type TelegramBotsAPI =
          :> ReqBody '[JSON] ForwardMessageRequest
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendLocation"
-             :> ReqBody '[JSON] SendLocationRequest
-             :> Post '[JSON] MessageResponse
+         :> ReqBody '[JSON] SendLocationRequest
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendChatAction"
+         :> ReqBody '[JSON] SendChatActionRequest
+         :> Post '[JSON] ChatActionResponse
+    :<|> TelegramToken :> "getUpdates"
+         :> QueryParam "offset" Int
+         :> QueryParam "limit" Int
+         :> QueryParam "timeout" Int
+         :> Get '[JSON] UpdatesResponse
 
 api :: Proxy TelegramBotsAPI
 api = Proxy
@@ -66,11 +78,15 @@ sendMessage_    :: Token -> SendMessageRequest -> EitherT ServantError IO Messag
 sendSticker_    :: Token -> SendStickerRequest -> EitherT ServantError IO MessageResponse
 forwardMessage_ :: Token -> ForwardMessageRequest -> EitherT ServantError IO MessageResponse
 sendLocation_   :: Token -> SendLocationRequest -> EitherT ServantError IO MessageResponse
+sendChatAction_ :: Token -> SendChatActionRequest -> EitherT ServantError IO ChatActionResponse
+getUpdates_     :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UpdatesResponse
 getMe_
   :<|> sendMessage_
   :<|> sendSticker_
   :<|> forwardMessage_
-  :<|> sendLocation_ =
+  :<|> sendLocation_
+  :<|> sendChatAction_
+  :<|> getUpdates_ =
       client api
   --      (BaseUrl Http "localhost" 8888)
           (BaseUrl Https "api.telegram.org" 443)
@@ -89,3 +105,9 @@ forwardMessage token request = runEitherT $ forwardMessage_ token request
 
 sendLocation :: Token -> SendLocationRequest -> IO (Either ServantError MessageResponse)
 sendLocation token request = runEitherT $ sendLocation_ token request
+
+sendChatAction :: Token -> SendChatActionRequest -> IO (Either ServantError ChatActionResponse)
+sendChatAction token request = runEitherT $ sendChatAction_ token request
+
+getUpdates :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> IO (Either ServantError UpdatesResponse)
+getUpdates token offset limit timeout = runEitherT $ getUpdates_ token offset limit timeout
