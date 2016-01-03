@@ -9,24 +9,21 @@ module Main (main) where
 
 import           Control.Monad
 import           Telegram.API.Bot
-import           Telegram.API.Bot.Data
-import           Telegram.API.Bot.Responses
-import           Telegram.API.Bot.Requests
 import           Test.Hspec
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Servant.Client
 import           Servant.API
 import           Network.HTTP.Types.Status
+import           System.Environment
 
 main :: IO ()
-main = hspec spec
+main = do
+    [token, chatId] <- getArgs
+    withArgs [] $ hspec (spec (Token (T.pack token)) (T.pack chatId))
 
-token = Token "bot179176211:AAGtOVb_YxcpK8FaJ-ixpdOKsEEy-7LINH0"
-chatId = "3331366"
-
-spec :: Spec
-spec = do
+spec :: Token -> Text -> Spec
+spec token chatId = do
   describe "/getMe" $ do
     it "responds with correct bot's name" $ do
       Right GetMeResponse { user_result = u } <-
@@ -42,8 +39,7 @@ spec = do
     it "should be error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing)
-      --putStrLn (show status)
-      msg  `shouldBe` "Bad Request"
+      msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
       Right MessageResponse { message_result = m } <-
@@ -58,9 +54,9 @@ spec = do
 
   describe "/forwardMessage" $ do
     it "should forward message" $ do
-      Right MessageResponse { message_result = m } <-
-        forwardMessage token (ForwardMessageRequest chatId "anotherChatId" 123)
-      (text m) `shouldBe` Nothing
+      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
+        forwardMessage token (ForwardMessageRequest chatId chatId 123)
+      msg `shouldBe` "Bad Request"
 
   describe "/sendLocation" $ do
     it "should send location" $ do

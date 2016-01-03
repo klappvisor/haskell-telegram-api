@@ -7,7 +7,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 
 module Telegram.API.Bot.Responses
-    (
+    ( -- * Types
       GetMeResponse           (..)
     , MessageResponse         (..)
     , ChatActionResponse      (..)
@@ -25,6 +25,7 @@ import           GHC.TypeLits
 import           Telegram.API.Bot.Data
 import           Telegram.API.Bot.JsonExt
 
+-- | This object represents getMe response
 data GetMeResponse = GetMeResponse
   {
     user_result :: User
@@ -36,6 +37,7 @@ instance ToJSON GetMeResponse where
 instance FromJSON GetMeResponse where
   parseJSON = parseJsonDrop 5
 
+-- | This object represents message response
 data MessageResponse = MessageResponse
   {
     message_result :: Message
@@ -47,6 +49,7 @@ instance ToJSON MessageResponse where
 instance FromJSON MessageResponse where
   parseJSON = parseJsonDrop 8
 
+-- | This object represents sendChatAction response
 data ChatActionResponse = ChatActionResponse
   {
     action_result :: Bool
@@ -58,6 +61,7 @@ instance ToJSON ChatActionResponse where
 instance FromJSON ChatActionResponse where
   parseJSON = parseJsonDrop 7
 
+-- | This object represents getUpdates response
 data UpdatesResponse = UpdatesResponse
   {
     update_result :: [Update  ]

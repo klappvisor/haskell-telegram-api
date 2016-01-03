@@ -7,7 +7,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 
 module Telegram.API.Bot.Requests
-    (
+    ( -- * Types
       SendMessageRequest           (..)
     , SendStickerRequest           (..)
     , ForwardMessageRequest        (..)

@@ -6,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 module Telegram.API.Bot.Data
-    (
+    ( -- * Types
       User       (..)
     , Chat       (..)
     , Message    (..)
@@ -31,6 +31,7 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Telegram.API.Bot.JsonExt
 
+-- | This object represents a Telegram user or bot.
 data User = User
   {
     user_id :: Int
@@ -45,6 +46,7 @@ instance ToJSON User where
 instance FromJSON User where
   parseJSON = parseJsonDrop 5
 
+-- | This object represents a phone contact.
 data Contact = Contact
   {
     contact_phone_number :: Text
@@ -59,6 +61,7 @@ instance ToJSON Contact where
 instance FromJSON Contact where
   parseJSON = parseJsonDrop 8
 
+-- | This object represents a chat.
 data Chat = Chat
   {
     chat_id :: Int
@@ -75,6 +78,7 @@ instance ToJSON Chat where
 instance FromJSON Chat where
   parseJSON = parseJsonDrop 5
 
+-- | This object represents one size of a photo or a `File` / `Sticker` thumbnail.
 data PhotoSize = PhotoSize
   {
     photo_file_id   :: Text
@@ -89,6 +93,7 @@ instance ToJSON PhotoSize where
 instance FromJSON PhotoSize where
   parseJSON = parseJsonDrop 6
 
+-- | This object represents an audio file to be treated as music by the Telegram clients.
 data Audio = Audio
   {
     audio_file_id   :: Text
@@ -105,6 +110,7 @@ instance ToJSON Audio where
 instance FromJSON Audio where
   parseJSON = parseJsonDrop 6
 
+-- | This object represents a general file (as opposed to `PhotoSize`, `Voice` messages and `Audio` files).
 data Document = Document
   {
     doc_file_id   :: Text
@@ -120,6 +126,7 @@ instance ToJSON Document where
 instance FromJSON Document where
   parseJSON = parseJsonDrop 4
 
+-- | This object represents a sticker.
 data Sticker = Sticker
   {
     sticker_file_id   :: Text
@@ -135,6 +142,7 @@ instance ToJSON Sticker where
 instance FromJSON Sticker where
   parseJSON = parseJsonDrop 8
 
+-- | This object represents a video file.
 data Video = Video
   {
     video_file_id   :: Text
@@ -152,6 +160,7 @@ instance ToJSON Video where
 instance FromJSON Video where
   parseJSON = parseJsonDrop 6
 
+-- | This object represents a voice note.
 data Voice = Voice
   {
     voice_file_id   :: Text
@@ -166,18 +175,22 @@ instance ToJSON Voice where
 instance FromJSON Voice where
   parseJSON = parseJsonDrop 6
 
+-- | This object represents an incoming update.
+-- Only one of the optional parameters can be present in any given update.
 data Update = Update
   {
     update_id :: Int
   , message :: Message
   } deriving (FromJSON, ToJSON, Show, Generic)
 
+-- | This object represents a point on the map.
 data Location = Location
   {
     longitude :: Float
   , latitude  :: Float
   } deriving (FromJSON, ToJSON, Show, Generic)
 
+-- | This object represents a message.
 data Message = Message
   {
     message_id :: Int

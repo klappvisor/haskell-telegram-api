@@ -1,13 +1,13 @@
 name:                telegram-api
 version:             0.1.0.0
-synopsis:            Initial project template from stack
+synopsis:            Telegram Bot API bindings
 description:         Please see README.md
 homepage:            http://github.com/klappvisor/telegram-api#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Alexey Rodiontsev
 maintainer:          alex.rodiontsev@gmail.com
-copyright:           2010 Author Here
+copyright:           Alexey Rodiontsev (c) 2016
 category:            Web
 build-type:          Simple
 -- extra-source-files:
@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Telegram.API.Bot
+                     , Telegram.API.Bot.API
                      , Telegram.API.Bot.Data
                      , Telegram.API.Bot.Responses
                      , Telegram.API.Bot.Requests
@@ -25,19 +26,6 @@ library
                      , servant-client
                      , text
                      , either
-  default-language:    Haskell2010
-
-executable telegram-api
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base
-                     , telegram-api
-                     , servant-server
-                     , wai
-                     , warp
-                     , text
-                     , aeson
   default-language:    Haskell2010
 
 test-suite telegram-api-test
