@@ -1,3 +1,15 @@
 machine:
   ghc:
     version: 7.10.2
+
+test:
+  cache_directories:
+    - "dist"
+    - "~/.cabal"
+  pre:
+    - cabal update
+    - cabal install --only-dependencies
+  override:
+    - cabal configure
+    - cabal build
+    - cabal test
