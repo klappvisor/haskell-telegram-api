@@ -21,6 +21,7 @@ module Web.Telegram.API.Bot.Data
     , Location   (..)
     , Update     (..)
     , File       (..)
+    , ChatType   (..)
     ) where
 
 import           Data.Aeson
@@ -73,6 +74,24 @@ data Chat = Chat
   , chat_first_name :: Maybe Text -- ^ First name of the other party in a private chat
   , chat_last_name :: Maybe Text  -- ^ Last name of the other party in a private chat
   } deriving (Show, Generic)
+
+-- | Type of chat.
+data ChatType = Private
+              | Group
+              | Supergroup
+              | Channel deriving (Show, Generic)
+
+instance ToJSON ChatType where
+  toJSON Private        = "private"
+  toJSON Group          = "group"
+  toJSON Supergroup     = "supergroup"
+  toJSON Channel        = "channel"
+
+instance FromJSON ChatType where
+  parseJSON "private"    = pure Private
+  parseJSON "group"      = pure Group
+  parseJSON "supergroup" = pure Supergroup
+  parseJSON "channel"    = pure Channel
 
 instance ToJSON Chat where
   toJSON = toJsonDrop 5
