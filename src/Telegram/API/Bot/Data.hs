@@ -133,7 +133,7 @@ data Sticker = Sticker
   , sticker_width     :: Int
   , sticker_height    :: Int
   , sticker_thumb     :: Maybe PhotoSize
-  , sticker_file_size :: Int
+  , sticker_file_size :: Maybe Int
   } deriving (Show, Generic)
 
 instance ToJSON Sticker where
