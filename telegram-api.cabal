@@ -1,7 +1,7 @@
 name:                telegram-api
 version:             0.1.0.0
 synopsis:            Telegram Bot API bindings
-description:         Please see README.md
+description:         High-level bindings to the Telegram Bots API
 homepage:            http://github.com/klappvisor/telegram-api#readme
 license:             BSD3
 license-file:        LICENSE

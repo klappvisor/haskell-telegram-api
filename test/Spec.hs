@@ -36,7 +36,7 @@ spec token chatId = do
         sendMessage token (SendMessageRequest chatId "test message" Nothing Nothing Nothing)
       (text m) `shouldBe` (Just "test message")
 
-    it "should be error message" $ do
+    it "should return error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing)
       msg `shouldBe` "Bad Request"
@@ -46,17 +46,37 @@ spec token chatId = do
         sendMessage token (SendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)" (Just Markdown) Nothing Nothing)
       (text m) `shouldBe` (Just "text bold italic github")
 
-  describe "/sendSticker" $ do
-    it "should send sticker" $ do
-      Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
-        sendSticker token (SendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI" Nothing)
-      (sticker_file_id sticker) `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
-
   describe "/forwardMessage" $ do
     it "should forward message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         forwardMessage token (ForwardMessageRequest chatId chatId 123)
       msg `shouldBe` "Bad Request"
+
+  describe "/sendPhoto" $ do
+    it "should return error message" $ do
+      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
+        sendPhoto token (SendPhotoRequest "" "photo_id" (Just "photo caption") Nothing)
+      msg `shouldBe` "Bad Request"
+    it "should send photo" $ do
+      Right MessageResponse { message_result = Message { caption = Just cpt } } <-
+        sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing)
+      cpt `shouldBe` "photo caption"
+
+  describe "/sendAudio" $ do
+    it "should return error message" $ do
+      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
+        sendAudio token (SendAudioRequest "" "audio_id" Nothing (Just "performer") (Just "title") Nothing)
+      msg `shouldBe` "Bad Request"
+--         it "should send audio" $ do
+--           Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
+--             sendAudio token (SendAudioRequest chatId "audio_id" Nothing (Just "performer") (Just "my title 1") Nothing)
+--           title `shouldBe` "my title 1"
+
+  describe "/sendSticker" $ do
+    it "should send sticker" $ do
+      Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
+        sendSticker token (SendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI" Nothing)
+      (sticker_file_id sticker) `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
 
   describe "/sendLocation" $ do
     it "should send location" $ do

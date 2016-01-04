@@ -10,8 +10,13 @@
 module Web.Telegram.API.Bot.Requests
     ( -- * Types
       SendMessageRequest           (..)
-    , SendStickerRequest           (..)
     , ForwardMessageRequest        (..)
+    , SendPhotoRequest             (..)
+    , SendAudioRequest             (..)
+    , SendDocumentRequest          (..)
+    , SendStickerRequest           (..)
+    , SendVideoRequest             (..)
+    , SendVoiceRequest             (..)
     , SendLocationRequest          (..)
     , SendChatActionRequest        (..)
     , ParseMode                    (..)
@@ -68,6 +73,38 @@ instance ToJSON ForwardMessageRequest where
 instance FromJSON ForwardMessageRequest where
   parseJSON = parseJsonDrop 8
 
+-- | This object represents request for 'sendPhoto'
+data SendPhotoRequest = SendPhotoRequest
+  {
+    photo_chat_id             :: Text
+  , photo_photo               :: Text
+  , photo_caption             :: Maybe Text
+  , photo_reply_to_message_id :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON SendPhotoRequest where
+  toJSON = toJsonDrop 6
+
+instance FromJSON SendPhotoRequest where
+  parseJSON = parseJsonDrop 6
+
+-- | This object represents request for 'sendAudio'
+data SendAudioRequest = SendAudioRequest
+  {
+    _audio_chat_id             :: Text
+  , _audio_audio               :: Text
+  , _audio_duration            :: Maybe Int
+  , _audio_performer           :: Maybe Text
+  , _audio_title               :: Maybe Text
+  , _audio_reply_to_message_id :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON SendAudioRequest where
+  toJSON = toJsonDrop 7
+
+instance FromJSON SendAudioRequest where
+  parseJSON = parseJsonDrop 7
+
 -- | This object represents request for 'sendSticker'
 data SendStickerRequest = SendStickerRequest
   {
@@ -81,6 +118,51 @@ instance ToJSON SendStickerRequest where
 
 instance FromJSON SendStickerRequest where
   parseJSON = parseJsonDrop 8
+
+-- | This object represents request for 'sendDocument'
+data SendDocumentRequest = SendDocumentRequest
+  {
+    document_chat_id                  :: Text
+  , document_document                 :: Text
+  , document_reply_to_message_id      :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON SendDocumentRequest where
+  toJSON = toJsonDrop 9
+
+instance FromJSON SendDocumentRequest where
+  parseJSON = parseJsonDrop 9
+
+-- | This object represents request for 'sendVideo'
+data SendVideoRequest = SendVideoRequest
+  {
+    _video_chat_id                  :: Text
+  , _video_video                    :: Text
+  , _video_duration                 :: Maybe Int
+  , _video_caption                  :: Maybe Text
+  , _video_reply_to_message_id      :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON SendVideoRequest where
+  toJSON = toJsonDrop 7
+
+instance FromJSON SendVideoRequest where
+  parseJSON = parseJsonDrop 7
+
+-- | This object represents request for 'sendVoice'
+data SendVoiceRequest = SendVoiceRequest
+  {
+    _voice_chat_id                  :: Text
+  , _voice_voice                    :: Text
+  , _voice_duration                 :: Maybe Int
+  , _voice_reply_to_message_id      :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON SendVoiceRequest where
+  toJSON = toJsonDrop 7
+
+instance FromJSON SendVoiceRequest where
+  parseJSON = parseJsonDrop 7
 
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest

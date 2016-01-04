@@ -1,10 +1,10 @@
 # telegram-api
 
+![Build Status](https://img.shields.io/circleci/project/klappvisor/haskell-telegram-api.svg)
 ![Hackage](https://img.shields.io/hackage/v/haskell-telegram-api.svg)
 ![Hackage Dependencies](https://img.shields.io/hackage-deps/v/telegram-api.svg)
 ![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
-![Build Status](https://img.shields.io/circleci/project/klappvisor/haskell-telegram-api.svg)
 
 High-level bindings to the [Telegram Bots API][telegram-bot-api] based on [servant][servant] library. 
 Currently supports only one way of receiving updates based on [`getUpdates`](https://core.telegram.org/bots/api#getupdates) method.

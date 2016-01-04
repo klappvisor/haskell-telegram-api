@@ -75,6 +75,12 @@ data Chat = Chat
   , chat_last_name :: Maybe Text  -- ^ Last name of the other party in a private chat
   } deriving (Show, Generic)
 
+instance ToJSON Chat where
+  toJSON = toJsonDrop 5
+
+instance FromJSON Chat where
+  parseJSON = parseJsonDrop 5
+
 -- | Type of chat.
 data ChatType = Private
               | Group
@@ -92,12 +98,6 @@ instance FromJSON ChatType where
   parseJSON "group"      = pure Group
   parseJSON "supergroup" = pure Supergroup
   parseJSON "channel"    = pure Channel
-
-instance ToJSON Chat where
-  toJSON = toJsonDrop 5
-
-instance FromJSON Chat where
-  parseJSON = parseJsonDrop 5
 
 -- | This object represents one size of a photo or a 'File' / 'Sticker' thumbnail.
 data PhotoSize = PhotoSize
