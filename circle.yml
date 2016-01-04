@@ -1,15 +1,14 @@
-machine:
-  ghc:
-    version: 7.10.2
+dependencies:
+  cache_directories:
+    - "~/.stack"
+  pre:
+    - wget https://github.com/commercialhaskell/stack/releases/download/v0.1.2.0/stack-0.1.2.0-x86_64-linux.gz -O /tmp/stack.gz
+    - gunzip /tmp/stack.gz && chmod +x /tmp/stack
+    - sudo mv /tmp/stack /usr/bin/stack
+  override:
+    - stack setup
+    - stack build
 
 test:
-  cache_directories:
-    - "dist"
-    - "~/.cabal"
-  pre:
-    - cabal update
-    - cabal install --only-dependencies
   override:
-    - cabal configure
-    - cabal build
-    - cabal test
+    - stack test
