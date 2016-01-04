@@ -6,7 +6,7 @@
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 ![Build Status](https://img.shields.io/circleci/project/dmjio/telegram-api.svg)
 
-High-level, bindings to the [Telegram Bots API][telegram-bot-api] based on [servant][servant].
+High-level, bindings to the [Telegram Bots API][telegram-bot-api] based on [servant][servant] library.
 
 ## Usage
 

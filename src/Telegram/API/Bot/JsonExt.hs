@@ -6,6 +6,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE FlexibleContexts  #-}
 
+-- | This module contains helper functions to work with JSON
 module Telegram.API.Bot.JsonExt
     (
       toJsonDrop,
@@ -17,7 +18,7 @@ import           Data.Aeson.Types
 import           GHC.Generics
 import           GHC.TypeLits
 
-
+-- |
 toJsonDrop prefix = genericToJSON defaultOptions {
     fieldLabelModifier = drop prefix
   , omitNothingFields = True

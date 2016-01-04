@@ -5,6 +5,7 @@
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
+-- | This module provides Telegram Bot API
 module Telegram.API.Bot
   (
     module Telegram.API.Bot.API

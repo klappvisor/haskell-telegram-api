@@ -6,6 +6,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE FlexibleContexts  #-}
 
+-- | This module contains data objects which represents requests to Telegram Bot API
 module Telegram.API.Bot.Requests
     ( -- * Types
       SendMessageRequest           (..)
@@ -27,6 +28,7 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Telegram.API.Bot.JsonExt
 
+-- | Parse mode for text message
 data ParseMode = Markdown deriving (Show, Generic)
 
 instance ToJSON ParseMode where
@@ -36,7 +38,7 @@ instance FromJSON ParseMode where
   parseJSON "Markdown" = pure $ Markdown
   parseJSON _          = fail "Failed to parse ParseMode"
 
--- Send Message
+-- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
   {
     message_chat_id                  :: Text
@@ -52,7 +54,7 @@ instance ToJSON SendMessageRequest where
 instance FromJSON SendMessageRequest where
   parseJSON = parseJsonDrop 8
 
--- Forward Message
+-- | This object represents request for 'forwardMessage'
 data ForwardMessageRequest = ForwardMessageRequest
   {
     forward_chat_id :: Text
@@ -66,8 +68,7 @@ instance ToJSON ForwardMessageRequest where
 instance FromJSON ForwardMessageRequest where
   parseJSON = parseJsonDrop 8
 
--- Send Sticker
-
+-- | This object represents request for 'sendSticker'
 data SendStickerRequest = SendStickerRequest
   {
     sticker_chat_id                  :: Text
@@ -81,8 +82,7 @@ instance ToJSON SendStickerRequest where
 instance FromJSON SendStickerRequest where
   parseJSON = parseJsonDrop 8
 
--- Send Location
-
+-- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
   {
     location_chat_id :: Text
@@ -97,8 +97,7 @@ instance ToJSON SendLocationRequest where
 instance FromJSON SendLocationRequest where
   parseJSON = parseJsonDrop 9
 
--- Send Chat Actions
-
+-- | Type of action to broadcast.
 data ChatAction = Typing
                 | UploadPhoto
                 | RecordVideo
@@ -128,6 +127,7 @@ instance FromJSON ChatAction where
   parseJSON "upload_cocument" = pure UploadDocument
   parseJSON "find_location"   = pure FindLocation
 
+-- | This object represents request for 'sendChatAction'
 data SendChatActionRequest = SendChatActionRequest
   {
     action_chat_id :: Text

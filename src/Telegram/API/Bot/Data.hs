@@ -5,6 +5,7 @@
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
+-- | This module contains objects which represent data of Telegram Bot API responses
 module Telegram.API.Bot.Data
     ( -- * Types
       User       (..)
@@ -78,7 +79,7 @@ instance ToJSON Chat where
 instance FromJSON Chat where
   parseJSON = parseJsonDrop 5
 
--- | This object represents one size of a photo or a `File` / `Sticker` thumbnail.
+-- | This object represents one size of a photo or a 'File' / 'Sticker' thumbnail.
 data PhotoSize = PhotoSize
   {
     photo_file_id   :: Text
@@ -110,7 +111,7 @@ instance ToJSON Audio where
 instance FromJSON Audio where
   parseJSON = parseJsonDrop 6
 
--- | This object represents a general file (as opposed to `PhotoSize`, `Voice` messages and `Audio` files).
+-- | This object represents a general file (as opposed to 'PhotoSize', 'Voice' messages and 'Audio' files).
 data Document = Document
   {
     doc_file_id   :: Text
