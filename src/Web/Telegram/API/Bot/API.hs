@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Telegram.API.Bot.API
+module Web.Telegram.API.Bot.API
   ( -- * Functions
     getMe
   , sendMessage
@@ -33,9 +33,9 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Servant.API
 import           Servant.Client
-import           Telegram.API.Bot.Data
-import           Telegram.API.Bot.Responses
-import           Telegram.API.Bot.Requests
+import           Web.Telegram.API.Bot.Data
+import           Web.Telegram.API.Bot.Responses
+import           Web.Telegram.API.Bot.Requests
 
 -- | Telegram Bot's Token
 newtype Token = Token Text

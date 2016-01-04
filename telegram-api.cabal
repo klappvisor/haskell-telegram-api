@@ -15,11 +15,11 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Telegram.API.Bot
-                     , Telegram.API.Bot.API
-                     , Telegram.API.Bot.Data
-                     , Telegram.API.Bot.Responses
-                     , Telegram.API.Bot.Requests
+  exposed-modules:     Web.Telegram.API.Bot
+                     , Web.Telegram.API.Bot.API
+                     , Web.Telegram.API.Bot.Data
+                     , Web.Telegram.API.Bot.Responses
+                     , Web.Telegram.API.Bot.Requests
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , servant

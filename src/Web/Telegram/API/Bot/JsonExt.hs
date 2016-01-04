@@ -7,7 +7,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 
 -- | This module contains helper functions to work with JSON
-module Telegram.API.Bot.JsonExt
+module Web.Telegram.API.Bot.JsonExt
     (
       toJsonDrop,
       parseJsonDrop

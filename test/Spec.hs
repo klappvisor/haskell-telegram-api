@@ -8,7 +8,7 @@
 module Main (main) where
 
 import           Control.Monad
-import           Telegram.API.Bot
+import           Web.Telegram.API.Bot
 import           Test.Hspec
 import           Data.Text (Text)
 import qualified Data.Text as T

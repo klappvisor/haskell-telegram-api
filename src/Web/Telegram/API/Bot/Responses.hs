@@ -7,7 +7,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 
 -- | This module contains responses from Telegram Bot API
-module Telegram.API.Bot.Responses
+module Web.Telegram.API.Bot.Responses
     ( -- * Types
       GetMeResponse           (..)
     , MessageResponse         (..)
@@ -23,8 +23,8 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
 import           GHC.TypeLits
-import           Telegram.API.Bot.Data
-import           Telegram.API.Bot.JsonExt
+import           Web.Telegram.API.Bot.Data
+import           Web.Telegram.API.Bot.JsonExt
 
 -- | This object represents 'getMe' response
 data GetMeResponse = GetMeResponse

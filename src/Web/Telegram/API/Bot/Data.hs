@@ -6,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 -- | This module contains objects which represent data of Telegram Bot API responses
-module Telegram.API.Bot.Data
+module Web.Telegram.API.Bot.Data
     ( -- * Types
       User       (..)
     , Chat       (..)
@@ -30,7 +30,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
 import           GHC.TypeLits
-import           Telegram.API.Bot.JsonExt
+import           Web.Telegram.API.Bot.JsonExt
 
 -- | This object represents a Telegram user or bot.
 data User = User

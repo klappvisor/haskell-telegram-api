@@ -7,7 +7,7 @@
 {-# LANGUAGE FlexibleContexts  #-}
 
 -- | This module contains data objects which represents requests to Telegram Bot API
-module Telegram.API.Bot.Requests
+module Web.Telegram.API.Bot.Requests
     ( -- * Types
       SendMessageRequest           (..)
     , SendStickerRequest           (..)
@@ -26,7 +26,7 @@ import           Data.Text (Text)
 import qualified Data.Text as T
 import           GHC.Generics
 import           GHC.TypeLits
-import           Telegram.API.Bot.JsonExt
+import           Web.Telegram.API.Bot.JsonExt
 
 -- | Parse mode for text message
 data ParseMode = Markdown deriving (Show, Generic)
