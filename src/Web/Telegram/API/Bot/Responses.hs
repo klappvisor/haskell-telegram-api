@@ -9,11 +9,12 @@
 -- | This module contains responses from Telegram Bot API
 module Web.Telegram.API.Bot.Responses
     ( -- * Types
-      GetMeResponse           (..)
-    , MessageResponse         (..)
-    , ChatActionResponse      (..)
-    , UpdatesResponse         (..)
-    , FileResponse         (..)
+      GetMeResponse             (..)
+    , MessageResponse           (..)
+    , ChatActionResponse        (..)
+    , UpdatesResponse           (..)
+    , FileResponse              (..)
+    , UserProfilePhotosResponse (..)
     ) where
 
 import           Data.Aeson
@@ -75,7 +76,7 @@ instance ToJSON UpdatesResponse where
 instance FromJSON UpdatesResponse where
   parseJSON = parseJsonDrop 7
 
--- | This object represents message response
+-- | This object represents file response
 data FileResponse = FileResponse
   {
     file_result :: File
@@ -86,3 +87,15 @@ instance ToJSON FileResponse where
 
 instance FromJSON FileResponse where
   parseJSON = parseJsonDrop 5
+
+-- | This object represents user profile photos response
+data UserProfilePhotosResponse = UserProfilePhotosResponse
+  {
+    photos_result :: UserProfilePhotos
+  } deriving (Show, Generic)
+
+instance ToJSON UserProfilePhotosResponse where
+  toJSON = toJsonDrop 7
+
+instance FromJSON UserProfilePhotosResponse where
+  parseJSON = parseJsonDrop 7

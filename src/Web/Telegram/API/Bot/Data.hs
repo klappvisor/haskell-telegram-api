@@ -8,20 +8,21 @@
 -- | This module contains objects which represent data of Telegram Bot API responses
 module Web.Telegram.API.Bot.Data
     ( -- * Types
-      User       (..)
-    , Chat       (..)
-    , Message    (..)
-    , PhotoSize  (..)
-    , Audio      (..)
-    , Document   (..)
-    , Sticker    (..)
-    , Video      (..)
-    , Voice      (..)
-    , Contact    (..)
-    , Location   (..)
-    , Update     (..)
-    , File       (..)
-    , ChatType   (..)
+      User              (..)
+    , Chat              (..)
+    , Message           (..)
+    , PhotoSize         (..)
+    , Audio             (..)
+    , Document          (..)
+    , Sticker           (..)
+    , Video             (..)
+    , Voice             (..)
+    , Contact           (..)
+    , Location          (..)
+    , Update            (..)
+    , File              (..)
+    , UserProfilePhotos (..)
+    , ChatType          (..)
     ) where
 
 import           Data.Aeson
@@ -222,6 +223,13 @@ data File = File
   , file_size :: Maybe Int  -- ^ File size, if known
   , file_path :: Maybe Text -- ^ File path. Use @https://api.telegram.org/file/bot<token>/<file_path>@ to get the file.
   } deriving (FromJSON, ToJSON, Show, Generic)
+
+-- | This object represent a user's profile pictures.
+data UserProfilePhotos = UserProfilePhotos
+  {
+    total_count :: Int      -- ^ Total number of profile pictures the target user has
+  , photos :: [[PhotoSize]] -- ^ Requested profile pictures (in up to 4 sizes each)
+  }  deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a message.
 data Message = Message

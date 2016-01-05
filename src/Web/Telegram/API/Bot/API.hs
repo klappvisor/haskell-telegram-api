@@ -20,6 +20,7 @@ module Web.Telegram.API.Bot.API
   , sendChatAction
   , getUpdates
   , getFile
+  , getUserProfilePhotos
     -- * API
   , TelegramBotAPI
   , api
@@ -98,24 +99,30 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "getFile"
          :> QueryParam "file_id" Text
          :> Get '[JSON] FileResponse
+    :<|> TelegramToken :> "getUserProfilePhotos"
+         :> QueryParam "user_id" Int
+         :> QueryParam "offset" Int
+         :> QueryParam "limit" Int
+         :> Get '[JSON] UserProfilePhotosResponse
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
 api = Proxy
 
-getMe_          :: Token -> EitherT ServantError IO GetMeResponse
-sendMessage_    :: Token -> SendMessageRequest -> EitherT ServantError IO MessageResponse
-forwardMessage_ :: Token -> ForwardMessageRequest -> EitherT ServantError IO MessageResponse
-sendPhoto_      :: Token -> SendPhotoRequest -> EitherT ServantError IO MessageResponse
-sendAudio_      :: Token -> SendAudioRequest -> EitherT ServantError IO MessageResponse
-sendDocument_   :: Token -> SendDocumentRequest -> EitherT ServantError IO MessageResponse
-sendSticker_    :: Token -> SendStickerRequest -> EitherT ServantError IO MessageResponse
-sendVideo_      :: Token -> SendVideoRequest -> EitherT ServantError IO MessageResponse
-sendVoice_      :: Token -> SendVoiceRequest -> EitherT ServantError IO MessageResponse
-sendLocation_   :: Token -> SendLocationRequest -> EitherT ServantError IO MessageResponse
-sendChatAction_ :: Token -> SendChatActionRequest -> EitherT ServantError IO ChatActionResponse
-getUpdates_     :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UpdatesResponse
-getFile_        :: Token -> Maybe Text -> EitherT ServantError IO FileResponse
+getMe_                :: Token -> EitherT ServantError IO GetMeResponse
+sendMessage_          :: Token -> SendMessageRequest -> EitherT ServantError IO MessageResponse
+forwardMessage_       :: Token -> ForwardMessageRequest -> EitherT ServantError IO MessageResponse
+sendPhoto_            :: Token -> SendPhotoRequest -> EitherT ServantError IO MessageResponse
+sendAudio_            :: Token -> SendAudioRequest -> EitherT ServantError IO MessageResponse
+sendDocument_         :: Token -> SendDocumentRequest -> EitherT ServantError IO MessageResponse
+sendSticker_          :: Token -> SendStickerRequest -> EitherT ServantError IO MessageResponse
+sendVideo_            :: Token -> SendVideoRequest -> EitherT ServantError IO MessageResponse
+sendVoice_            :: Token -> SendVoiceRequest -> EitherT ServantError IO MessageResponse
+sendLocation_         :: Token -> SendLocationRequest -> EitherT ServantError IO MessageResponse
+sendChatAction_       :: Token -> SendChatActionRequest -> EitherT ServantError IO ChatActionResponse
+getUpdates_           :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UpdatesResponse
+getFile_              :: Token -> Maybe Text -> EitherT ServantError IO FileResponse
+getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UserProfilePhotosResponse
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -128,7 +135,8 @@ getMe_
   :<|> sendLocation_
   :<|> sendChatAction_
   :<|> getUpdates_
-  :<|> getFile_ =
+  :<|> getFile_
+  :<|> getUserProfilePhotos_ =
       client api
           (BaseUrl Https "api.telegram.org" 443)
 -- | A simple method for testing your bot's auth token. Requires no parameters.
@@ -186,3 +194,7 @@ getUpdates token offset limit timeout = runEitherT $ getUpdates_ token offset li
 
 getFile :: Token -> Text -> IO (Either ServantError FileResponse)
 getFile token file_id = runEitherT $ getFile_ token (Just file_id)
+
+-- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
+getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> IO (Either ServantError UserProfilePhotosResponse)
+getUserProfilePhotos token user_id offset limit = runEitherT $ getUserProfilePhotos_ token (Just user_id) offset limit

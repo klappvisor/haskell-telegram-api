@@ -110,9 +110,15 @@ spec token chatId = do
     it "should get file" $ do
       Right FileResponse { file_result = file } <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC"
-      putStrLn (show (file_path file))
+      (file_path file) `shouldBe` (Just "thumb/file_2")
 
     it "should return error" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm"
-      msg `shouldBe` "Bed Request"
+      msg `shouldBe` "Bad Request"
+
+  describe "/getUserProfilePhotos" $ do
+    it "should get user profile photos" $ do
+      Right UserProfilePhotosResponse { photos_result = photos } <-
+        getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing
+      (total_count photos) `shouldSatisfy` (> 0)
