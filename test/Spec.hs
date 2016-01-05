@@ -90,9 +90,13 @@ spec token chatId = do
       Right ChatActionResponse { action_result = res} <-
         sendChatAction token (SendChatActionRequest chatId Typing)
       res `shouldBe` True
-    it "should find location action" $ do
+    it "should set find location action" $ do
       Right ChatActionResponse { action_result = res} <-
         sendChatAction token (SendChatActionRequest chatId FindLocation)
+      res `shouldBe` True
+    it "should set upload photo action" $ do
+      Right ChatActionResponse { action_result = res} <-
+        sendChatAction token (SendChatActionRequest chatId UploadPhoto)
       res `shouldBe` True
 
   describe "/getUpdates" $ do
@@ -101,3 +105,14 @@ spec token chatId = do
         getUpdates token Nothing Nothing Nothing
       (length updates) `shouldSatisfy` (> 0)
       ((message_id . message) (head updates)) `shouldSatisfy` (> 0)
+
+  describe "/getFile" $ do
+    it "should get file" $ do
+      Right FileResponse { file_result = file } <-
+        getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC"
+      putStrLn (show (file_path file))
+
+    it "should return error" $ do
+      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
+        getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm"
+      msg `shouldBe` "Bed Request"

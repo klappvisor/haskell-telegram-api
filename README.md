@@ -67,21 +67,26 @@ Currently supported:
 * `getMe`
 * `sendMessage`
 * `forwardMessage`
-* `sendSticker` - without upload functionality
+* `sendPhoto` - without upload
+* `sendAudio` - without upload
+* `sendDocument` - without upload
+* `sendSticker` - without upload
+* `sendVideo` - without upload
+* `sendVoice` - without upload
 * `sendLocation`
 * `getUpdates`
+* `getFile`
 * `sendChatAction`
 
 To be done:
-* `sendPhoto` 
-* `sendAudio`
-* `sendDocument`
-* `sendSticker` - uploading stickers
-* `sendVideo`
-* `sendVoice`
+* `sendPhoto` - upload photo
+* `sendAudio` - upload audio
+* `sendDocument` - upload documents
+* `sendSticker` - upload stickers
+* `sendVideo` - upload video
+* `sendVoice` - upload voice
 * `getUserProfilePhotos`
 * `setWebhook`
-* `getFile`
 * `answerInlineQuery` inline bots
 
 

@@ -13,6 +13,7 @@ module Web.Telegram.API.Bot.Responses
     , MessageResponse         (..)
     , ChatActionResponse      (..)
     , UpdatesResponse         (..)
+    , FileResponse         (..)
     ) where
 
 import           Data.Aeson
@@ -73,3 +74,15 @@ instance ToJSON UpdatesResponse where
 
 instance FromJSON UpdatesResponse where
   parseJSON = parseJsonDrop 7
+
+-- | This object represents message response
+data FileResponse = FileResponse
+  {
+    file_result :: File
+  } deriving (Show, Generic)
+
+instance ToJSON FileResponse where
+  toJSON = toJsonDrop 5
+
+instance FromJSON FileResponse where
+  parseJSON = parseJsonDrop 5

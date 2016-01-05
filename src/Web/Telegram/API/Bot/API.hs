@@ -19,6 +19,7 @@ module Web.Telegram.API.Bot.API
   , sendLocation
   , sendChatAction
   , getUpdates
+  , getFile
     -- * API
   , TelegramBotAPI
   , api
@@ -94,6 +95,9 @@ type TelegramBotAPI =
          :> QueryParam "limit" Int
          :> QueryParam "timeout" Int
          :> Get '[JSON] UpdatesResponse
+    :<|> TelegramToken :> "getFile"
+         :> QueryParam "file_id" Text
+         :> Get '[JSON] FileResponse
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
@@ -111,6 +115,7 @@ sendVoice_      :: Token -> SendVoiceRequest -> EitherT ServantError IO MessageR
 sendLocation_   :: Token -> SendLocationRequest -> EitherT ServantError IO MessageResponse
 sendChatAction_ :: Token -> SendChatActionRequest -> EitherT ServantError IO ChatActionResponse
 getUpdates_     :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UpdatesResponse
+getFile_        :: Token -> Maybe Text -> EitherT ServantError IO FileResponse
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -122,9 +127,9 @@ getMe_
   :<|> sendVoice_
   :<|> sendLocation_
   :<|> sendChatAction_
-  :<|> getUpdates_ =
+  :<|> getUpdates_
+  :<|> getFile_ =
       client api
-  --      (BaseUrl Http "localhost" 8888)
           (BaseUrl Https "api.telegram.org" 443)
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
@@ -178,3 +183,6 @@ sendChatAction token request = runEitherT $ sendChatAction_ token request
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned.
 getUpdates :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> IO (Either ServantError UpdatesResponse)
 getUpdates token offset limit timeout = runEitherT $ getUpdates_ token offset limit timeout
+
+getFile :: Token -> Text -> IO (Either ServantError FileResponse)
+getFile token file_id = runEitherT $ getFile_ token (Just file_id)
