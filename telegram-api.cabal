@@ -1,8 +1,8 @@
 name:                telegram-api
-version:             0.1.0.0
+version:             0.1.0.1
 synopsis:            Telegram Bot API bindings
-description:         High-level bindings to the Telegram Bots API
-homepage:            http://github.com/klappvisor/telegram-api#readme
+description:         High-level bindings to the Telegram Bot API
+homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Alexey Rodiontsev
@@ -44,4 +44,4 @@ test-suite telegram-api-test
 
 source-repository head
   type:     git
-  location: https://github.com/klappvisor/telegram-api
+  location: https://github.com/klappvisor/haskell-telegram-api

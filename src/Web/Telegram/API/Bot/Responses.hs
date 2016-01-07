@@ -15,6 +15,7 @@ module Web.Telegram.API.Bot.Responses
     , UpdatesResponse           (..)
     , FileResponse              (..)
     , UserProfilePhotosResponse (..)
+    , SetWebhookResponse        (..)
     ) where
 
 import           Data.Aeson
@@ -99,3 +100,15 @@ instance ToJSON UserProfilePhotosResponse where
 
 instance FromJSON UserProfilePhotosResponse where
   parseJSON = parseJsonDrop 7
+
+-- | This object represents 'setWebhook' response
+data SetWebhookResponse = SetWebhookResponse
+  {
+    webhook_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON SetWebhookResponse where
+  toJSON = toJsonDrop 8
+
+instance FromJSON SetWebhookResponse where
+  parseJSON = parseJsonDrop 8

@@ -21,6 +21,7 @@ module Web.Telegram.API.Bot.API
   , getUpdates
   , getFile
   , getUserProfilePhotos
+  , setWebhook
     -- * API
   , TelegramBotAPI
   , api
@@ -104,6 +105,10 @@ type TelegramBotAPI =
          :> QueryParam "offset" Int
          :> QueryParam "limit" Int
          :> Get '[JSON] UserProfilePhotosResponse
+    :<|> TelegramToken :> "setWebhook"
+         :> QueryParam "url" Text
+         :> Get '[JSON]
+         SetWebhookResponse
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
@@ -123,6 +128,7 @@ sendChatAction_       :: Token -> SendChatActionRequest -> EitherT ServantError 
 getUpdates_           :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UpdatesResponse
 getFile_              :: Token -> Maybe Text -> EitherT ServantError IO FileResponse
 getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UserProfilePhotosResponse
+setWebhook_           :: Token -> Maybe Text -> EitherT ServantError IO SetWebhookResponse
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -136,7 +142,8 @@ getMe_
   :<|> sendChatAction_
   :<|> getUpdates_
   :<|> getFile_
-  :<|> getUserProfilePhotos_ =
+  :<|> getUserProfilePhotos_
+  :<|> setWebhook_ =
       client api
           (BaseUrl Https "api.telegram.org" 443)
 -- | A simple method for testing your bot's auth token. Requires no parameters.
@@ -198,3 +205,11 @@ getFile token file_id = runEitherT $ getFile_ token (Just file_id)
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
 getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> IO (Either ServantError UserProfilePhotosResponse)
 getUserProfilePhotos token user_id offset limit = runEitherT $ getUserProfilePhotos_ token (Just user_id) offset limit
+
+-- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+--
+--       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
+setWebhook :: Token
+    -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
+    -> IO (Either ServantError SetWebhookResponse)
+setWebhook token url = runEitherT $ setWebhook_ token url

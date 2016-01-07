@@ -77,6 +77,8 @@ Currently supported:
 * `getUpdates`
 * `getFile`
 * `sendChatAction`
+* `getUserProfilePhotos`
+* `setWebhook` - without uploading certificate
 
 To be done:
 * `sendPhoto` - upload photo
@@ -85,8 +87,7 @@ To be done:
 * `sendSticker` - upload stickers
 * `sendVideo` - upload video
 * `sendVoice` - upload voice
-* `getUserProfilePhotos`
-* `setWebhook`
+* `setWebhook` - upload certificate
 * `answerInlineQuery` inline bots
 
 

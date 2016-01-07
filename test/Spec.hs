@@ -110,7 +110,7 @@ spec token chatId = do
     it "should get file" $ do
       Right FileResponse { file_result = file } <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC"
-      (file_path file) `shouldBe` (Just "thumb/file_2")
+      (fmap (T.take 10) (file_path file)) `shouldBe` (Just "thumb/file")
 
     it "should return error" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
@@ -122,3 +122,14 @@ spec token chatId = do
       Right UserProfilePhotosResponse { photos_result = photos } <-
         getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing
       (total_count photos) `shouldSatisfy` (> 0)
+
+  describe "/setWebhook" $ do
+    it "should set webhook" $ do
+      Right SetWebhookResponse { webhook_result = res } <-
+        setWebhook token (Just "https://example.com/secret_token")
+      res `shouldBe` True
+
+    it "should remove webhook" $ do
+      Right SetWebhookResponse { webhook_result = res } <-
+        setWebhook token Nothing
+      res `shouldBe` True
