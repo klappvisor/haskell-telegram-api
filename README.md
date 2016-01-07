@@ -1,19 +1,19 @@
 # telegram-api
 
 ![Build Status](https://img.shields.io/circleci/project/klappvisor/haskell-telegram-api.svg)
-![Hackage](https://img.shields.io/hackage/v/haskell-telegram-api.svg)
+![Hackage](https://img.shields.io/hackage/v/telegram-api.svg)
 ![Hackage Dependencies](https://img.shields.io/hackage-deps/v/telegram-api.svg)
 ![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 
 High-level bindings to the [Telegram Bots API][telegram-bot-api] based on [servant][servant] library. 
 Currently supports only one way of receiving updates based on [`getUpdates`](https://core.telegram.org/bots/api#getupdates) method.
-Uploading stickers, documents, video, etc is not supported yet, so you can send items which are already uploaded on the Telegram servers.
+Uploading stickers, documents, video, etc is not supported yet, so you can only send items which are already uploaded on the Telegram servers.
 See list of supported methods below in TODO section.
 
 ## Usage
 
-`getMe` request example
+`getMe` example
 
 ```haskell
 import Control.Monad
@@ -31,7 +31,7 @@ main = do
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
 
-`sendMessage` request example
+`sendMessage` example
 
 ```haskell
 import Control.Monad
@@ -50,7 +50,7 @@ main = do
     T.putStrLn (text m)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
         chatId = "<chat_id> or <@channelusername>" 
-        message = "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)"
+        message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
 ```
 
 ## TODO
@@ -63,7 +63,8 @@ main = do
 
 ### Methods
 
-Currently supported:
+##### Currently supported:
+
 * `getMe`
 * `sendMessage`
 * `forwardMessage`
@@ -80,7 +81,8 @@ Currently supported:
 * `getUserProfilePhotos`
 * `setWebhook` - without uploading certificate
 
-To be done:
+##### To be done:
+
 * `sendPhoto` - upload photo
 * `sendAudio` - upload audio
 * `sendDocument` - upload documents
@@ -89,7 +91,6 @@ To be done:
 * `sendVoice` - upload voice
 * `setWebhook` - upload certificate
 * `answerInlineQuery` inline bots
-
 
 [telegram-bot-api]: https://core.telegram.org/bots/api
 [servant]: https://haskell-servant.github.io/

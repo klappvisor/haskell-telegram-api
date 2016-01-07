@@ -13,6 +13,9 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
+extra-source-files:
+  README.md
+
 library
   hs-source-dirs:      src
   exposed-modules:     Web.Telegram.API.Bot
@@ -20,6 +23,7 @@ library
                      , Web.Telegram.API.Bot.Data
                      , Web.Telegram.API.Bot.Responses
                      , Web.Telegram.API.Bot.Requests
+  other-modules:       Web.Telegram.API.Bot.JsonExt
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , servant
