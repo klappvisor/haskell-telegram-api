@@ -8,21 +8,24 @@
 -- | This module contains objects which represent data of Telegram Bot API responses
 module Web.Telegram.API.Bot.Data
     ( -- * Types
-      User              (..)
-    , Chat              (..)
-    , Message           (..)
-    , PhotoSize         (..)
-    , Audio             (..)
-    , Document          (..)
-    , Sticker           (..)
-    , Video             (..)
-    , Voice             (..)
-    , Contact           (..)
-    , Location          (..)
-    , Update            (..)
-    , File              (..)
-    , UserProfilePhotos (..)
-    , ChatType          (..)
+      User                          (..)
+    , Chat                          (..)
+    , Message                       (..)
+    , PhotoSize                     (..)
+    , Audio                         (..)
+    , Document                      (..)
+    , Sticker                       (..)
+    , Video                         (..)
+    , Voice                         (..)
+    , Contact                       (..)
+    , Location                      (..)
+    , Update                        (..)
+    , File                          (..)
+    , UserProfilePhotos             (..)
+    , InlineQuery                   (..)
+    , ChosenInlineResult            (..)
+    
+    , ChatType                      (..)
     ) where
 
 import           Data.Aeson
@@ -197,12 +200,43 @@ instance ToJSON Voice where
 instance FromJSON Voice where
   parseJSON = parseJsonDrop 6
 
+-- | This object represents an incoming inline query. When the user sends an empty query, your bot could return some default or trending results.
+data InlineQuery = InlineQuery
+  {
+    query_id        :: Text -- ^ Unique identifier for this query
+  , query_from      :: User -- ^ Sender
+  , query_query     :: Text -- ^ Text of the query
+  , query_offset    :: Text -- ^ Offset of the results to be returned, can be controlled by the bot
+  } deriving (Show, Generic)
+
+instance ToJSON InlineQuery where
+  toJSON = toJsonDrop 6
+
+instance FromJSON InlineQuery where
+  parseJSON = parseJsonDrop 6
+
+-- | This object represents a result of an inline query that was chosen by the user and sent to their chat partner.
+data ChosenInlineResult = ChosenInlineResult
+  {
+    chosen_result_id :: Text -- ^ Unique identifier for this query
+  , chosen_from      :: User -- ^ Sender
+  , chosen_query     :: Text -- ^ Text of the query
+  } deriving (Show, Generic)
+
+instance ToJSON ChosenInlineResult where
+  toJSON = toJsonDrop 7
+
+instance FromJSON ChosenInlineResult where
+  parseJSON = parseJsonDrop 7
+
 -- | This object represents an incoming update.
 -- Only one of the optional parameters can be present in any given update.
 data Update = Update
   {
-    update_id :: Int   -- ^ The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using 'setWebhooks', since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
-  , message :: Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
+    update_id            :: Int   -- ^ The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using 'setWebhooks', since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
+  , message              :: Maybe Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
+  , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
+  , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a point on the map.
