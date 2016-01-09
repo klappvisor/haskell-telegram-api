@@ -33,18 +33,33 @@ spec token chatId = do
   describe "/sendMessage" $ do
     it "should send message" $ do
       Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "test message" Nothing Nothing Nothing)
+        sendMessage token (SendMessageRequest chatId "test message" Nothing Nothing Nothing Nothing)
       (text m) `shouldBe` (Just "test message")
 
     it "should return error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing)
+        sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing Nothing)
       msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
       Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)" (Just Markdown) Nothing Nothing)
+        sendMessage token (SendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)" (Just Markdown) Nothing Nothing Nothing)
       (text m) `shouldBe` (Just "text bold italic github")
+
+    it "should set keyboard" $ do
+      Right MessageResponse { message_result = m } <-
+        sendMessage token (SendMessageRequest chatId "set keyboard" Nothing Nothing Nothing (Just (ReplyKeyboardMarkup [["A", "B"], ["C"]] Nothing Nothing Nothing)))
+      (text m) `shouldBe` (Just "set keyboard")
+
+    it "should remove keyboard" $ do
+      Right MessageResponse { message_result = m } <-
+        sendMessage token (SendMessageRequest chatId "remove keyboard" Nothing Nothing Nothing (Just (ReplyKeyboardHide True Nothing)))
+      (text m) `shouldBe` (Just "remove keyboard")
+
+    it "should force reply" $ do
+      Right MessageResponse { message_result = m } <-
+        sendMessage token (SendMessageRequest chatId "force reply" Nothing Nothing Nothing (Just (ForceReply True Nothing)))
+      (text m) `shouldBe` (Just "force reply")
 
   describe "/forwardMessage" $ do
     it "should forward message" $ do
@@ -55,17 +70,17 @@ spec token chatId = do
   describe "/sendPhoto" $ do
     it "should return error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendPhoto token (SendPhotoRequest "" "photo_id" (Just "photo caption") Nothing)
+        sendPhoto token (SendPhotoRequest "" "photo_id" (Just "photo caption") Nothing Nothing)
       msg `shouldBe` "Bad Request"
     it "should send photo" $ do
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing)
+        sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing Nothing)
       cpt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendAudio token (SendAudioRequest "" "audio_id" Nothing (Just "performer") (Just "title") Nothing)
+        sendAudio token (SendAudioRequest "" "audio_id" Nothing (Just "performer") (Just "title") Nothing Nothing)
       msg `shouldBe` "Bad Request"
 --         it "should send audio" $ do
 --           Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
@@ -75,13 +90,13 @@ spec token chatId = do
   describe "/sendSticker" $ do
     it "should send sticker" $ do
       Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
-        sendSticker token (SendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI" Nothing)
+        sendSticker token (SendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI" Nothing Nothing)
       (sticker_file_id sticker) `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
 
   describe "/sendLocation" $ do
     it "should send location" $ do
       Right MessageResponse { message_result = Message { location = Just loc } } <-
-        sendLocation token (SendLocationRequest chatId 52.38 4.9 Nothing)
+        sendLocation token (SendLocationRequest chatId 52.38 4.9 Nothing Nothing)
       (latitude loc) `shouldSatisfy` (liftM2 (&&) (> 52) (< 52.4))
       (longitude loc) `shouldSatisfy` (liftM2 (&&) (> 4.89) (< 5))
 
