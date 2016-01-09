@@ -243,7 +243,8 @@ instance FromJSON ChosenInlineResult where
   parseJSON = parseJsonDrop 7
 
 data InlineQueryResult =
-  InlineQueryResultArticle -- ^ Represents a link to an article or web page.
+  -- | Represents a link to an article or web page.
+  InlineQueryResultArticle
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 Bytes
   , iq_res_title                           :: Maybe Text -- ^ Title of the result
@@ -257,7 +258,8 @@ data InlineQueryResult =
   , iq_res_thumb_width                     :: Maybe Int -- ^ Thumbnail width
   , iq_res_thumb_height                    :: Maybe Int -- ^ Thumbnail height
   }
-  | InlineQueryResultPhoto -- ^ Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of photo.
+  -- | Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of photo.
+  | InlineQueryResultPhoto
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_photo_url                       :: Text -- ^ A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
@@ -271,7 +273,8 @@ data InlineQueryResult =
   , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
   , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
   }
-  | InlineQueryResultGif -- ^ Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+  -- | Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+  | InlineQueryResultGif
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_gif_url                         :: Text -- ^ A valid URL for the GIF file. File size must not exceed 1MB
@@ -284,7 +287,8 @@ data InlineQueryResult =
   , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
   , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
   }
-  | InlineQueryResultMpeg4Gif -- ^ Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+  -- | Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+  | InlineQueryResultMpeg4Gif
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_mpeg4_url                       :: Text -- ^ A valid URL for the MP4 file. File size must not exceed 1MB
@@ -297,7 +301,8 @@ data InlineQueryResult =
   , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
   , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
   }
-  | InlineQueryResultVideo -- ^ Represents link to a page containing an embedded video player or a video file.
+  -- | Represents link to a page containing an embedded video player or a video file.
+  | InlineQueryResultVideo
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_video_url                       :: Text -- ^ A valid URL for the embedded video player or video file
