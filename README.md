@@ -21,9 +21,7 @@ See list of supported methods below in TODO section.
 import Control.Monad
 import qualified Data.Text.IO as T
 import Data.Maybe
-import Telegram.API.Data
-import Telegram.API.Responses
-import Telegram.API.Bot
+import Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
@@ -39,10 +37,7 @@ main = do
 import Control.Monad
 import qualified Data.Text.IO as T
 import Data.Maybe
-import Telegram.API.Data
-import Telegram.API.Requests
-import Telegram.API.Responses
-import Telegram.API.Bot
+import Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
@@ -57,10 +52,7 @@ main = do
 
 ## TODO
 
-### General
-
 * `reply_markup` is skipped for all methods 
-* Inline mode is not supported yet
 * Uploading of Files, Documents, Stickers, etc
 
 ### Methods
