@@ -7,8 +7,10 @@
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 
 High-level bindings to the [Telegram Bots API][telegram-bot-api] based on [servant][servant] library. 
-Currently supports only one way of receiving updates based on [`getUpdates`](https://core.telegram.org/bots/api#getupdates) method.
-Uploading stickers, documents, video, etc is not supported yet, so you can only send items which are already uploaded on the Telegram servers.
+Both `getUpdates` request or webhook can be used to receive updates for your bot. 
+Inline mode is supported.
+Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
+
 See list of supported methods below in TODO section.
 
 ## Usage
@@ -80,6 +82,7 @@ main = do
 * `sendChatAction`
 * `getUserProfilePhotos`
 * `setWebhook` - without uploading certificate
+* `answerInlineQuery`
 
 ##### To be done:
 
@@ -90,7 +93,6 @@ main = do
 * `sendVideo` - upload video
 * `sendVoice` - upload voice
 * `setWebhook` - upload certificate
-* `answerInlineQuery` inline bots
 
 [telegram-bot-api]: https://core.telegram.org/bots/api
 [servant]: https://haskell-servant.github.io/

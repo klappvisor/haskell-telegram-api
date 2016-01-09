@@ -22,6 +22,7 @@ module Web.Telegram.API.Bot.API
   , getFile
   , getUserProfilePhotos
   , setWebhook
+  , answerInlineQuery
     -- * API
   , TelegramBotAPI
   , api
@@ -109,6 +110,9 @@ type TelegramBotAPI =
          :> QueryParam "url" Text
          :> Get '[JSON]
          SetWebhookResponse
+    :<|> TelegramToken :> "answerInlineQuery"
+         :> ReqBody '[JSON] AnswerInlineQueryRequest
+         :> Post '[JSON] InlineQueryResponse
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
@@ -129,6 +133,7 @@ getUpdates_           :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT
 getFile_              :: Token -> Maybe Text -> EitherT ServantError IO FileResponse
 getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UserProfilePhotosResponse
 setWebhook_           :: Token -> Maybe Text -> EitherT ServantError IO SetWebhookResponse
+answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> EitherT ServantError IO InlineQueryResponse
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -143,7 +148,8 @@ getMe_
   :<|> getUpdates_
   :<|> getFile_
   :<|> getUserProfilePhotos_
-  :<|> setWebhook_ =
+  :<|> setWebhook_
+  :<|> answerInlineQuery_ =
       client api
           (BaseUrl Https "api.telegram.org" 443)
 -- | A simple method for testing your bot's auth token. Requires no parameters.
@@ -199,6 +205,7 @@ sendChatAction token request = runEitherT $ sendChatAction_ token request
 getUpdates :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> IO (Either ServantError UpdatesResponse)
 getUpdates token offset limit timeout = runEitherT $ getUpdates_ token offset limit timeout
 
+-- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
 getFile :: Token -> Text -> IO (Either ServantError FileResponse)
 getFile token file_id = runEitherT $ getFile_ token (Just file_id)
 
@@ -213,3 +220,6 @@ setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url = runEitherT $ setWebhook_ token url
+
+answerInlineQuery :: Token -> AnswerInlineQueryRequest -> IO (Either ServantError InlineQueryResponse)
+answerInlineQuery token request = runEitherT $ answerInlineQuery_ token request

@@ -8,21 +8,25 @@
 -- | This module contains objects which represent data of Telegram Bot API responses
 module Web.Telegram.API.Bot.Data
     ( -- * Types
-      User              (..)
-    , Chat              (..)
-    , Message           (..)
-    , PhotoSize         (..)
-    , Audio             (..)
-    , Document          (..)
-    , Sticker           (..)
-    , Video             (..)
-    , Voice             (..)
-    , Contact           (..)
-    , Location          (..)
-    , Update            (..)
-    , File              (..)
-    , UserProfilePhotos (..)
-    , ChatType          (..)
+      User                          (..)
+    , Chat                          (..)
+    , Message                       (..)
+    , PhotoSize                     (..)
+    , Audio                         (..)
+    , Document                      (..)
+    , Sticker                       (..)
+    , Video                         (..)
+    , Voice                         (..)
+    , Contact                       (..)
+    , Location                      (..)
+    , Update                        (..)
+    , File                          (..)
+    , UserProfilePhotos             (..)
+    , InlineQuery                   (..)
+    , ChosenInlineResult            (..)
+    , InlineQueryResult             (..)
+    , ChatType                      (..)
+    , ParseMode                     (..)
     ) where
 
 import           Data.Aeson
@@ -31,8 +35,10 @@ import           Data.Maybe
 import           Data.Proxy
 import           Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Char as Char
 import           GHC.Generics
 import           GHC.TypeLits
+import           Data.List
 import           Web.Telegram.API.Bot.JsonExt
 
 -- | This object represents a Telegram user or bot.
@@ -99,6 +105,16 @@ instance FromJSON ChatType where
   parseJSON "group"      = pure Group
   parseJSON "supergroup" = pure Supergroup
   parseJSON "channel"    = pure Channel
+
+-- | Parse mode for text message
+data ParseMode = Markdown deriving (Show, Generic)
+
+instance ToJSON ParseMode where
+  toJSON Markdown = "Markdown"
+
+instance FromJSON ParseMode where
+  parseJSON "Markdown" = pure $ Markdown
+  parseJSON _          = fail "Failed to parse ParseMode"
 
 -- | This object represents one size of a photo or a 'File' / 'Sticker' thumbnail.
 data PhotoSize = PhotoSize
@@ -197,12 +213,131 @@ instance ToJSON Voice where
 instance FromJSON Voice where
   parseJSON = parseJsonDrop 6
 
+-- | This object represents an incoming inline query. When the user sends an empty query, your bot could return some default or trending results.
+data InlineQuery = InlineQuery
+  {
+    query_id        :: Text -- ^ Unique identifier for this query
+  , query_from      :: User -- ^ Sender
+  , query_query     :: Text -- ^ Text of the query
+  , query_offset    :: Text -- ^ Offset of the results to be returned, can be controlled by the bot
+  } deriving (Show, Generic)
+
+instance ToJSON InlineQuery where
+  toJSON = toJsonDrop 6
+
+instance FromJSON InlineQuery where
+  parseJSON = parseJsonDrop 6
+
+-- | This object represents a result of an inline query that was chosen by the user and sent to their chat partner.
+data ChosenInlineResult = ChosenInlineResult
+  {
+    chosen_result_id :: Text -- ^ Unique identifier for this query
+  , chosen_from      :: User -- ^ Sender
+  , chosen_query     :: Text -- ^ Text of the query
+  } deriving (Show, Generic)
+
+instance ToJSON ChosenInlineResult where
+  toJSON = toJsonDrop 7
+
+instance FromJSON ChosenInlineResult where
+  parseJSON = parseJsonDrop 7
+
+data InlineQueryResult =
+  InlineQueryResultArticle -- ^ Represents a link to an article or web page.
+  {
+    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_title                           :: Maybe Text -- ^ Title of the result
+  , iq_res_message_text                    :: Maybe Text -- ^ Text of the message to be sent
+  , iq_res_parse_mode                      :: Maybe ParseMode -- Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
+  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_url                             :: Maybe Text -- ^ URL of the result
+  , iq_res_hide_url                        :: Maybe Bool -- ^ Pass True, if you don't want the URL to be shown in the message
+  , iq_res_description                     :: Maybe Text -- ^ Short description of the result
+  , iq_res_thumb_url                       :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width                     :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height                    :: Maybe Int -- ^ Thumbnail height
+  }
+  | InlineQueryResultPhoto -- ^ Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of photo.
+  {
+    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_photo_url                       :: Text -- ^ A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
+  , iq_res_photo_width                     :: Maybe Int -- ^ Optional. Width of the photo
+  , iq_res_photo_height                    :: Maybe Int -- ^ Optional. Height of the photo
+  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail for the photo
+  , iq_res_title                           :: Maybe Text -- ^ Title for the result
+  , iq_res_description                     :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption                         :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
+  , iq_res_message_text                    :: Maybe Text -- ^ Text of a message to be sent instead of the photo, 1-512 characters
+  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
+  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  }
+  | InlineQueryResultGif -- ^ Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+  {
+    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_gif_url                         :: Text -- ^ A valid URL for the GIF file. File size must not exceed 1MB
+  , iq_res_gif_width                       :: Maybe Int -- ^ Width of the GIF
+  , iq_res_gif_height                      :: Maybe Int -- ^ Height of the GIF
+  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the static thumbnail for the result (jpeg or gif)
+  , iq_res_title                           :: Maybe Text -- ^ Title for the result
+  , iq_res_caption                         :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
+  , iq_res_message_text                    :: Maybe Text -- ^ Text of a message to be sent instead of the animation, 1-512 characters
+  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
+  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  }
+  | InlineQueryResultMpeg4Gif -- ^ Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
+  {
+    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_mpeg4_url                       :: Text -- ^ A valid URL for the MP4 file. File size must not exceed 1MB
+  , iq_res_mpeg4_width                     :: Maybe Int -- ^ Video width
+  , iq_res_mpeg4_height                    :: Maybe Int -- ^ Video height
+  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the static thumbnail (jpeg or gif) for the result
+  , iq_res_title                           :: Maybe Text -- ^ Title for the result
+  , iq_res_caption                         :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
+  , iq_res_message_text                    :: Maybe Text -- ^ Text of a message to be sent instead of the animation, 1-512 characters
+  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
+  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  }
+  | InlineQueryResultVideo -- ^ Represents link to a page containing an embedded video player or a video file.
+  {
+    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_video_url                       :: Text -- ^ A valid URL for the embedded video player or video file
+  , iq_res_mime_type                       :: Text -- ^ Mime type of the content of video url, “text/html” or “video/mp4”
+  , iq_res_message_text                    :: Maybe Text -- ^ Text of the message to be sent with the video, 1-512 characters
+  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
+  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_video_width                     :: Maybe Int -- ^ Video width
+  , iq_res_video_height                    :: Maybe Int -- ^ Video height
+  , iq_res_video_duration                  :: Maybe Int -- ^ Video duration in seconds
+  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the video
+  , iq_res_title                           :: Maybe Text -- ^ Title for the result
+  , iq_res_description                     :: Maybe Text -- ^ Short description of the result
+  } deriving (Show, Generic)
+
+tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
+tagModifier x = ((drop 17) . (fmap (Char.toLower))) x
+
+inlineQueryJSONOptions :: Options
+inlineQueryJSONOptions = defaultOptions {
+    fieldLabelModifier     = drop 7
+  , omitNothingFields      = True
+  , sumEncoding            = TaggedObject { tagFieldName = "type" }
+  , constructorTagModifier = tagModifier
+  }
+
+instance ToJSON InlineQueryResult where
+  toJSON = genericToJSON inlineQueryJSONOptions
+
+instance FromJSON InlineQueryResult where
+  parseJSON = genericParseJSON inlineQueryJSONOptions
+
 -- | This object represents an incoming update.
 -- Only one of the optional parameters can be present in any given update.
 data Update = Update
   {
-    update_id :: Int   -- ^ The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using 'setWebhooks', since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
-  , message :: Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
+    update_id            :: Int   -- ^ The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using 'setWebhooks', since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
+  , message              :: Maybe Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
+  , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
+  , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a point on the map.
