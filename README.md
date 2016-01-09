@@ -6,7 +6,7 @@
 ![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 
-High-level bindings to the [Telegram Bots API][telegram-bot-api] based on [servant][servant] library. 
+High-level bindings to the [Telegram Bot API][telegram-bot-api] based on [servant][servant] library. 
 Both `getUpdates` request or webhook can be used to receive updates for your bot. 
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
@@ -42,7 +42,7 @@ import Web.Telegram.API.Bot
 main :: IO ()
 main = do
   Right MessageResponse { message_result = m } <-
-    sendMessage token (SendMessageRequest chatId message (Just Markdown) Nothing Nothing)
+    sendMessage token (SendMessageRequest chatId message (Just Markdown) Nothing Nothing Nothing)
     T.putStrLn (message_id m)
     T.putStrLn (text m)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
@@ -52,7 +52,6 @@ main = do
 
 ## TODO
 
-* `reply_markup` is skipped for all methods 
 * Uploading of Files, Documents, Stickers, etc
 
 ### Methods

@@ -21,6 +21,7 @@ module Web.Telegram.API.Bot.Requests
     , SendChatActionRequest        (..)
     , ChatAction                   (..)
     , AnswerInlineQueryRequest     (..)
+    , ReplyKeyboard                (..)
     ) where
 
 import           Data.Aeson
@@ -37,11 +38,12 @@ import           Web.Telegram.API.Bot.Data
 -- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
   {
-    message_chat_id                  :: Text
-  , message_text                     :: Text
-  , message_parse_mode               :: Maybe ParseMode
-  , message_disable_web_page_preview :: Maybe Bool
-  , message_reply_to_message_id      :: Maybe Int
+    message_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , message_text                     :: Text -- ^ Text of the message to be sent
+  , message_parse_mode               :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message
+  , message_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in this message
+  , message_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , message_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendMessageRequest where
@@ -53,9 +55,9 @@ instance FromJSON SendMessageRequest where
 -- | This object represents request for 'forwardMessage'
 data ForwardMessageRequest = ForwardMessageRequest
   {
-    forward_chat_id :: Text
-  , forward_from_chat_id :: Text
-  , forward_mesage_id :: Int
+    forward_chat_id :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , forward_from_chat_id :: Text -- ^ Unique identifier for the chat where the original message was sent (or channel username in the format @@channelusername@)
+  , forward_mesage_id :: Int -- ^ Unique message identifier
   } deriving (Show, Generic)
 
 instance ToJSON ForwardMessageRequest where
@@ -67,10 +69,11 @@ instance FromJSON ForwardMessageRequest where
 -- | This object represents request for 'sendPhoto'
 data SendPhotoRequest = SendPhotoRequest
   {
-    photo_chat_id             :: Text
-  , photo_photo               :: Text
-  , photo_caption             :: Maybe Text
-  , photo_reply_to_message_id :: Maybe Int
+    photo_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , photo_photo               :: Text -- ^ Photo to send. Pass a file_id as String to resend a photo that is already on the Telegram servers
+  , photo_caption             :: Maybe Text -- ^ Photo caption (may also be used when resending photos by file_id), 0-200 characters.
+  , photo_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , photo_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendPhotoRequest where
@@ -82,12 +85,13 @@ instance FromJSON SendPhotoRequest where
 -- | This object represents request for 'sendAudio'
 data SendAudioRequest = SendAudioRequest
   {
-    _audio_chat_id             :: Text
-  , _audio_audio               :: Text
-  , _audio_duration            :: Maybe Int
-  , _audio_performer           :: Maybe Text
-  , _audio_title               :: Maybe Text
-  , _audio_reply_to_message_id :: Maybe Int
+    _audio_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _audio_audio               :: Text -- ^ Audio file to send. Pass a file_id as String to resend an audio that is already on the Telegram servers.
+  , _audio_duration            :: Maybe Int -- ^ Duration of the audio in seconds
+  , _audio_performer           :: Maybe Text -- ^ Performer
+  , _audio_title               :: Maybe Text -- ^ Track name
+  , _audio_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _audio_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendAudioRequest where
@@ -99,9 +103,10 @@ instance FromJSON SendAudioRequest where
 -- | This object represents request for 'sendSticker'
 data SendStickerRequest = SendStickerRequest
   {
-    sticker_chat_id                  :: Text
-  , sticker_sticker                  :: Text
-  , sticker_reply_to_message_id      :: Maybe Int
+    sticker_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , sticker_sticker                  :: Text -- ^ Sticker to send. A file_id as String to resend a sticker that is already on the Telegram servers
+  , sticker_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , sticker_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendStickerRequest where
@@ -113,9 +118,10 @@ instance FromJSON SendStickerRequest where
 -- | This object represents request for 'sendDocument'
 data SendDocumentRequest = SendDocumentRequest
   {
-    document_chat_id                  :: Text
-  , document_document                 :: Text
-  , document_reply_to_message_id      :: Maybe Int
+    document_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , document_document                 :: Text -- ^ File to send. A file_id as String to resend a file that is already on the Telegram servers
+  , document_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , document_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendDocumentRequest where
@@ -127,11 +133,12 @@ instance FromJSON SendDocumentRequest where
 -- | This object represents request for 'sendVideo'
 data SendVideoRequest = SendVideoRequest
   {
-    _video_chat_id                  :: Text
-  , _video_video                    :: Text
-  , _video_duration                 :: Maybe Int
-  , _video_caption                  :: Maybe Text
-  , _video_reply_to_message_id      :: Maybe Int
+    _video_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _video_video                    :: Text -- ^ Video to send. A file_id as String to resend a video that is already on the Telegram servers
+  , _video_duration                 :: Maybe Int -- ^ Duration of sent video in seconds
+  , _video_caption                  :: Maybe Text -- ^ Video caption, 0-200 characters.
+  , _video_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _video_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendVideoRequest where
@@ -143,10 +150,11 @@ instance FromJSON SendVideoRequest where
 -- | This object represents request for 'sendVoice'
 data SendVoiceRequest = SendVoiceRequest
   {
-    _voice_chat_id                  :: Text
-  , _voice_voice                    :: Text
-  , _voice_duration                 :: Maybe Int
-  , _voice_reply_to_message_id      :: Maybe Int
+    _voice_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _voice_voice                    :: Text -- ^ Audio file to send. A file_id as String to resend an audio that is already on the Telegram servers
+  , _voice_duration                 :: Maybe Int -- ^ Duration of sent audio in seconds
+  , _voice_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _voice_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendVoiceRequest where
@@ -158,10 +166,11 @@ instance FromJSON SendVoiceRequest where
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
   {
-    location_chat_id :: Text
-  , location_latitude :: Float
-  , location_longitude :: Float
-  , location_reply_to_message_id :: Maybe Int
+    location_chat_id                :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , location_latitude               :: Float -- ^ Latitude of location
+  , location_longitude              :: Float -- ^ Longitude of location
+  , location_reply_to_message_id    :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , location_reply_markup           :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendLocationRequest where
@@ -227,4 +236,32 @@ instance ToJSON AnswerInlineQueryRequest where
   toJSON = toJsonDrop 6
 
 instance FromJSON AnswerInlineQueryRequest where
+  parseJSON = parseJsonDrop 6
+
+data ReplyKeyboard =
+  -- | This object represents a custom keyboard with reply options
+  ReplyKeyboardMarkup
+  {
+    reply_keyboard             :: [[Text]] -- ^ Array of button rows, each represented by an Array of Strings
+  , reply_resize_keyboard      :: Maybe Bool -- ^ Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
+  , reply_one_time_keyboard    :: Maybe Bool -- ^ Requests clients to hide the keyboard as soon as it's been used. Defaults to false.
+  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select the new language. Other users in the group don’t see the keyboard.
+  }
+  -- | Upon receiving a message with this object, Telegram clients will hide the current custom keyboard and display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the user presses a button
+  | ReplyKeyboardHide
+  {
+    reply_hide_keyboard        :: Bool -- ^ Requests clients to hide the custom keyboard
+  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to hide keyboard for specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
+  }
+  -- | Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
+  | ForceReply
+  {
+    reply_force_reply          :: Bool -- ^ Shows reply interface to the user, as if they manually selected the bot‘s message and tapped ’Reply'
+  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to force reply from specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
+  } deriving (Show, Generic)
+
+instance ToJSON ReplyKeyboard where
+  toJSON = toJsonDrop 6
+
+instance FromJSON ReplyKeyboard where
   parseJSON = parseJsonDrop 6
