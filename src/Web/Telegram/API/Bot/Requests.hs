@@ -19,8 +19,8 @@ module Web.Telegram.API.Bot.Requests
     , SendVoiceRequest             (..)
     , SendLocationRequest          (..)
     , SendChatActionRequest        (..)
-    , ParseMode                    (..)
     , ChatAction                   (..)
+    , AnswerInlineQueryRequest     (..)
     ) where
 
 import           Data.Aeson
@@ -32,16 +32,7 @@ import qualified Data.Text as T
 import           GHC.Generics
 import           GHC.TypeLits
 import           Web.Telegram.API.Bot.JsonExt
-
--- | Parse mode for text message
-data ParseMode = Markdown deriving (Show, Generic)
-
-instance ToJSON ParseMode where
-  toJSON Markdown = "Markdown"
-
-instance FromJSON ParseMode where
-  parseJSON "Markdown" = pure $ Markdown
-  parseJSON _          = fail "Failed to parse ParseMode"
+import           Web.Telegram.API.Bot.Data
 
 -- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
@@ -221,3 +212,19 @@ instance ToJSON SendChatActionRequest where
 
 instance FromJSON SendChatActionRequest where
   parseJSON = parseJsonDrop 7
+
+
+data AnswerInlineQueryRequest = AnswerInlineQueryRequest
+  {
+    query_inline_query_id :: Text -- ^ Unique identifier for the answered query
+  , query_results         :: [InlineQueryResult] -- ^ A JSON-serialized array of results for the inline query
+  , query_cache_time      :: Maybe Int -- ^ The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300.
+  , query_is_personal     :: Maybe Bool -- ^ Pass True, if results may be cached on the server side only for the user that sent the query. By default, results may be returned to any user who sends the same query
+  , query_next_offset     :: Maybe Text -- ^ Pass the offset that a client should send in the next query with the same text to receive more results. Pass an empty string if there are no more results or if you don‘t support pagination. Offset length can’t exceed 64 bytes.
+  } deriving (Show, Generic)
+
+instance ToJSON AnswerInlineQueryRequest where
+  toJSON = toJsonDrop 6
+
+instance FromJSON AnswerInlineQueryRequest where
+  parseJSON = parseJsonDrop 6

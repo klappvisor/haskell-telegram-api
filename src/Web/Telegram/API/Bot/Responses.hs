@@ -16,6 +16,7 @@ module Web.Telegram.API.Bot.Responses
     , FileResponse              (..)
     , UserProfilePhotosResponse (..)
     , SetWebhookResponse        (..)
+    , InlineQueryResponse       (..)
     ) where
 
 import           Data.Aeson
@@ -68,7 +69,7 @@ instance FromJSON ChatActionResponse where
 -- | This object represents 'getUpdates' response
 data UpdatesResponse = UpdatesResponse
   {
-    update_result :: [Update  ]
+    update_result :: [Update]
   } deriving (Show, Generic)
 
 instance ToJSON UpdatesResponse where
@@ -112,3 +113,15 @@ instance ToJSON SetWebhookResponse where
 
 instance FromJSON SetWebhookResponse where
   parseJSON = parseJsonDrop 8
+
+-- | This object represents 'answerInlineQuery' response
+data InlineQueryResponse = InlineQueryResponse
+  {
+    query_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON InlineQueryResponse where
+  toJSON = toJsonDrop 6
+
+instance FromJSON InlineQueryResponse where
+  parseJSON = parseJsonDrop 6
