@@ -325,7 +325,7 @@ inlineQueryJSONOptions :: Options
 inlineQueryJSONOptions = defaultOptions {
     fieldLabelModifier     = drop 7
   , omitNothingFields      = True
-  , sumEncoding            = TaggedObject { tagFieldName = "type" }
+  , sumEncoding            = TaggedObject { tagFieldName = "type", contentsFieldName = undefined }
   , constructorTagModifier = tagModifier
   }
 
