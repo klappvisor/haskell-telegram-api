@@ -196,7 +196,7 @@ instance ToJSON ChatAction where
   toJSON UploadVideo    = "upload_video"
   toJSON RecordAudio    = "record_audio"
   toJSON UploadAudio    = "upload_audio"
-  toJSON UploadDocument = "upload_cocument"
+  toJSON UploadDocument = "upload_document"
   toJSON FindLocation   = "find_location"
 
 instance FromJSON ChatAction where
