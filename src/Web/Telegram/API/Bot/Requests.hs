@@ -206,7 +206,7 @@ instance FromJSON ChatAction where
   parseJSON "upload_video"    = pure UploadVideo
   parseJSON "record_audio"    = pure RecordAudio
   parseJSON "upload_audio"    = pure UploadAudio
-  parseJSON "upload_cocument" = pure UploadDocument
+  parseJSON "upload_document" = pure UploadDocument
   parseJSON "find_location"   = pure FindLocation
 
 -- | This object represents request for 'sendChatAction'
