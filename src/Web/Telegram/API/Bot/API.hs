@@ -54,7 +54,7 @@ instance ToText Token where
   toText (Token x) = x
 
 instance FromText Token where
-  fromText x = Just (Token (x))
+  fromText x = Just $ Token x
 
 -- | Type for token
 type TelegramToken = Capture ":token" Token
@@ -207,7 +207,7 @@ getUpdates token offset limit timeout = runEitherT $ getUpdates_ token offset li
 
 -- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
 getFile :: Token -> Text -> IO (Either ServantError FileResponse)
-getFile token file_id = runEitherT $ getFile_ token (Just file_id)
+getFile token file_id = runEitherT $ getFile_ token $ Just file_id
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
 getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> IO (Either ServantError UserProfilePhotosResponse)
@@ -225,4 +225,4 @@ answerInlineQuery :: Token -> AnswerInlineQueryRequest -> IO (Either ServantErro
 answerInlineQuery = run answerInlineQuery_
 
 run :: (Token -> a -> EitherT ServantError IO b) -> Token -> a -> IO (Either ServantError b)
-run e t r = runEitherT $ (e t r)
+run e t r = runEitherT $ e t r

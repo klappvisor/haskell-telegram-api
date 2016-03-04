@@ -1,5 +1,5 @@
 name:                telegram-api
-version:             0.2.1.0
+version:             0.2.1.1
 synopsis:            Telegram Bot API bindings
 description:         High-level bindings to the Telegram Bot API
 homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
@@ -36,6 +36,8 @@ test-suite telegram-api-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       MainSpec
+                     , InlineSpec
   build-depends:       base
                      , text
                      , hspec
