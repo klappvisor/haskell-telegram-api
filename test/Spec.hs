@@ -28,15 +28,17 @@ main = do
 runSpec :: [String] -> SpecWith ()
 runSpec [] = do
   describe "NoTests" $ do
-    it "Does not run integration tests if no token and chat id provided" $ do
+    it "Does not run integration tests if no token, chat id and boot name provided" $ do
       pending
 
-runSpec [tkn,cId] = do
+runSpec [tkn,cId,bNm] = do
     let token = Token (T.pack tkn)
     let chatId = T.pack cId
-    runSpec' token chatId
+    let botName = T.pack bNm
+    runSpec' token chatId botName
 
-runSpec' :: Token -> Text -> SpecWith ()
-runSpec' token chatId = do
-    describe "Main" $ MainSpec.spec token chatId
-    --describe "Inline" $ InlineSpec.spec token chatId
+runSpec' :: Token -> Text -> Text -> SpecWith ()
+runSpec' token chatId botName = do
+    describe "Main" $ MainSpec.spec token chatId botName
+    --describe "Inline" $ InlineSpec.spec token chatId botName
+

@@ -375,7 +375,7 @@ data UserProfilePhotos = UserProfilePhotos
 data Message = Message
   {
     message_id :: Int                     -- ^ Unique message identifier
-  , from :: User                          -- ^ Sender, can be empty for messages sent to channels
+  , from :: Maybe User                        -- ^ Sender, can be empty for messages sent to channels
   , date :: Int                           -- ^ Date the message was sent in Unix time
   , chat :: Chat                          -- ^ Conversation the message belongs to
   , forward_from :: Maybe User            -- ^ For forwarded messages, sender of the original message

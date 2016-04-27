@@ -10,6 +10,7 @@ module MainSpec (spec) where
 import           Control.Monad
 import           Web.Telegram.API.Bot
 import           Test.Hspec
+import           Data.Either (isRight, isLeft)
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Servant.Client
@@ -17,49 +18,61 @@ import           Servant.API
 import           Network.HTTP.Types.Status
 import           System.Environment
 
-spec :: Token -> Text -> Spec
-spec token chatId = do
+-- to print out remote response if response success not match
+success, nosuccess :: (Show a, Show b) =>Either a b ->Expectation
+success   e = e `shouldSatisfy` isRight
+nosuccess e = e `shouldSatisfy` isLeft
+
+spec :: Token -> Text -> Text -> Spec
+spec token chatId botName = do
   describe "/getMe" $ do
     it "responds with correct bot's name" $ do
       Right GetMeResponse { user_result = u } <-
         getMe token
-      (user_first_name u) `shouldBe` "TelegramAPIBot"
+      (user_first_name u) `shouldBe` botName -- "TelegramAPIBot"
 
   describe "/sendMessage" $ do
     it "should send message" $ do
-      Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "test message" Nothing Nothing Nothing Nothing)
+      res <-sendMessage token (SendMessageRequest chatId "test message" Nothing Nothing Nothing Nothing)
+      success res
+      let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "test message")
 
     it "should return error message" $ do
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing Nothing)
+      res <-sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing Nothing)
+      nosuccess res
+      let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
       msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
-      Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)" (Just Markdown) Nothing Nothing Nothing)
+      res <-sendMessage token (SendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)" (Just Markdown) Nothing Nothing Nothing)
+      success res
+      let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "text bold italic github")
 
     it "should set keyboard" $ do
-      Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "set keyboard" Nothing Nothing Nothing (Just (ReplyKeyboardMarkup [["A", "B"], ["C"]] Nothing Nothing Nothing)))
+      res <-sendMessage token (SendMessageRequest chatId "set keyboard" Nothing Nothing Nothing (Just (ReplyKeyboardMarkup [["A", "B"], ["C"]] Nothing Nothing Nothing)))
+      success res
+      let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "set keyboard")
 
     it "should remove keyboard" $ do
-      Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "remove keyboard" Nothing Nothing Nothing (Just (ReplyKeyboardHide True Nothing)))
+      res <-sendMessage token (SendMessageRequest chatId "remove keyboard" Nothing Nothing Nothing (Just (ReplyKeyboardHide True Nothing)))
+      success res
+      let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "remove keyboard")
 
     it "should force reply" $ do
-      Right MessageResponse { message_result = m } <-
-        sendMessage token (SendMessageRequest chatId "force reply" Nothing Nothing Nothing (Just (ForceReply True Nothing)))
+      res <-sendMessage token (SendMessageRequest chatId "force reply" Nothing Nothing Nothing (Just (ForceReply True Nothing)))
+      success res
+      let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "force reply")
 
   describe "/forwardMessage" $ do
     it "should forward message" $ do
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        forwardMessage token (ForwardMessageRequest chatId chatId 123)
+      res <-forwardMessage token (ForwardMessageRequest chatId chatId 123)
+      nosuccess res
+      let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
       msg `shouldBe` "Bad Request"
 
   describe "/sendPhoto" $ do
