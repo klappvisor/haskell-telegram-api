@@ -11,4 +11,4 @@ dependencies:
 
 test:
   override:
-    - stack test --test-arguments "$BOT_TOKEN $CHAT_ID"
+    - stack test --test-arguments "$BOT_TOKEN $CHAT_ID $BOT_NAME"
