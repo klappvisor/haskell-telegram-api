@@ -2,7 +2,7 @@ dependencies:
   cache_directories:
     - "~/.stack"
   pre:
-    - wget https://github.com/commercialhaskell/stack/releases/download/v0.1.2.0/stack-0.1.2.0-x86_64-linux.gz -O /tmp/stack.gz
+    - wget https://github.com/commercialhaskell/stack/releases/download/v1.1.0/stack-1.1.0-linux-x86_64.tar.gz -O /tmp/stack.gz
     - gunzip /tmp/stack.gz && chmod +x /tmp/stack
     - sudo mv /tmp/stack /usr/bin/stack
   override:
@@ -18,7 +18,4 @@ deployment:
     branch: master
     commands:
       - stack sdist
-
-general:
-  artifacts:
-    - ".stack-work/dist/"
+      - mv .stack-work/dist/**/*.tar.gz $CIRCLE_ARTIFACT
