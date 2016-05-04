@@ -12,3 +12,13 @@ dependencies:
 test:
   override:
     - stack test --test-arguments "$BOT_TOKEN $CHAT_ID $BOT_NAME"
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - stack sdist
+
+general:
+  artifacts:
+    - ".stack-work/dist/"
