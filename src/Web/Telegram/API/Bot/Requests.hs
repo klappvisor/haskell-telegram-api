@@ -208,6 +208,7 @@ instance FromJSON ChatAction where
   parseJSON "upload_audio"    = pure UploadAudio
   parseJSON "upload_document" = pure UploadDocument
   parseJSON "find_location"   = pure FindLocation
+  parseJSON _                 = fail "Failed to parse ChatAction"
 
 -- | This object represents request for 'sendChatAction'
 data SendChatActionRequest = SendChatActionRequest

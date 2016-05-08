@@ -105,6 +105,7 @@ instance FromJSON ChatType where
   parseJSON "group"      = pure Group
   parseJSON "supergroup" = pure Supergroup
   parseJSON "channel"    = pure Channel
+  parseJSON _            = fail "Failed to parse ChatType"
 
 -- | Parse mode for text message
 data ParseMode = Markdown deriving (Show, Generic)
