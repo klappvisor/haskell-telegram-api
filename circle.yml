@@ -7,6 +7,7 @@ dependencies:
     - sudo mv /tmp/stack-**/stack /usr/bin/stack
   override:
     - stack setup
+    - stack clean
     - stack build
 
 test:
