@@ -27,7 +27,7 @@ main :: IO ()
 main = do
   Right GetMeResponse { user_result = u } <-
     getMe token
-    T.putStrLn (user_first_name u)
+  T.putStrLn (user_first_name u)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
 
@@ -43,8 +43,8 @@ main :: IO ()
 main = do
   Right MessageResponse { message_result = m } <-
     sendMessage token (SendMessageRequest chatId message (Just Markdown) Nothing Nothing Nothing)
-    T.putStrLn (message_id m)
-    T.putStrLn (text m)
+  T.putStrLn (message_id m)
+  T.putStrLn (text m)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
         chatId = "<chat_id> or <@channelusername>" 
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
