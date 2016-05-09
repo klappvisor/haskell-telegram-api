@@ -50,6 +50,38 @@ main = do
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
 ```
 
+## Contribution
+
+Contributions are welcome!
+1. Fork repository
+2. Do some changes
+3. Create pull request
+4. Wait for CI build and review
+5. ??????
+6. PROFIT
+
+You can use `stack` to build project
+
+```
+stack build
+```
+
+To run test you have to create your own bot.
+
+```
+stack test --test-arguments "$BOT_TOKEN $CHAT_ID $BOT_NAME"
+```
+
+where
+
+* `$BOT_TOKEN` is token obtained from BotFather with prefix `bot<token from BotFather>`
+* `$CHAT_ID` can be id of your chat with your bot. Send some message to this chat in Telegram and do `curl "https://api.telegram.org/bot<replace_with_token>/getUpdates"`, you have to parse some JSON with your brain ;-) or any other suitable tool and you will find chat id there.
+* `$BOT_NAME` name of your bot
+
+Note: Inline Spec is disabled for now...
+
+If everything is fine after test you will see receive a few new messages from your bot.
+
 ## TODO
 
 * Uploading of Files, Documents, Stickers, etc
