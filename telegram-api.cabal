@@ -23,6 +23,7 @@ library
                      , Web.Telegram.API.Bot.Data
                      , Web.Telegram.API.Bot.Responses
                      , Web.Telegram.API.Bot.Requests
+                     , Servant.Client.MultipartFormData
   other-modules:       Web.Telegram.API.Bot.JsonExt
   build-depends:       base >= 4.7 && < 5
                      , aeson
@@ -30,6 +31,12 @@ library
                      , servant-client == 0.4.*
                      , text
                      , either
+                     , http-client
+                     , http-media
+                     , http-types
+                     , transformers
+                     , bytestring
+                     , string-conversions
   default-language:    Haskell2010
 
 test-suite telegram-api-test
