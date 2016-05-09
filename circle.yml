@@ -18,4 +18,4 @@ deployment:
     branch: master
     commands:
       - stack sdist
-      - mv .stack-work/dist/**/*.tar.gz $CIRCLE_ARTIFACT
+      - mv .stack-work/dist/**/*.tar.gz $CIRCLE_ARTIFACTS
