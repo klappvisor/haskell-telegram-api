@@ -18,4 +18,4 @@ deployment:
     branch: master
     commands:
       - stack sdist
-      - mv .stack-work/dist/**/*.tar.gz $CIRCLE_ARTIFACTS
+      - mv /home/ubuntu/haskell-telegram-api/.stack-work/dist $CIRCLE_ARTIFACTS
