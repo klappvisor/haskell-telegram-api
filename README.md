@@ -53,6 +53,7 @@ main = do
 ## Contribution
 
 Contributions are welcome!
+
 1. Fork repository
 2. Do some changes
 3. Create pull request
@@ -66,7 +67,7 @@ You can use `stack` to build project
 stack build
 ```
 
-To run test you have to create your own bot.
+To run test you have to create your own bot. Go to [BotFather](https://telegram.me/botfather) and create the bot. As the result you will have private bot's access token. Keep it safe!
 
 ```
 stack test --test-arguments "$BOT_TOKEN $CHAT_ID $BOT_NAME"
