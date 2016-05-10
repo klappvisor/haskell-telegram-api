@@ -25,6 +25,9 @@ module Web.Telegram.API.Bot.Data
     , InlineQuery                   (..)
     , ChosenInlineResult            (..)
     , InlineQueryResult             (..)
+    , InlineKeyboardMarkup          (..)
+    , InlineKeyboardButton          (..)
+    , CallbackQuery                 (..)
     , ChatType                      (..)
     , ParseMode                     (..)
     ) where
@@ -107,13 +110,15 @@ instance FromJSON ChatType where
   parseJSON "channel"    = pure Channel
 
 -- | Parse mode for text message
-data ParseMode = Markdown deriving (Show, Generic)
+data ParseMode = Markdown | HTML deriving (Show, Generic)
 
 instance ToJSON ParseMode where
   toJSON Markdown = "Markdown"
+  toJSON HTML = "HTML"
 
 instance FromJSON ParseMode where
   parseJSON "Markdown" = pure $ Markdown
+  parseJSON "HTML" = pure $ HTML
   parseJSON _          = fail "Failed to parse ParseMode"
 
 -- | This object represents one size of a photo or a 'File' / 'Sticker' thumbnail.
@@ -248,6 +253,7 @@ data InlineQueryResult =
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 Bytes
   , iq_res_title                           :: Maybe Text -- ^ Title of the result
+  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup
   , iq_res_message_text                    :: Maybe Text -- ^ Text of the message to be sent
   , iq_res_parse_mode                      :: Maybe ParseMode -- Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
   , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
@@ -335,6 +341,40 @@ instance ToJSON InlineQueryResult where
 instance FromJSON InlineQueryResult where
   parseJSON = genericParseJSON inlineQueryJSONOptions
 
+data InlineKeyboardMarkup = InlineKeyboardMarkup
+  {
+    inline_keyboard :: [[InlineKeyboardButton]]
+  } deriving (FromJSON, ToJSON, Show, Generic)
+
+data InlineKeyboardButton = InlineKeyboardButton
+  {
+    iq_kb_text :: Text
+  , iq_kb_url :: Maybe Text
+  , iq_kb_callback_data :: Maybe Text
+  , iq_kb_switch_inline_query :: Maybe Text
+  } deriving (Show, Generic)
+
+instance ToJSON InlineKeyboardButton where
+  toJSON = toJsonDrop 6
+
+instance FromJSON InlineKeyboardButton where
+  parseJSON = parseJsonDrop 6
+
+data CallbackQuery = CallbackQuery
+  {
+    cq_id :: Text
+  , cq_from :: User
+  , cq_message :: Maybe Message
+  , cq_inline_message_id :: Maybe Text
+  , cq_data :: Maybe Text
+  } deriving (Show, Generic)
+
+instance ToJSON CallbackQuery where
+  toJSON = toJsonDrop 3
+
+instance FromJSON CallbackQuery where
+  parseJSON = parseJsonDrop 3
+
 -- | This object represents an incoming update.
 -- Only one of the optional parameters can be present in any given update.
 data Update = Update
@@ -343,6 +383,7 @@ data Update = Update
   , message              :: Maybe Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
   , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
   , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
+  , callback_query       :: Maybe CallbackQuery -- ^ This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a point on the map.

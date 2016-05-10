@@ -135,6 +135,7 @@ getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT
 setWebhook_           :: Token -> Maybe Text -> EitherT ServantError IO SetWebhookResponse
 answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> EitherT ServantError IO InlineQueryResponse
 getMe_
+
   :<|> sendMessage_
   :<|> forwardMessage_
   :<|> sendPhoto_
@@ -152,6 +153,7 @@ getMe_
   :<|> answerInlineQuery_ =
       client api
           (BaseUrl Https "api.telegram.org" 443)
+          --(BaseUrl Https "5813bfb3.ngrok.io" 443)
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
 getMe :: Token -> IO (Either ServantError GetMeResponse)
