@@ -16,7 +16,7 @@ module Web.Telegram.API.Bot.Responses
     , FileResponse              (..)
     , UserProfilePhotosResponse (..)
     , SetWebhookResponse        (..)
-    , InlineQueryResponse       (..)
+    , BasicResponse            (..)
     , KickChatMemberResponse    (..)
     , UnbanChatMemberResponse   (..)
     ) where
@@ -116,38 +116,31 @@ instance ToJSON SetWebhookResponse where
 instance FromJSON SetWebhookResponse where
   parseJSON = parseJsonDrop 8
 
--- | This object represents 'answerInlineQuery' response
-data InlineQueryResponse = InlineQueryResponse
+
+data BasicResponse =
+  -- | This object represents 'answerInlineQuery' response
+  InlineQueryResponse
   {
-    query_result :: Bool
+    res_result :: Bool
+  }
+  -- | This object represents 'answerCallbackQuery' response
+  | CallbackQueryResponse
+  {
+    res_result :: Bool
+  }
+  -- | This object represents 'kickChatMember' response
+  | KickChatMemberResponse
+  {
+    res_result :: Bool
+  }
+  -- | This object represents 'unbanChatMember' response
+  | UnbanChatMemberResponse
+  {
+    res_result :: Bool
   } deriving (Show, Generic)
 
-instance ToJSON InlineQueryResponse where
-  toJSON = toJsonDrop 6
+instance ToJSON BasicResponse where
+  toJSON = toJsonDrop 4
 
-instance FromJSON InlineQueryResponse where
-  parseJSON = parseJsonDrop 6
-
--- | This object represents 'kickChatMember' response
-data KickChatMemberResponse = KickChatMemberResponse
-  {
-    kick_result :: Bool
-  } deriving (Show, Generic)
-
-instance ToJSON KickChatMemberResponse where
-  toJSON = toJsonDrop 5
-
-instance FromJSON KickChatMemberResponse where
-  parseJSON = parseJsonDrop 5
-
--- | This object represents 'unbanChatMember' response
-data UnbanChatMemberResponse = UnbanChatMemberResponse
-  {
-    unban_result :: Bool
-  } deriving (Show, Generic)
-
-instance ToJSON UnbanChatMemberResponse where
-  toJSON = toJsonDrop 6
-
-instance FromJSON UnbanChatMemberResponse where
-  parseJSON = parseJsonDrop 6
+instance FromJSON BasicResponse where
+  parseJSON = parseJsonDrop 4

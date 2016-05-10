@@ -22,6 +22,7 @@ module Web.Telegram.API.Bot.API
   , getUserProfilePhotos
   , setWebhook
   , answerInlineQuery
+  , answerCallbackQuery
   , kickChatMember
   , unbanChatMember
     -- * API
@@ -113,15 +114,18 @@ type TelegramBotAPI =
          SetWebhookResponse
     :<|> TelegramToken :> "answerInlineQuery"
          :> ReqBody '[JSON] AnswerInlineQueryRequest
-         :> Post '[JSON] InlineQueryResponse
+         :> Post '[JSON] BasicResponse
+    :<|> TelegramToken :> "answerCallbackQuery"
+         :> ReqBody '[JSON] AnswerCallbackQueryRequest
+         :> Post '[JSON] BasicResponse
     :<|> TelegramToken :> "kickChatMember"
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
-         :> Post '[JSON] KickChatMemberResponse
+         :> Post '[JSON] BasicResponse
     :<|> TelegramToken :> "unbanChatMember"
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
-         :> Post '[JSON] UnbanChatMemberResponse
+         :> Post '[JSON] BasicResponse
 
 
 -- | Proxy for Thelegram Bot API
@@ -143,9 +147,10 @@ getUpdates_           :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager
 getFile_              :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
 getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UserProfilePhotosResponse
 setWebhook_           :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
-answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO InlineQueryResponse
-kickChatMember_       :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO KickChatMemberResponse
-unbanChatMember_      :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UnbanChatMemberResponse
+answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO BasicResponse
+answerCallbackQuery_  :: Token -> AnswerCallbackQueryRequest -> ExceptT ServantError IO BasicResponse
+kickChatMember_       :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO BasicResponse
+unbanChatMember_      :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO BasicResponse
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -162,9 +167,11 @@ getMe_
   :<|> getUserProfilePhotos_
   :<|> setWebhook_
   :<|> answerInlineQuery_
+  :<|> answerCallbackQuery_
   :<|> kickChatMember_
   :<|> unbanChatMember_ =
       client api
+
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
 getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
@@ -235,8 +242,11 @@ setWebhook :: Token
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url manager = runExceptT $ setWebhook_ token url manager telegramBaseUrl
 
-answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
+answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError BasicResponse)
 answerInlineQuery = run telegramBaseUrl answerInlineQuery_
+
+answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> IO (Either ServantError BasicResponse)
+answerCallbackQuery = run answerCallbackQuery_
 
 kickChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError KickChatMemberResponse)
 kickChatMember token chat_id user_id manager = runExceptT $ kickChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl

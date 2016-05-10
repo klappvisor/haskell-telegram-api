@@ -21,6 +21,7 @@ module Web.Telegram.API.Bot.Requests
     , SendChatActionRequest        (..)
     , ChatAction                   (..)
     , AnswerInlineQueryRequest     (..)
+    , AnswerCallbackQueryRequest   (..)
     , ReplyKeyboard                (..)
     ) where
 
@@ -238,6 +239,19 @@ instance ToJSON AnswerInlineQueryRequest where
 
 instance FromJSON AnswerInlineQueryRequest where
   parseJSON = parseJsonDrop 6
+
+data AnswerCallbackQueryRequest = AnswerCallbackQueryRequest
+  {
+    cq_callback_query_id :: Text
+  , cq_text :: Maybe Text
+  , cq_show_alert :: Maybe Bool
+  } deriving (Show, Generic)
+
+instance ToJSON AnswerCallbackQueryRequest where
+  toJSON = toJsonDrop 3
+
+instance FromJSON AnswerCallbackQueryRequest where
+  parseJSON = parseJsonDrop 3
 
 data ReplyKeyboard =
   -- | This object represents a custom keyboard with reply options
