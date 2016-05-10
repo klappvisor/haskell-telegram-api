@@ -23,6 +23,7 @@ module Web.Telegram.API.Bot.API
   , getUserProfilePhotos
   , setWebhook
   , answerInlineQuery
+  , answerCallbackQuery
     -- * API
   , TelegramBotAPI
   , api
@@ -112,7 +113,10 @@ type TelegramBotAPI =
          SetWebhookResponse
     :<|> TelegramToken :> "answerInlineQuery"
          :> ReqBody '[JSON] AnswerInlineQueryRequest
-         :> Post '[JSON] InlineQueryResponse
+         :> Post '[JSON] BasicResponse
+    :<|> TelegramToken :> "answerCallbackQuery"
+         :> ReqBody '[JSON] AnswerCallbackQueryRequest
+         :> Post '[JSON] BasicResponse
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
@@ -133,9 +137,9 @@ getUpdates_           :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT
 getFile_              :: Token -> Maybe Text -> EitherT ServantError IO FileResponse
 getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> EitherT ServantError IO UserProfilePhotosResponse
 setWebhook_           :: Token -> Maybe Text -> EitherT ServantError IO SetWebhookResponse
-answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> EitherT ServantError IO InlineQueryResponse
+answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> EitherT ServantError IO BasicResponse
+answerCallbackQuery_  :: Token -> AnswerCallbackQueryRequest -> EitherT ServantError IO BasicResponse
 getMe_
-
   :<|> sendMessage_
   :<|> forwardMessage_
   :<|> sendPhoto_
@@ -150,10 +154,10 @@ getMe_
   :<|> getFile_
   :<|> getUserProfilePhotos_
   :<|> setWebhook_
-  :<|> answerInlineQuery_ =
+  :<|> answerInlineQuery_
+  :<|> answerCallbackQuery_ =
       client api
           (BaseUrl Https "api.telegram.org" 443)
-          --(BaseUrl Https "5813bfb3.ngrok.io" 443)
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
 getMe :: Token -> IO (Either ServantError GetMeResponse)
@@ -223,8 +227,12 @@ setWebhook :: Token
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url = runEitherT $ setWebhook_ token url
 
-answerInlineQuery :: Token -> AnswerInlineQueryRequest -> IO (Either ServantError InlineQueryResponse)
+answerInlineQuery :: Token -> AnswerInlineQueryRequest -> IO (Either ServantError BasicResponse)
 answerInlineQuery = run answerInlineQuery_
+
+answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> IO (Either ServantError BasicResponse)
+answerCallbackQuery = run answerCallbackQuery_
+
 
 run :: (Token -> a -> EitherT ServantError IO b) -> Token -> a -> IO (Either ServantError b)
 run e t r = runEitherT $ e t r

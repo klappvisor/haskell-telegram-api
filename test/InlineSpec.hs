@@ -22,23 +22,23 @@ spec token chatId = do
   let inline_query_id = ""
   describe "/answerInlineQuery" $ do
     it "should answer with article" $ do
-      Right InlineQueryResponse { query_result = res } <-
+      Right BasicResponse { query_result = res } <-
         answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_article] Nothing Nothing Nothing)
       res `shouldBe` True
     it "should answer with photo" $ do
-      Right InlineQueryResponse { query_result = res } <-
+      Right BasicResponse { query_result = res } <-
         answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_photo] Nothing Nothing Nothing)
       res `shouldBe` True
     it "should answer with gif" $ do
-      Right InlineQueryResponse { query_result = res } <-
+      Right BasicResponse { query_result = res } <-
         answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_gif] Nothing Nothing Nothing)
       res `shouldBe` True
     it "should answer with mpeg gif" $ do
-      Right InlineQueryResponse { query_result = res } <-
+      Right BasicResponse { query_result = res } <-
         answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_mpeg] Nothing Nothing Nothing)
       res `shouldBe` True
     it "should answer with video" $ do
-      Right InlineQueryResponse { query_result = res } <-
+      Right BasicResponse { query_result = res } <-
         answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_video] Nothing Nothing Nothing)
       res `shouldBe` True
 
