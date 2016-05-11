@@ -79,10 +79,10 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendPhoto token (SendPhotoRequest "" "photo_id" (Just "photo caption") Nothing Nothing) manager telegramBaseUrl
       msg `shouldBe` "Bad Request"
-    it "should send photo" $ do
-      Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing Nothing) manager telegramBaseUrl
-      cpt `shouldBe` "photo caption"
+    --it "should send photo" $ do
+    --  Right MessageResponse { message_result = Message { caption = Just cpt } } <-
+    --    sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing Nothing) manager telegramBaseUrl
+    --  cpt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
@@ -138,11 +138,11 @@ spec token chatId botName = do
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm" manager telegramBaseUrl
       msg `shouldBe` "Bad Request"
 
-  describe "/getUserProfilePhotos" $ do
-    it "should get user profile photos" $ do
-      Right UserProfilePhotosResponse { photos_result = photos } <-
-        getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager telegramBaseUrl
-      (total_count photos) `shouldSatisfy` (> 0)
+  --describe "/getUserProfilePhotos" $ do
+  --  it "should get user profile photos" $ do
+  --    Right UserProfilePhotosResponse { photos_result = photos } <-
+  --      getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager telegramBaseUrl
+  --    (total_count photos) `shouldSatisfy` (> 0)
 
   describe "/setWebhook" $ do
     it "should set webhook" $ do
