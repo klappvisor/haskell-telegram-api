@@ -255,7 +255,7 @@ data InputMessageContent =
   InputTextMessageContent
   {
     imc_message_text :: Text -- ^ Text of the message to be sent, 1-4096 characters
-  , imc_parse_mode :: Maybe Text -- ^ Send 'Markdown' or 'HTML', if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
+  , imc_parse_mode :: Maybe ParseMode -- ^ Send 'Markdown' or 'HTML', if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
   , imc_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in the sent message
   }
   -- | Represents the content of a location message to be sent as the result of an inline query.
@@ -383,17 +383,17 @@ data InlineKeyboardMarkup = InlineKeyboardMarkup
 
 data InlineKeyboardButton = InlineKeyboardButton
   {
-    iq_kb_text :: Text
-  , iq_kb_url :: Maybe Text
-  , iq_kb_callback_data :: Maybe Text
-  , iq_kb_switch_inline_query :: Maybe Text
+    ikb_text :: Text
+  , ikb_url :: Maybe Text
+  , ikb_callback_data :: Maybe Text
+  , ikb_switch_inline_query :: Maybe Text
   } deriving (Show, Generic)
 
 instance ToJSON InlineKeyboardButton where
-  toJSON = toJsonDrop 6
+  toJSON = toJsonDrop 4
 
 instance FromJSON InlineKeyboardButton where
-  parseJSON = parseJsonDrop 6
+  parseJSON = parseJsonDrop 4
 
 data CallbackQuery = CallbackQuery
   {
