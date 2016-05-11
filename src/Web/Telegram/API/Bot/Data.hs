@@ -25,8 +25,12 @@ module Web.Telegram.API.Bot.Data
     , InlineQuery                   (..)
     , ChosenInlineResult            (..)
     , InlineQueryResult             (..)
+    , InlineKeyboardMarkup          (..)
+    , InlineKeyboardButton          (..)
+    , CallbackQuery                 (..)
     , ChatType                      (..)
     , ParseMode                     (..)
+    , InputMessageContent           (..)
     ) where
 
 import           Data.Aeson
@@ -108,13 +112,15 @@ instance FromJSON ChatType where
   parseJSON _            = fail "Failed to parse ChatType"
 
 -- | Parse mode for text message
-data ParseMode = Markdown deriving (Show, Generic)
+data ParseMode = Markdown | HTML deriving (Show, Generic)
 
 instance ToJSON ParseMode where
   toJSON Markdown = "Markdown"
+  toJSON HTML = "HTML"
 
 instance FromJSON ParseMode where
   parseJSON "Markdown" = pure $ Markdown
+  parseJSON "HTML" = pure $ HTML
   parseJSON _          = fail "Failed to parse ParseMode"
 
 -- | This object represents one size of a photo or a 'File' / 'Sticker' thumbnail.
@@ -243,15 +249,52 @@ instance ToJSON ChosenInlineResult where
 instance FromJSON ChosenInlineResult where
   parseJSON = parseJsonDrop 7
 
+-- | This object represents the content of a message to be sent as a result of an inline query.
+data InputMessageContent =
+  -- | Represents the content of a text message to be sent as the result of an inline query.
+  InputTextMessageContent
+  {
+    imc_message_text :: Text -- ^ Text of the message to be sent, 1-4096 characters
+  , imc_parse_mode :: Maybe ParseMode -- ^ Send 'Markdown' or 'HTML', if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
+  , imc_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  }
+  -- | Represents the content of a location message to be sent as the result of an inline query.
+  | InputLocationMessageContent
+  {
+    imc_latitude :: Float -- ^ Latitude of the location in degrees
+  , imc_longitude :: Float -- ^ Longitude of the location in degrees
+  }
+  -- | Represents the content of a venue message to be sent as the result of an inline query.
+  | InputVenueMessageContent
+  {
+    imc_latitude :: Float -- ^ Latitude of the location in degrees
+  , imc_longitude :: Float -- ^ Longitude of the location in degrees
+  , imc_title :: Text -- ^ Name of the venue
+  , imc_address :: Text -- ^ Address of the venue
+  , imc_foursquare_id :: Maybe Text -- ^ Foursquare identifier of the venue, if known
+  }
+  -- | Represents the content of a contact message to be sent as the result of an inline query.
+  | InputContactMessageContent
+  {
+    imc_phone_number :: Text -- ^ Contact's phone number
+  , imc_first_name :: Text -- ^ Contact's first name
+  , imc_last_name :: Maybe Text -- ^ Contact's last name
+  } deriving (Show, Generic)
+
+instance ToJSON InputMessageContent where
+  toJSON = toJsonDrop 4
+
+instance FromJSON InputMessageContent where
+  parseJSON = parseJsonDrop 4
+
 data InlineQueryResult =
   -- | Represents a link to an article or web page.
   InlineQueryResultArticle
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 Bytes
   , iq_res_title                           :: Maybe Text -- ^ Title of the result
-  , iq_res_message_text                    :: Maybe Text -- ^ Text of the message to be sent
-  , iq_res_parse_mode                      :: Maybe ParseMode -- Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
-  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent
+  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_url                             :: Maybe Text -- ^ URL of the result
   , iq_res_hide_url                        :: Maybe Bool -- ^ Pass True, if you don't want the URL to be shown in the message
   , iq_res_description                     :: Maybe Text -- ^ Short description of the result
@@ -259,20 +302,19 @@ data InlineQueryResult =
   , iq_res_thumb_width                     :: Maybe Int -- ^ Thumbnail width
   , iq_res_thumb_height                    :: Maybe Int -- ^ Thumbnail height
   }
-  -- | Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of photo.
+  -- | Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   | InlineQueryResultPhoto
   {
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_photo_url                       :: Text -- ^ A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
+  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail for the photo
   , iq_res_photo_width                     :: Maybe Int -- ^ Optional. Width of the photo
   , iq_res_photo_height                    :: Maybe Int -- ^ Optional. Height of the photo
-  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail for the photo
   , iq_res_title                           :: Maybe Text -- ^ Title for the result
   , iq_res_description                     :: Maybe Text -- ^ Short description of the result
   , iq_res_caption                         :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
-  , iq_res_message_text                    :: Maybe Text -- ^ Text of a message to be sent instead of the photo, 1-512 characters
-  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
-  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the photo
   }
   -- | Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
   | InlineQueryResultGif
@@ -284,9 +326,8 @@ data InlineQueryResult =
   , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the static thumbnail for the result (jpeg or gif)
   , iq_res_title                           :: Maybe Text -- ^ Title for the result
   , iq_res_caption                         :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
-  , iq_res_message_text                    :: Maybe Text -- ^ Text of a message to be sent instead of the animation, 1-512 characters
-  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
-  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the GIF animation
   }
   -- | Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
   | InlineQueryResultMpeg4Gif
@@ -298,9 +339,8 @@ data InlineQueryResult =
   , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the static thumbnail (jpeg or gif) for the result
   , iq_res_title                           :: Maybe Text -- ^ Title for the result
   , iq_res_caption                         :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
-  , iq_res_message_text                    :: Maybe Text -- ^ Text of a message to be sent instead of the animation, 1-512 characters
-  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
-  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video animation
   }
   -- | Represents link to a page containing an embedded video player or a video file.
   | InlineQueryResultVideo
@@ -308,15 +348,15 @@ data InlineQueryResult =
     iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_video_url                       :: Text -- ^ A valid URL for the embedded video player or video file
   , iq_res_mime_type                       :: Text -- ^ Mime type of the content of video url, “text/html” or “video/mp4”
-  , iq_res_message_text                    :: Maybe Text -- ^ Text of the message to be sent with the video, 1-512 characters
-  , iq_res_parse_mode                      :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message.
-  , iq_res_disable_web_page_preview        :: Maybe Bool -- ^ Disables link previews for links in the sent message
+  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the video
+  , iq_res_title                           :: Maybe Text -- ^ Title for the result
+  , iq_res_caption                         :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
   , iq_res_video_width                     :: Maybe Int -- ^ Video width
   , iq_res_video_height                    :: Maybe Int -- ^ Video height
   , iq_res_video_duration                  :: Maybe Int -- ^ Video duration in seconds
-  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the video
-  , iq_res_title                           :: Maybe Text -- ^ Title for the result
   , iq_res_description                     :: Maybe Text -- ^ Short description of the result
+  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video
   } deriving (Show, Generic)
 
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
@@ -336,6 +376,40 @@ instance ToJSON InlineQueryResult where
 instance FromJSON InlineQueryResult where
   parseJSON = genericParseJSON inlineQueryJSONOptions
 
+data InlineKeyboardMarkup = InlineKeyboardMarkup
+  {
+    inline_keyboard :: [[InlineKeyboardButton]]
+  } deriving (FromJSON, ToJSON, Show, Generic)
+
+data InlineKeyboardButton = InlineKeyboardButton
+  {
+    ikb_text :: Text
+  , ikb_url :: Maybe Text
+  , ikb_callback_data :: Maybe Text
+  , ikb_switch_inline_query :: Maybe Text
+  } deriving (Show, Generic)
+
+instance ToJSON InlineKeyboardButton where
+  toJSON = toJsonDrop 4
+
+instance FromJSON InlineKeyboardButton where
+  parseJSON = parseJsonDrop 4
+
+data CallbackQuery = CallbackQuery
+  {
+    cq_id :: Text
+  , cq_from :: User
+  , cq_message :: Maybe Message
+  , cq_inline_message_id :: Maybe Text
+  , cq_data :: Maybe Text
+  } deriving (Show, Generic)
+
+instance ToJSON CallbackQuery where
+  toJSON = toJsonDrop 3
+
+instance FromJSON CallbackQuery where
+  parseJSON = parseJsonDrop 3
+
 -- | This object represents an incoming update.
 -- Only one of the optional parameters can be present in any given update.
 data Update = Update
@@ -344,6 +418,7 @@ data Update = Update
   , message              :: Maybe Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
   , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
   , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
+  , callback_query       :: Maybe CallbackQuery -- ^ This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a point on the map.
