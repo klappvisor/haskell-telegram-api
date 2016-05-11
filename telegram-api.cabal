@@ -26,6 +26,7 @@ library
   other-modules:       Web.Telegram.API.Bot.JsonExt
   build-depends:       base >= 4.7 && < 5
                      , aeson
+                     , http-api-data
                      , servant == 0.6.*
                      , servant-client == 0.6.*
                      , text

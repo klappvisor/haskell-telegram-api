@@ -42,19 +42,14 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Servant.API
 import           Servant.Client
+import           Web.HttpApiData
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.Responses
 import           Web.Telegram.API.Bot.Requests
 
 -- | Telegram Bot's Token
 newtype Token = Token Text
-  deriving (Show, Eq, Ord)
-
-instance ToText Token where
-  toText (Token x) = x
-
-instance FromText Token where
-  fromText x = Just $ Token x
+  deriving (Show, Eq, Ord, ToHttpApiData, FromHttpApiData)
 
 -- | Type for token
 type TelegramToken = Capture ":token" Token
