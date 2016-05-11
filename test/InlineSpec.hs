@@ -29,32 +29,32 @@ spec token chatId = do
   describe "/answerInlineQuery" $ do
     it "should answer with article" $ do
       Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_article] Nothing Nothing Nothing) manager telegramBaseUrl
+        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_article] Nothing Nothing Nothing) manager
       res `shouldBe` True
     it "should answer with photo" $ do
       Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_photo] Nothing Nothing Nothing) manager telegramBaseUrl
+        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_photo] Nothing Nothing Nothing) manager
       res `shouldBe` True
     it "should answer with gif" $ do
       Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_gif] Nothing Nothing Nothing) manager telegramBaseUrl
+        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_gif] Nothing Nothing Nothing) manager
       res `shouldBe` True
     it "should answer with mpeg gif" $ do
       Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_mpeg] Nothing Nothing Nothing) manager telegramBaseUrl
+        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_mpeg] Nothing Nothing Nothing) manager
       res `shouldBe` True
     it "should answer with video" $ do
       Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_video] Nothing Nothing Nothing) manager telegramBaseUrl
+        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_video] Nothing Nothing Nothing) manager
       res `shouldBe` True
 
   describe "/answerInlineQuery" $ do
     it "should get updates and answer" $ do
       Right UpdatesResponse { update_result = updates} <-
-        getUpdates token Nothing Nothing Nothing manager telegramBaseUrl
+        getUpdates token Nothing Nothing Nothing manager
       Update { inline_query = Just (InlineQuery { query_id = id } ) } <- pure (last updates)
       e <-
-        answerInlineQuery token (AnswerInlineQueryRequest id [inline_video] Nothing Nothing Nothing) manager telegramBaseUrl
+        answerInlineQuery token (AnswerInlineQueryRequest id [inline_video] Nothing Nothing Nothing) manager
       putStrLn (show e)
 
 inline_article = InlineQueryResultArticle "2131341" (Just "text article content") Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
