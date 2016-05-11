@@ -39,7 +39,7 @@ spec token chatId = do
       res `shouldBe` True
     it "should answer with video" $ do
       Right BasicResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_video] Nothing Nothing Nothing)
+        answerInlineQuery token $ AnswerInlineQueryRequest inline_query_id [inline_video] Nothing Nothing Nothing
       res `shouldBe` True
 
   describe "/answerInlineQuery" $ do
@@ -51,8 +51,10 @@ spec token chatId = do
         answerInlineQuery token (AnswerInlineQueryRequest id [inline_video] Nothing Nothing Nothing)
       putStrLn (show e)
 
-inline_article = InlineQueryResultArticle "2131341" (Just "text article content") Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
-inline_photo = InlineQueryResultPhoto "1430810" "http://vignette3.wikia.nocookie.net/victorious/images/f/f8/NyanCat.jpg" Nothing Nothing (Just "http://vignette3.wikia.nocookie.net/victorious/images/f/f8/NyanCat.jpg") Nothing Nothing Nothing Nothing Nothing Nothing
-inline_gif = InlineQueryResultGif "131231234" "https://media.giphy.com/media/zEO5eq3ZsEwbS/giphy.gif" Nothing Nothing (Just "https://media.giphy.com/media/zEO5eq3ZsEwbS/100.gif") Nothing Nothing Nothing Nothing Nothing
-inline_mpeg = InlineQueryResultMpeg4Gif "131251234" "https://media.giphy.com/media/zEO5eq3ZsEwbS/giphy.gif" Nothing Nothing (Just "https://media.giphy.com/media/zEO5eq3ZsEwbS/100.gif") Nothing Nothing Nothing Nothing Nothing
-inline_video = InlineQueryResultVideo "123413542" "https://www.youtube.com/embed/TBKN7_vx2xo" "text/html" (Just "Enjoykin — Nyash Myash") Nothing Nothing Nothing Nothing Nothing (Just "https://i.ytimg.com/vi_webp/TBKN7_vx2xo/mqdefault.webp") (Just "Enjoykin — Nyash Myash") Nothing
+message_content = InputTextMessageContent "test message content" Nothing Nothing
+
+inline_article = InlineQueryResultArticle "2131341" (Just "text article content") (Just message_content) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+inline_photo = InlineQueryResultPhoto "1430810" "http://vignette3.wikia.nocookie.net/victorious/images/f/f8/NyanCat.jpg" (Just "http://vignette3.wikia.nocookie.net/victorious/images/f/f8/NyanCat.jpg") Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+inline_gif = InlineQueryResultGif "131231234" "https://media.giphy.com/media/zEO5eq3ZsEwbS/giphy.gif" Nothing Nothing (Just "https://media.giphy.com/media/zEO5eq3ZsEwbS/100.gif") Nothing Nothing Nothing Nothing
+inline_mpeg = InlineQueryResultMpeg4Gif "131251234" "https://media.giphy.com/media/zEO5eq3ZsEwbS/giphy.gif" Nothing Nothing (Just "https://media.giphy.com/media/zEO5eq3ZsEwbS/100.gif") Nothing Nothing Nothing Nothing
+inline_video = InlineQueryResultVideo "123413542" "https://www.youtube.com/embed/TBKN7_vx2xo" "text/html" (Just "https://i.ytimg.com/vi_webp/TBKN7_vx2xo/mqdefault.webp") (Just "Enjoykin — Nyash Myash") Nothing Nothing Nothing Nothing Nothing Nothing Nothing
