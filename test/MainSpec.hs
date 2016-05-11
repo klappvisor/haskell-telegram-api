@@ -81,17 +81,17 @@ spec token chatId botName = do
   describe "/sendPhoto" $ do
     it "should return error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendPhoto token (SendPhotoRequest "" (Left "photo_id") (Just "photo caption") Nothing Nothing)
+        sendPhotoById token (SendPhotoRequest "" "photo_id" (Just "photo caption") Nothing Nothing)
       msg `shouldBe` "Bad Request"
     it "should send photo with file_id" $ do
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhoto token (SendPhotoRequest chatId (Left "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC") (Just "photo caption") Nothing Nothing)
+        sendPhotoById token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing Nothing)
       cpt `shouldBe` "photo caption"
     it "should send uploaded photo" $ do
       dataDir <- getDataDir
       let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/klappvisor.jpg"))
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhoto token (SendPhotoRequest chatId (Right fileUpload) (Just "photo caption 2") Nothing Nothing)
+        sendPhoto token (SendPhotoRequest chatId fileUpload (Just "photo caption 2") Nothing Nothing)
       cpt `shouldBe` "photo caption 2"
 
   describe "/sendAudio" $ do
