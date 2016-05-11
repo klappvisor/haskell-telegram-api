@@ -1,13 +1,14 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE DeriveAnyClass    #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE TemplateHaskell            #-}
 
 module Web.Telegram.API.Bot.API
   ( -- * Functions
-    getMe
+    telegramBaseUrl
+  , getMe
   , sendMessage
   , forwardMessage
   , sendPhoto
@@ -50,6 +51,9 @@ import           Web.Telegram.API.Bot.Requests
 -- | Telegram Bot's Token
 newtype Token = Token Text
   deriving (Show, Eq, Ord, ToHttpApiData, FromHttpApiData)
+
+telegramBaseUrl :: BaseUrl
+telegramBaseUrl = BaseUrl Https "api.telegram.org" 443 ""
 
 -- | Type for token
 type TelegramToken = Capture ":token" Token
