@@ -26,8 +26,8 @@ library
   other-modules:       Web.Telegram.API.Bot.JsonExt
   build-depends:       base >= 4.7 && < 5
                      , aeson
-                     , servant == 0.4.*
-                     , servant-client == 0.4.*
+                     , servant == 0.6.*
+                     , servant-client == 0.6.*
                      , text
                      , either
   default-language:    Haskell2010
