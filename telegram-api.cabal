@@ -43,11 +43,14 @@ test-suite telegram-api-test
                      , InlineSpec
   build-depends:       base
                      , text
+                     , http-client
+                     , http-client-tls
                      , hspec
                      , servant
                      , servant-client
                      , telegram-api
                      , http-types
+                     , transformers
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
