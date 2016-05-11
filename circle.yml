@@ -2,11 +2,12 @@ dependencies:
   cache_directories:
     - "~/.stack"
   pre:
-    - wget https://github.com/commercialhaskell/stack/releases/download/v1.1.0/stack-1.1.0-linux-x86_64.tar.gz -O /tmp/stack.gz
-    - gunzip /tmp/stack.gz && chmod +x /tmp/stack
-    - sudo mv /tmp/stack /usr/bin/stack
+    - wget https://github.com/commercialhaskell/stack/releases/download/v1.1.0/stack-1.1.0-linux-x86_64.tar.gz -O /tmp/stack.tar.gz
+    - tar -zxvf /tmp/stack.tar.gz -C /tmp
+    - sudo mv /tmp/stack-**/stack /usr/bin/stack
   override:
     - stack setup
+    - stack clean
     - stack build
 
 test:
@@ -18,4 +19,4 @@ deployment:
     branch: master
     commands:
       - stack sdist
-      - mv .stack-work/dist/**/*.tar.gz $CIRCLE_ARTIFACT
+      - mv /home/ubuntu/haskell-telegram-api/.stack-work/dist $CIRCLE_ARTIFACTS
