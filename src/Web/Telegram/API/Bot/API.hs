@@ -3,12 +3,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TypeOperators              #-}
-{-# LANGUAGE TemplateHaskell            #-}
 
 module Web.Telegram.API.Bot.API
   ( -- * Functions
-    telegramBaseUrl
-  , getMe
+    getMe
   , sendMessage
   , forwardMessage
   , sendPhoto
@@ -154,64 +152,64 @@ getMe_
       client api
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
-getMe :: Token -> Manager -> BaseUrl -> IO (Either ServantError GetMeResponse)
-getMe token manager baseurl = runExceptT $ getMe_ token manager baseurl
+getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
+getMe token manager = runExceptT $ getMe_ token manager telegramBaseUrl
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
-sendMessage :: Token -> SendMessageRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendMessage = run sendMessage_
+sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendMessage = run telegramBaseUrl sendMessage_
 
 -- | Use this method to forward messages of any kind. On success, the sent 'Message' is returned.
-forwardMessage :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-forwardMessage = run forwardMessage_
+forwardMessage :: Token -> ForwardMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
+forwardMessage = run telegramBaseUrl forwardMessage_
 
 -- | Use this method to send photos. On success, the sent 'Message' is returned.
-sendPhoto :: Token -> SendPhotoRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendPhoto = run sendPhoto_
+sendPhoto :: Token -> SendPhotoRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendPhoto = run telegramBaseUrl sendPhoto_
 
 -- | Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
 --       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
-sendAudio :: Token -> SendAudioRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendAudio = run sendAudio_
+sendAudio :: Token -> SendAudioRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendAudio = run telegramBaseUrl sendAudio_
 
 -- | Use this method to send general files. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
-sendDocument :: Token -> SendDocumentRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendDocument = run sendDocument_
+sendDocument :: Token -> SendDocumentRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendDocument = run telegramBaseUrl sendDocument_
 
 -- | Use this method to send .webp stickers. On success, the sent 'Message' is returned.
-sendSticker :: Token -> SendStickerRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendSticker = run sendSticker_
+sendSticker :: Token -> SendStickerRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendSticker = run telegramBaseUrl sendSticker_
 
 -- | Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
-sendVideo :: Token -> SendVideoRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendVideo = run sendVideo_
+sendVideo :: Token -> SendVideoRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendVideo = run telegramBaseUrl sendVideo_
 
 -- | Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
-sendVoice :: Token -> SendVoiceRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendVoice = run sendVoice_
+sendVoice :: Token -> SendVoiceRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendVoice = run telegramBaseUrl sendVoice_
 
 -- | Use this method to send point on the map. On success, the sent 'Message' is returned.
-sendLocation :: Token -> SendLocationRequest -> Manager -> BaseUrl -> IO (Either ServantError MessageResponse)
-sendLocation = run sendLocation_
+sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendLocation = run telegramBaseUrl sendLocation_
 
 -- | Use this method when you need to tell the user that something is happening on the bot's side.
 --   The status is set for 5 seconds or less (when a message arrives from your bot,
 --   Telegram clients clear its typing status).
-sendChatAction :: Token -> SendChatActionRequest -> Manager -> BaseUrl -> IO (Either ServantError ChatActionResponse)
-sendChatAction = run sendChatAction_
+sendChatAction :: Token -> SendChatActionRequest -> Manager -> IO (Either ServantError ChatActionResponse)
+sendChatAction = run telegramBaseUrl sendChatAction_
 
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned.
-getUpdates :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> IO (Either ServantError UpdatesResponse)
-getUpdates token offset limit timeout manager baseurl = runExceptT $ getUpdates_ token offset limit timeout manager baseurl
+getUpdates :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UpdatesResponse)
+getUpdates token offset limit timeout manager = runExceptT $ getUpdates_ token offset limit timeout manager telegramBaseUrl
 
 -- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
-getFile :: Token -> Text -> Manager -> BaseUrl -> IO (Either ServantError FileResponse)
-getFile token file_id manager baseurl = runExceptT $ getFile_ token (Just file_id) manager baseurl
+getFile :: Token -> Text -> Manager -> IO (Either ServantError FileResponse)
+getFile token file_id manager = runExceptT $ getFile_ token (Just file_id) manager telegramBaseUrl
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
-getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> IO (Either ServantError UserProfilePhotosResponse)
-getUserProfilePhotos token user_id offset limit manager baseurl = runExceptT $ getUserProfilePhotos_ token (Just user_id) offset limit manager baseurl
+getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
+getUserProfilePhotos token user_id offset limit manager = runExceptT $ getUserProfilePhotos_ token (Just user_id) offset limit manager telegramBaseUrl
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -219,12 +217,11 @@ getUserProfilePhotos token user_id offset limit manager baseurl = runExceptT $ g
 setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
-    -> BaseUrl
     -> IO (Either ServantError SetWebhookResponse)
-setWebhook token url manager baseurl = runExceptT $ setWebhook_ token url manager baseurl
+setWebhook token url manager = runExceptT $ setWebhook_ token url manager telegramBaseUrl
 
-answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> IO (Either ServantError InlineQueryResponse)
-answerInlineQuery = run answerInlineQuery_
+answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
+answerInlineQuery = run telegramBaseUrl answerInlineQuery_
 
-run :: (Token -> a -> Manager -> BaseUrl -> ExceptT ServantError IO b) -> Token -> a -> Manager -> BaseUrl -> IO (Either ServantError b)
-run e t r m b = runExceptT $ e t r m b
+run :: BaseUrl -> (Token -> a -> Manager -> BaseUrl -> ExceptT ServantError IO b) -> Token -> a -> Manager -> IO (Either ServantError b)
+run b e t r m = runExceptT $ e t r m b
