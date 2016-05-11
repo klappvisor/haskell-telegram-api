@@ -1,5 +1,7 @@
 # telegram-api
 
+[![Join the chat at https://gitter.im/klappvisor/haskell-telegram-api](https://badges.gitter.im/klappvisor/haskell-telegram-api.svg)](https://gitter.im/klappvisor/haskell-telegram-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![Build Status](https://img.shields.io/circleci/project/klappvisor/haskell-telegram-api.svg)
 ![Hackage](https://img.shields.io/hackage/v/telegram-api.svg)
 ![Hackage Dependencies](https://img.shields.io/hackage-deps/v/telegram-api.svg)
