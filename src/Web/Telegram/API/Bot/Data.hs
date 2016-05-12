@@ -451,13 +451,14 @@ data UserProfilePhotos = UserProfilePhotos
 data Message = Message
   {
     message_id :: Int                     -- ^ Unique message identifier
-  , from :: Maybe User                        -- ^ Sender, can be empty for messages sent to channels
+  , from :: Maybe User                    -- ^ Sender, can be empty for messages sent to channels
   , date :: Int                           -- ^ Date the message was sent in Unix time
   , chat :: Chat                          -- ^ Conversation the message belongs to
   , forward_from :: Maybe User            -- ^ For forwarded messages, sender of the original message
   , forward_date :: Maybe Int             -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message :: Maybe Message     -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
   , text :: Maybe Text                    -- ^ For text messages, the actual UTF-8 text of the message
+  , entities :: Maybe [MessageEntity]     -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
   , audio :: Maybe Audio                  -- ^ Message is an audio file, information about the file
   , document :: Maybe Document            -- ^ Message is a general file, information about the file
   , photo :: Maybe [PhotoSize]            -- ^ Message is a photo, available sizes of the photo
@@ -467,8 +468,9 @@ data Message = Message
   , caption :: Maybe Text                 -- ^ Caption for the photo or video
   , contact :: Maybe Contact              -- ^ Message is a shared contact, information about the contact
   , location :: Maybe Location            -- ^ Message is a shared location, information about the location
-  , new_chat_member :: Maybe User    -- ^ A new member was added to the group, information about them (this member may be the bot itself)
-  , left_chat_member :: Maybe User   -- ^ A member was removed from the group, information about them (this member may be the bot itself)
+  , venue :: Maybe Venue                  -- ^ Message is a venue, information about the venue
+  , new_chat_member :: Maybe User         -- ^ A new member was added to the group, information about them (this member may be the bot itself)
+  , left_chat_member :: Maybe User        -- ^ A member was removed from the group, information about them (this member may be the bot itself)
   , new_chat_title :: Maybe Text          -- ^ A chat title was changed to this value
   , new_chat_photo :: Maybe [PhotoSize]   -- ^ A chat photo was change to this value
   , delete_chat_photo :: Maybe Bool       -- ^ Service message: the chat photo was deleted
@@ -477,4 +479,35 @@ data Message = Message
   , channel_chat_created :: Maybe Bool    -- ^ Service message: the channel has been created
   , migrate_to_chat_id :: Maybe Int       -- ^ The group has been migrated to a supergroup with the specified identifier, not exceeding 1e13 by absolute value
   , migrate_from_chat_id :: Maybe Int     -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
+  , pinned_message :: Maybe Message       -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
   } deriving (FromJSON, ToJSON, Show, Generic)
+
+-- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
+data MessageEntity = MessageEntity
+  {
+    me_type :: Text      -- ^ Type of the entity. One of mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs)
+  , me_offset :: Int     -- ^ Offset in UTF-16 code units to the start of the entity
+  , me_length :: Int     -- ^ Length of the entity in UTF-16 code units
+  , me_url :: Maybe Text -- ^ For “text_link” only, url that will be opened after user taps on the text
+  } deriving (Show, Generic)
+
+instance ToJSON MessageEntity where
+  toJSON = toJsonDrop 3
+
+instance FromJSON MessageEntity where
+  parseJSON = parseJsonDrop 3
+
+-- | This object represents a venue.
+data Venue = Venue
+  {
+    venue_location :: Location          -- ^ Venue location
+  , venue_title :: Text                 -- ^ Name of the venue
+  , venue_address :: Text               -- ^ Address of the venue
+  , venue_foursquare_id :: Maybe Text   -- ^ Foursquare identifier of the venue
+  } deriving (Show, Generic)
+
+instance ToJSON Venue where
+  toJSON = toJsonDrop 6
+
+instance FromJSON Venue where
+  parseJSON = parseJsonDrop 6
