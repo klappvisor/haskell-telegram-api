@@ -23,8 +23,6 @@ spec :: Token -> Text -> Spec
 spec token chatId = do
   let inline_query_id = ""
   manager <- runIO $ newManager tlsManagerSettings
-
-  -- Create the tls connection manager
   -- Create the tls connection manager
   describe "/answerInlineQuery" $ do
     it "should answer with article" $ do

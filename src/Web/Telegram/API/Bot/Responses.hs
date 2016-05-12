@@ -16,7 +16,8 @@ module Web.Telegram.API.Bot.Responses
     , FileResponse              (..)
     , UserProfilePhotosResponse (..)
     , SetWebhookResponse        (..)
-    , BasicResponse            (..)
+    , InlineQueryResponse       (..)
+    , CallbackQueryResponse     (..)
     , KickChatMemberResponse    (..)
     , UnbanChatMemberResponse   (..)
     ) where
@@ -116,31 +117,50 @@ instance ToJSON SetWebhookResponse where
 instance FromJSON SetWebhookResponse where
   parseJSON = parseJsonDrop 8
 
-
-data BasicResponse =
-  -- | This object represents 'answerInlineQuery' response
-  InlineQueryResponse
+-- | This object represents 'answerInlineQuery' response
+data InlineQueryResponse = InlineQueryResponse
   {
-    res_result :: Bool
-  }
-  -- | This object represents 'answerCallbackQuery' response
-  | CallbackQueryResponse
-  {
-    res_result :: Bool
-  }
-  -- | This object represents 'kickChatMember' response
-  | KickChatMemberResponse
-  {
-    res_result :: Bool
-  }
-  -- | This object represents 'unbanChatMember' response
-  | UnbanChatMemberResponse
-  {
-    res_result :: Bool
+    query_result :: Bool
   } deriving (Show, Generic)
 
-instance ToJSON BasicResponse where
-  toJSON = toJsonDrop 4
+instance ToJSON InlineQueryResponse where
+  toJSON = toJsonDrop 6
 
-instance FromJSON BasicResponse where
-  parseJSON = parseJsonDrop 4
+instance FromJSON InlineQueryResponse where
+  parseJSON = parseJsonDrop 6
+
+-- | This object represents 'answerCallbackQuery' response
+data CallbackQueryResponse = CallbackQueryResponse
+  {
+    callback_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON CallbackQueryResponse where
+  toJSON = toJsonDrop 7
+
+instance FromJSON CallbackQueryResponse where
+  parseJSON = parseJsonDrop 7
+
+-- | This object represents 'kickChatMember' response
+data KickChatMemberResponse = KickChatMemberResponse
+  {
+    kick_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON KickChatMemberResponse where
+  toJSON = toJsonDrop 5
+
+instance FromJSON KickChatMemberResponse where
+  parseJSON = parseJsonDrop 5
+
+-- | This object represents 'unbanChatMember' response
+data UnbanChatMemberResponse = UnbanChatMemberResponse
+  {
+    unban_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON UnbanChatMemberResponse where
+  toJSON = toJsonDrop 6
+
+instance FromJSON UnbanChatMemberResponse where
+  parseJSON = parseJsonDrop 6
