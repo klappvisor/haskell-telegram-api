@@ -28,7 +28,7 @@ spec token chatId botName = do
     it "responds with correct bot's name" $ do
       Right GetMeResponse { user_result = u } <-
         getMe token manager
-      (user_first_name u) `shouldBe` botName -- "TelegramAPIBot"
+      (user_first_name u) `shouldBe` botName -- f.e. "TelegramAPIBot"
 
   describe "/sendMessage" $ do
     it "should send message" $ do
@@ -79,20 +79,20 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendPhoto token (SendPhotoRequest "" "photo_id" (Just "photo caption") Nothing Nothing) manager
       msg `shouldBe` "Bad Request"
-    --it "should send photo" $ do
-    --  Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-    --    sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing Nothing) manager
-    --  cpt `shouldBe` "photo caption"
+    it "should send photo" $ do
+     Right MessageResponse { message_result = Message { caption = Just cpt } } <-
+       sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAS0kQ9gsy1eDh2FAAIC" (Just "photo caption") Nothing Nothing) manager
+     cpt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendAudio token (SendAudioRequest "" "audio_id" Nothing (Just "performer") (Just "title") Nothing Nothing) manager
       msg `shouldBe` "Bad Request"
---         it "should send audio" $ do
---           Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
---             sendAudio token (SendAudioRequest chatId "audio_id" Nothing (Just "performer") (Just "my title 1") Nothing)
---           title `shouldBe` "my title 1"
+    it "should send audio" $ do
+      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
+        sendAudio token (SendAudioRequest chatId "BQADBAADAQQAAiBOnQHThzc4cz1-IwI" Nothing Nothing Nothing Nothing Nothing) manager
+      title `shouldBe` "The Nutcracker Suite - Act II, No.12. Pas de Deux variations"
 
   describe "/sendSticker" $ do
     it "should send sticker" $ do
@@ -138,11 +138,11 @@ spec token chatId botName = do
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm" manager
       msg `shouldBe` "Bad Request"
 
-  --describe "/getUserProfilePhotos" $ do
-  --  it "should get user profile photos" $ do
-  --    Right UserProfilePhotosResponse { photos_result = photos } <-
-  --      getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager
-  --    (total_count photos) `shouldSatisfy` (> 0)
+  describe "/getUserProfilePhotos" $ do
+   it "should get user profile photos" $ do
+     Right UserProfilePhotosResponse { photos_result = photos } <-
+       getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager
+     (total_count photos) `shouldSatisfy` (>= 0)
 
   describe "/setWebhook" $ do
     it "should set webhook" $ do
