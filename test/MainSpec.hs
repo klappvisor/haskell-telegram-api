@@ -85,7 +85,7 @@ spec token chatId botName = do
       msg `shouldBe` "Bad Request"
     it "should send photo with file_id" $ do
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhotoById token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAQ4ElUVMAsbbBqFAAIC" (Just "photo caption") Nothing Nothing)
+        sendPhotoById token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAS0kQ9gsy1eDh2FAAIC" (Just "photo caption") Nothing Nothing)
       cpt `shouldBe` "photo caption"
     it "should send uploaded photo" $ do
       dataDir <- getDataDir
@@ -99,10 +99,10 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendAudio token (SendAudioRequest "" "audio_id" Nothing (Just "performer") (Just "title") Nothing Nothing)
       msg `shouldBe` "Bad Request"
---         it "should send audio" $ do
---           Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
---             sendAudio token (SendAudioRequest chatId "audio_id" Nothing (Just "performer") (Just "my title 1") Nothing)
---           title `shouldBe` "my title 1"
+    it "should send audio" $ do
+      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
+        sendAudio token (SendAudioRequest chatId "BQADBAADAQQAAiBOnQHThzc4cz1-IwI" Nothing Nothing Nothing Nothing Nothing)
+      title `shouldBe` "The Nutcracker Suite - Act II, No.12. Pas de Deux variations"
 
   describe "/sendSticker" $ do
     it "should send sticker" $ do

@@ -77,7 +77,7 @@ stack test --test-arguments "$BOT_TOKEN $CHAT_ID $BOT_NAME"
 
 where
 
-* `$BOT_TOKEN` is token obtained from BotFather with prefix `bot<token from BotFather>`
+* `$BOT_TOKEN` is token obtained from BotFather with prefix `<token from BotFather>`
 * `$CHAT_ID` can be id of your chat with your bot. Send some message to this chat in Telegram and do `curl "https://api.telegram.org/bot<replace_with_token>/getUpdates"`, you have to parse some JSON with your brain ;-) or any other suitable tool and you will find chat id there.
 * `$BOT_NAME` name of your bot
 
