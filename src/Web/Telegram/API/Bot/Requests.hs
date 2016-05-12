@@ -287,7 +287,7 @@ instance FromJSON ReplyKeyboard where
 data EditMessageTextRequest = EditMessageTextRequest
   {
     emt_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , emt_message_id :: Maybe Integer -- ^ if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emt_message_id :: Maybe Int -- ^ if `inline_message_id` is not specified. Unique identifier of the sent message
   , emt_inline_message_id :: Maybe Text -- ^ Required if chat_id and message_id are not specified. Identifier of the inline message
   , emt_text :: Text -- ^ New text of the message
   , emt_parse_mode :: Maybe ParseMode -- ^ Send `Markdown` or `HTML`, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
@@ -304,7 +304,7 @@ instance FromJSON EditMessageTextRequest where
 data EditMessageCaptionRequest = EditMessageCaptionRequest
   {
     emc_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , emc_message_id :: Maybe Integer -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emc_message_id :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
   , emc_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
   , emc_caption :: Maybe Text -- ^ New caption of the message
   , emc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
@@ -319,7 +319,7 @@ instance FromJSON EditMessageCaptionRequest where
 data EditMessageReplyMarkupRequest = EditMessageReplyMarkupRequest
   {
     emrm_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , emrm_message_id :: Maybe Integer -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emrm_message_id :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
   , emrm_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
   , emrm_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
   } deriving (Show, Generic)
