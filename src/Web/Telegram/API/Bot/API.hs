@@ -11,6 +11,7 @@ module Web.Telegram.API.Bot.API
   , sendMessage
   , forwardMessage
   , sendPhoto
+  , sendPhotoById
   , sendAudio
   , sendDocument
   , sendSticker
@@ -42,6 +43,7 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Servant.API
 import           Servant.Client
+import           Servant.Client.MultipartFormData
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.Responses
 import           Web.Telegram.API.Bot.Requests
@@ -70,7 +72,10 @@ type TelegramBotAPI =
          :> ReqBody '[JSON] ForwardMessageRequest
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendPhoto"
-         :> ReqBody '[JSON] SendPhotoRequest
+         :> MultipartFormDataReqBody (SendPhotoRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendPhoto"
+         :> ReqBody '[JSON] (SendPhotoRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendAudio"
          :> ReqBody '[JSON] SendAudioRequest
@@ -121,7 +126,8 @@ api = Proxy
 getMe_                :: Token -> EitherT ServantError IO GetMeResponse
 sendMessage_          :: Token -> SendMessageRequest -> EitherT ServantError IO MessageResponse
 forwardMessage_       :: Token -> ForwardMessageRequest -> EitherT ServantError IO MessageResponse
-sendPhoto_            :: Token -> SendPhotoRequest -> EitherT ServantError IO MessageResponse
+sendPhotoById_        :: Token -> SendPhotoRequest Text -> EitherT ServantError IO MessageResponse
+sendPhoto_            :: Token -> SendPhotoRequest FileUpload -> EitherT ServantError IO MessageResponse
 sendAudio_            :: Token -> SendAudioRequest -> EitherT ServantError IO MessageResponse
 sendDocument_         :: Token -> SendDocumentRequest -> EitherT ServantError IO MessageResponse
 sendSticker_          :: Token -> SendStickerRequest -> EitherT ServantError IO MessageResponse
@@ -138,6 +144,7 @@ getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
   :<|> sendPhoto_
+  :<|> sendPhotoById_
   :<|> sendAudio_
   :<|> sendDocument_
   :<|> sendSticker_
@@ -165,9 +172,13 @@ sendMessage = run sendMessage_
 forwardMessage :: Token -> ForwardMessageRequest -> IO (Either ServantError MessageResponse)
 forwardMessage = run forwardMessage_
 
--- | Use this method to send photos. On success, the sent 'Message' is returned.
-sendPhoto :: Token -> SendPhotoRequest -> IO (Either ServantError MessageResponse)
+-- | Use this method to upload and send photos. On success, the sent 'Message' is returned.
+sendPhoto :: Token -> SendPhotoRequest FileUpload -> IO (Either ServantError MessageResponse)
 sendPhoto = run sendPhoto_
+
+-- | Use this method to send photos that have already been uploaded. On success, the sent 'Message' is returned.
+sendPhotoById :: Token -> SendPhotoRequest Text -> IO (Either ServantError MessageResponse)
+sendPhotoById = run sendPhotoById_
 
 -- | Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
