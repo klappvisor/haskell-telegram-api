@@ -8,6 +8,7 @@
 module Main (main) where
 
 import           Control.Monad
+import           Data.Monoid
 import           Web.Telegram.API.Bot
 import           Test.Hspec
 import           Data.Text (Text)
@@ -32,7 +33,7 @@ runSpec [] = do
       pending
 
 runSpec [tkn,cId,bNm] = do
-    let token = Token (T.pack tkn)
+    let token = Token ("bot" <> T.pack tkn)
     let chatId = T.pack cId
     let botName = T.pack bNm
     runSpec' token chatId botName
