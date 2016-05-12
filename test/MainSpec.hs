@@ -6,6 +6,7 @@
 module MainSpec (spec) where
 
 import           Control.Monad
+import           Data.Monoid
 import           Web.Telegram.API.Bot
 import           Test.Hspec
 import           Data.Either (isRight, isLeft)
@@ -81,7 +82,7 @@ spec token chatId botName = do
       msg `shouldBe` "Bad Request"
     it "should send photo" $ do
      Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-       sendPhoto token (SendPhotoRequest chatId "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAS0kQ9gsy1eDh2FAAIC" (Just "photo caption") Nothing Nothing) manager
+       sendPhoto token (SendPhotoRequest chatId catPic (Just "photo caption") Nothing Nothing) manager
      cpt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
@@ -154,3 +155,24 @@ spec token chatId botName = do
       Right SetWebhookResponse { webhook_result = res } <-
         setWebhook token Nothing manager
       res `shouldBe` True
+
+  describe "/editTextMessage" $ do
+    it "should edit message" $ do
+      let originalMessage = SendMessageRequest chatId "veritas" Nothing Nothing Nothing Nothing
+      Right MessageResponse { message_result = Message { message_id = msg_id, text = Just txt } } <-
+        sendMessage token originalMessage manager
+      Right MessageResponse { message_result = Message { text = txt' } } <-
+        editMessageText token (EditMessageTextRequest (Just chatId) (Just msg_id) Nothing ("edited " <> txt) Nothing Nothing Nothing) manager
+      txt' `shouldBe` Just "edited veritas"
+
+    it "should edit caption" $ do
+      let originalMessage = SendPhotoRequest chatId catPic (Just "cat picture") Nothing Nothing
+      Right MessageResponse { message_result = Message { message_id = msg_id, caption = Just cpt } } <-
+        sendPhoto token originalMessage manager
+      Right MessageResponse { message_result = Message { caption = Just cpt' } } <-
+        editMessageCaption token (EditMessageCaptionRequest (Just chatId) (Just msg_id) Nothing (Just ("edited " <> cpt)) Nothing) manager
+      cpt' `shouldBe` "edited cat picture"
+
+    -- it "should edit caption" $ do ... after inline query tests are on place
+
+catPic = "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAS0kQ9gsy1eDh2FAAIC"
