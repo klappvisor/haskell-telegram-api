@@ -392,8 +392,8 @@ data Message = Message
   , caption :: Maybe Text                 -- ^ Caption for the photo or video
   , contact :: Maybe Contact              -- ^ Message is a shared contact, information about the contact
   , location :: Maybe Location            -- ^ Message is a shared location, information about the location
-  , new_chat_participant :: Maybe User    -- ^ A new member was added to the group, information about them (this member may be the bot itself)
-  , left_chat_participant :: Maybe User   -- ^ A member was removed from the group, information about them (this member may be the bot itself)
+  , new_chat_member :: Maybe User    -- ^ A new member was added to the group, information about them (this member may be the bot itself)
+  , left_chat_member :: Maybe User   -- ^ A member was removed from the group, information about them (this member may be the bot itself)
   , new_chat_title :: Maybe Text          -- ^ A chat title was changed to this value
   , new_chat_photo :: Maybe [PhotoSize]   -- ^ A chat photo was change to this value
   , delete_chat_photo :: Maybe Bool       -- ^ Service message: the chat photo was deleted
