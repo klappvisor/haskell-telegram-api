@@ -25,6 +25,9 @@ module Web.Telegram.API.Bot.API
   , answerCallbackQuery
   , kickChatMember
   , unbanChatMember
+  , editMessageText
+  , editMessageCaption
+  , editMessageReplyMarkup
     -- * API
   , TelegramBotAPI
   , api
@@ -126,31 +129,43 @@ type TelegramBotAPI =
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
          :> Post '[JSON] UnbanChatMemberResponse
+    :<|> TelegramToken :> "editMessageText"
+         :> ReqBody '[JSON] EditMessageTextRequest
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "editMessageCaption"
+         :> ReqBody '[JSON] EditMessageCaptionRequest
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "editMessageReplyMarkup"
+         :> ReqBody '[JSON] EditMessageReplyMarkupRequest
+         :> Post '[JSON] MessageResponse
 
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
 api = Proxy
 
-getMe_                :: Token -> Manager -> BaseUrl -> ExceptT ServantError IO GetMeResponse
-sendMessage_          :: Token -> SendMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-forwardMessage_       :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendPhoto_            :: Token -> SendPhotoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendAudio_            :: Token -> SendAudioRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendDocument_         :: Token -> SendDocumentRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendSticker_          :: Token -> SendStickerRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVideo_            :: Token -> SendVideoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVoice_            :: Token -> SendVoiceRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendLocation_         :: Token -> SendLocationRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendChatAction_       :: Token -> SendChatActionRequest -> Manager -> BaseUrl -> ExceptT ServantError IO ChatActionResponse
-getUpdates_           :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UpdatesResponse
-getFile_              :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
-getUserProfilePhotos_ :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UserProfilePhotosResponse
-setWebhook_           :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
-answerInlineQuery_    :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO InlineQueryResponse
-answerCallbackQuery_  :: Token -> AnswerCallbackQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO CallbackQueryResponse
-kickChatMember_       :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO KickChatMemberResponse
-unbanChatMember_      :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UnbanChatMemberResponse
+getMe_                     :: Token -> Manager -> BaseUrl -> ExceptT ServantError IO GetMeResponse
+sendMessage_               :: Token -> SendMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+forwardMessage_            :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendPhoto_                 :: Token -> SendPhotoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendAudio_                 :: Token -> SendAudioRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendDocument_              :: Token -> SendDocumentRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendSticker_               :: Token -> SendStickerRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendVideo_                 :: Token -> SendVideoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendVoice_                 :: Token -> SendVoiceRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendLocation_              :: Token -> SendLocationRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendChatAction_            :: Token -> SendChatActionRequest -> Manager -> BaseUrl -> ExceptT ServantError IO ChatActionResponse
+getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UpdatesResponse
+getFile_                   :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
+getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UserProfilePhotosResponse
+setWebhook_                :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
+answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO InlineQueryResponse
+answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO CallbackQueryResponse
+kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO KickChatMemberResponse
+unbanChatMember_           :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UnbanChatMemberResponse
+editMessageText_           :: Token -> EditMessageTextRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
+editMessageCaption_        :: Token -> EditMessageCaptionRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
+editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -169,7 +184,10 @@ getMe_
   :<|> answerInlineQuery_
   :<|> answerCallbackQuery_
   :<|> kickChatMember_
-  :<|> unbanChatMember_ =
+  :<|> unbanChatMember_
+  :<|> editMessageText_
+  :<|> editMessageCaption_
+  :<|> editMessageReplyMarkup_ =
       client api
 
 -- | A simple method for testing your bot's auth token. Requires no parameters.
@@ -242,17 +260,33 @@ setWebhook :: Token
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url manager = runExceptT $ setWebhook_ token url manager telegramBaseUrl
 
+-- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
 answerInlineQuery = run telegramBaseUrl answerInlineQuery_
 
+-- | Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
 answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> IO (Either ServantError CallbackQueryResponse)
 answerCallbackQuery = run telegramBaseUrl answerCallbackQuery_
 
+-- | Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must be an administrator in the group for this to work.
 kickChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError KickChatMemberResponse)
 kickChatMember token chat_id user_id manager = runExceptT $ kickChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl
 
+-- | Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically, but will be able to join via link, etc. The bot must be an administrator in the group for this to work.
 unbanChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError UnbanChatMemberResponse)
 unbanChatMember token chat_id user_id manager = runExceptT $ unbanChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl
+
+-- | Use this method to edit text messages sent by the bot or via the bot (for inline bots). On success, if edited message is sent by the bot, the edited `Message` is returned, otherwise True is returned.
+editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
+editMessageText = run telegramBaseUrl editMessageText_
+
+-- | Use this method to edit captions of messages sent by the bot or via the bot (for inline bots). On success, if edited message is sent by the bot, the edited `Message` is returned.
+editMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError MessageResponse)
+editMessageCaption = run telegramBaseUrl editMessageCaption_
+
+-- | Use this method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots). On success, if edited message is sent by the bot, the edited `Message` is returned.
+editMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError MessageResponse)
+editMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup_
 
 run :: BaseUrl -> (Token -> a -> Manager -> BaseUrl -> ExceptT ServantError IO b) -> Token -> a -> Manager -> IO (Either ServantError b)
 run b e t r m = runExceptT $ e t r m b

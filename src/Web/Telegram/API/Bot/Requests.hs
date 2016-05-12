@@ -9,20 +9,23 @@
 -- | This module contains data objects which represents requests to Telegram Bot API
 module Web.Telegram.API.Bot.Requests
     ( -- * Types
-      SendMessageRequest           (..)
-    , ForwardMessageRequest        (..)
-    , SendPhotoRequest             (..)
-    , SendAudioRequest             (..)
-    , SendDocumentRequest          (..)
-    , SendStickerRequest           (..)
-    , SendVideoRequest             (..)
-    , SendVoiceRequest             (..)
-    , SendLocationRequest          (..)
-    , SendChatActionRequest        (..)
-    , ChatAction                   (..)
-    , AnswerInlineQueryRequest     (..)
-    , AnswerCallbackQueryRequest   (..)
-    , ReplyKeyboard                (..)
+      SendMessageRequest             (..)
+    , ForwardMessageRequest          (..)
+    , SendPhotoRequest               (..)
+    , SendAudioRequest               (..)
+    , SendDocumentRequest            (..)
+    , SendStickerRequest             (..)
+    , SendVideoRequest               (..)
+    , SendVoiceRequest               (..)
+    , SendLocationRequest            (..)
+    , SendChatActionRequest          (..)
+    , ChatAction                     (..)
+    , AnswerInlineQueryRequest       (..)
+    , AnswerCallbackQueryRequest     (..)
+    , ReplyKeyboard                  (..)
+    , EditMessageTextRequest         (..)
+    , EditMessageCaptionRequest      (..)
+    , EditMessageReplyMarkupRequest  (..)
     ) where
 
 import           Data.Aeson
@@ -214,8 +217,8 @@ instance FromJSON ChatAction where
 -- | This object represents request for 'sendChatAction'
 data SendChatActionRequest = SendChatActionRequest
   {
-    action_chat_id :: Text
-  , action_action :: ChatAction
+    action_chat_id :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , action_action :: ChatAction -- ^ Type of action to broadcast.
   } deriving (Show, Generic)
 
 instance ToJSON SendChatActionRequest where
@@ -242,9 +245,9 @@ instance FromJSON AnswerInlineQueryRequest where
 
 data AnswerCallbackQueryRequest = AnswerCallbackQueryRequest
   {
-    cq_callback_query_id :: Text
-  , cq_text :: Maybe Text
-  , cq_show_alert :: Maybe Bool
+    cq_callback_query_id :: Text -- ^ Unique identifier for the query to be answered
+  , cq_text :: Maybe Text -- ^ Text of the notification. If not specified, nothing will be shown to the user
+  , cq_show_alert :: Maybe Bool -- ^ If true, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to false.
   } deriving (Show, Generic)
 
 instance ToJSON AnswerCallbackQueryRequest where
@@ -280,3 +283,49 @@ instance ToJSON ReplyKeyboard where
 
 instance FromJSON ReplyKeyboard where
   parseJSON = parseJsonDrop 6
+
+data EditMessageTextRequest = EditMessageTextRequest
+  {
+    emt_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , emt_message_id :: Maybe Integer -- ^ if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emt_inline_message_id :: Maybe Text -- ^ Required if chat_id and message_id are not specified. Identifier of the inline message
+  , emt_text :: Text -- ^ New text of the message
+  , emt_parse_mode :: Maybe ParseMode -- ^ Send `Markdown` or `HTML`, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
+  , emt_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in this message
+  , emt_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON EditMessageTextRequest where
+  toJSON = toJsonDrop 4
+
+instance FromJSON EditMessageTextRequest where
+  parseJSON = parseJsonDrop 4
+
+data EditMessageCaptionRequest = EditMessageCaptionRequest
+  {
+    emc_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , emc_message_id :: Maybe Integer -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emc_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
+  , emc_caption :: Maybe Text -- ^ New caption of the message
+  , emc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON EditMessageCaptionRequest where
+  toJSON = toJsonDrop 4
+
+instance FromJSON EditMessageCaptionRequest where
+  parseJSON = parseJsonDrop 4
+
+data EditMessageReplyMarkupRequest = EditMessageReplyMarkupRequest
+  {
+    emrm_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , emrm_message_id :: Maybe Integer -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emrm_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
+  , emrm_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON EditMessageReplyMarkupRequest where
+  toJSON = toJsonDrop 5
+
+instance FromJSON EditMessageReplyMarkupRequest where
+  parseJSON = parseJsonDrop 5
