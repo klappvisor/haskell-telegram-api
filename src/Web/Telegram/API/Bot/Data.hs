@@ -179,6 +179,7 @@ data Sticker = Sticker
   , sticker_width     :: Int              -- ^ Sticker width
   , sticker_height    :: Int              -- ^ Sticker height
   , sticker_thumb     :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
+  , sticker_emoji     :: Maybe Text       -- ^ Emoji associated with the sticker
   , sticker_file_size :: Maybe Int        -- ^ File size
   } deriving (Show, Generic)
 
@@ -226,6 +227,7 @@ data InlineQuery = InlineQuery
   {
     query_id        :: Text -- ^ Unique identifier for this query
   , query_from      :: User -- ^ Sender
+  , query_location  :: Maybe Location -- ^ Sender location, only for bots that request user location
   , query_query     :: Text -- ^ Text of the query
   , query_offset    :: Text -- ^ Offset of the results to be returned, can be controlled by the bot
   } deriving (Show, Generic)
@@ -239,9 +241,11 @@ instance FromJSON InlineQuery where
 -- | This object represents a result of an inline query that was chosen by the user and sent to their chat partner.
 data ChosenInlineResult = ChosenInlineResult
   {
-    chosen_result_id :: Text -- ^ Unique identifier for this query
-  , chosen_from      :: User -- ^ Sender
-  , chosen_query     :: Text -- ^ Text of the query
+    chosen_result_id          :: Text -- ^ The unique identifier for the result that was chosen
+  , chosen_from               :: User -- ^ The user that chose the result
+  , chosen_location           :: Maybe Location -- ^ Sender location, only for bots that require user location
+  , chosen_inline_message_id  :: Maybe Text -- ^ Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
+  , chosen_query              :: Text -- ^ The query that was used to obtain the result
   } deriving (Show, Generic)
 
 instance ToJSON ChosenInlineResult where
@@ -456,6 +460,7 @@ data Message = Message
   , date :: Int                           -- ^ Date the message was sent in Unix time
   , chat :: Chat                          -- ^ Conversation the message belongs to
   , forward_from :: Maybe User            -- ^ For forwarded messages, sender of the original message
+  , forward_from_chat :: Maybe Chat       -- ^ For messages forwarded from a channel, information about the original channel
   , forward_date :: Maybe Int             -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message :: Maybe Message     -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
   , text :: Maybe Text                    -- ^ For text messages, the actual UTF-8 text of the message
