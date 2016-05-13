@@ -179,6 +179,7 @@ data Sticker = Sticker
   , sticker_width     :: Int              -- ^ Sticker width
   , sticker_height    :: Int              -- ^ Sticker height
   , sticker_thumb     :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
+  , sticker_emoji     :: Maybe Text       -- ^ Emoji associated with the sticker
   , sticker_file_size :: Maybe Int        -- ^ File size
   } deriving (Show, Generic)
 
@@ -459,6 +460,7 @@ data Message = Message
   , date :: Int                           -- ^ Date the message was sent in Unix time
   , chat :: Chat                          -- ^ Conversation the message belongs to
   , forward_from :: Maybe User            -- ^ For forwarded messages, sender of the original message
+  , forward_from_chat :: Maybe Chat       -- ^ For messages forwarded from a channel, information about the original channel
   , forward_date :: Maybe Int             -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message :: Maybe Message     -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
   , text :: Maybe Text                    -- ^ For text messages, the actual UTF-8 text of the message
