@@ -60,7 +60,7 @@ main = do
 #### Note on requests:
 
 Many request data records have a lot of optional parameters which are usually redundant.
-There is two way of creating requests:In order to solve this issue new way of creating request is introduced:
+There is two way to create requests:
 
 With data type constructor:
 ```haskell
