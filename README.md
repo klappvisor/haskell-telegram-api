@@ -20,38 +20,48 @@ See list of supported methods below in TODO section.
 `getMe` example
 
 ```haskell
-import Control.Monad
 import qualified Data.Text.IO as T
-import Data.Maybe
-import Web.Telegram.API.Bot
+import           Network.HTTP.Client      (newManager)
+import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
-  manager <- runIO $ newManager tlsManagerSettings
-  Right GetMeResponse { user_result = u } <-
-    getMe token manager
-  T.putStrLn (user_first_name u)
+  manager <- newManager tlsManagerSettings
+  res <- getMe token manager
+  case res of
+    Left e -> do
+      putStrLn "Request failed"
+      print e
+    Right GetMeResponse { user_result = u } -> do
+      putStrLn "Request succeded"
+      print $ user_first_name u
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
 
 `sendMessage` example
 
 ```haskell
-import Control.Monad
-import qualified Data.Text.IO as T
-import Data.Maybe
-import Web.Telegram.API.Bot
+{-# LANGUAGE OverloadedStrings #-}
+
+import qualified Data.Text.IO             as T
+import           Network.HTTP.Client      (newManager)
+import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
-  manager <- runIO $ newManager tlsManagerSettings
-  let request = sendMessageRequest chatId message {
-    message_parse_mode = Just Markdown
-  }
-  Right MessageResponse { message_result = m } <-
-    sendMessage token request manager
-  T.putStrLn (message_id m)
-  T.putStrLn (text m)
+  manager <- newManager tlsManagerSettings
+  let request = sendMessageRequest chatId message
+  res <- sendMessage token request manager
+  case res of
+    Left e -> do
+      putStrLn "Request failed"
+      print e
+    Right MessageResponse { message_result = m } -> do
+      putStrLn "Request succeded"
+      print $ message_id m
+      print $ text m
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
         chatId = "<chat_id> or <@channelusername>" 
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
@@ -60,7 +70,7 @@ main = do
 #### Note on requests:
 
 Many request data records have a lot of optional parameters which are usually redundant.
-There is two way to create requests:
+There are two ways to create requests:
 
 With data type constructor:
 ```haskell
@@ -103,13 +113,13 @@ stack test --test-arguments "$BOT_TOKEN $CHAT_ID $BOT_NAME"
 
 where
 
-* `$BOT_TOKEN` is token obtained from BotFather with prefix `bot<token from BotFather>`
+* `$BOT_TOKEN` is token obtained from BotFather
 * `$CHAT_ID` can be id of your chat with your bot. Send some message to this chat in Telegram and do `curl "https://api.telegram.org/bot<replace_with_token>/getUpdates"`, you have to parse some JSON with your brain ;-) or any other suitable tool and you will find chat id there.
 * `$BOT_NAME` name of your bot
 
 Note: Inline Spec is disabled for now...
 
-If everything is fine after test you will see receive a few new messages from your bot.
+If everything is fine after running the tests you will receive a few new messages from your bot.
 
 ## TODO
 
