@@ -33,19 +33,22 @@ spec token chatId botName = do
 
   describe "/sendMessage" $ do
     it "should send message" $ do
-      res <- sendMessage token (SendMessageRequest chatId "test message" Nothing Nothing Nothing Nothing Nothing) manager
+      res <- sendMessage token (sendMessageRequest chatId "test message") manager
       success res 
       let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "test message")
 
     it "should return error message" $ do
-      res <- sendMessage token (SendMessageRequest "" "test message" Nothing Nothing Nothing Nothing Nothing) manager
+      res <- sendMessage token (sendMessageRequest "" "test message") manager
       nosuccess res
       let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
       msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
-      res <- sendMessage token (SendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)" (Just Markdown) Nothing Nothing Nothing Nothing) manager
+      let request = (sendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)") {
+          message_parse_mode = Just Markdown
+        }
+      res <- sendMessage token request manager
       success res
       let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "text bold italic github")
@@ -73,7 +76,7 @@ spec token chatId botName = do
 
   describe "/forwardMessage" $ do
     it "should forward message" $ do
-      res <- forwardMessage token (ForwardMessageRequest chatId chatId Nothing 123) manager
+      res <- forwardMessage token (ForwardMessageRequest chatId chatId Nothing 123000) manager
       nosuccess res
       let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
       msg `shouldBe` "Bad Request"
