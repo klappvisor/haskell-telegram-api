@@ -16,6 +16,8 @@ module Web.Telegram.API.Bot.API
   , sendVideo
   , sendVoice
   , sendLocation
+  , sendVenue
+  , sendContact
   , sendChatAction
   , getUpdates
   , getFile
@@ -95,6 +97,12 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "sendLocation"
          :> ReqBody '[JSON] SendLocationRequest
          :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendVenue"
+         :> ReqBody '[JSON] SendVenueRequest
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendContact"
+         :> ReqBody '[JSON] SendContactRequest
+         :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendChatAction"
          :> ReqBody '[JSON] SendChatActionRequest
          :> Post '[JSON] ChatActionResponse
@@ -154,6 +162,8 @@ sendSticker_               :: Token -> SendStickerRequest -> Manager -> BaseUrl 
 sendVideo_                 :: Token -> SendVideoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendVoice_                 :: Token -> SendVoiceRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendLocation_              :: Token -> SendLocationRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendVenue_                 :: Token -> SendVenueRequest-> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendContact_               :: Token -> SendContactRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendChatAction_            :: Token -> SendChatActionRequest -> Manager -> BaseUrl -> ExceptT ServantError IO ChatActionResponse
 getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UpdatesResponse
 getFile_                   :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
@@ -176,6 +186,8 @@ getMe_
   :<|> sendVideo_
   :<|> sendVoice_
   :<|> sendLocation_
+  :<|> sendVenue_
+  :<|> sendContact_
   :<|> sendChatAction_
   :<|> getUpdates_
   :<|> getFile_
@@ -232,6 +244,14 @@ sendVoice = run telegramBaseUrl sendVoice_
 -- | Use this method to send point on the map. On success, the sent 'Message' is returned.
 sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ServantError MessageResponse)
 sendLocation = run telegramBaseUrl sendLocation_
+
+-- | Use this method to send information about a venue. On success, the sent Message is returned.
+sendVenue :: Token -> SendVenueRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendVenue = run telegramBaseUrl sendVenue_
+
+-- | Use this method to send information about a venue. On success, the sent Message is returned.
+sendContact :: Token -> SendContactRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendContact = run telegramBaseUrl sendContact_
 
 -- | Use this method when you need to tell the user that something is happening on the bot's side.
 --   The status is set for 5 seconds or less (when a message arrives from your bot,

@@ -108,6 +108,21 @@ spec token chatId botName = do
       (latitude loc) `shouldSatisfy` (liftM2 (&&) (> 52) (< 52.4))
       (longitude loc) `shouldSatisfy` (liftM2 (&&) (> 4.89) (< 5))
 
+  describe "/sendVenue" $ do
+    it "should send a venue" $ do
+      Right MessageResponse { message_result = Message { location = Just loc } } <-
+        sendVenue token (SendVenueRequest chatId 52.38 4.9 "Amsterdam Centraal" "Amsterdam" Nothing Nothing Nothing) manager
+      (latitude loc) `shouldSatisfy` (liftM2 (&&) (> 52) (< 52.4))
+      (longitude loc) `shouldSatisfy` (liftM2 (&&) (> 4.89) (< 5))
+
+  describe "/sendContact" $ do
+    it "should send a contact" $ do
+      Right MessageResponse { message_result = Message { contact = Just con } } <-
+        sendContact token (SendContactRequest chatId "06-18035176" "Hilbert" Nothing Nothing Nothing) manager
+      -- Telegram seems to remove any non numeric characters from the sent phone number (at least it removed my '-')
+      (contact_phone_number con) `shouldBe` "0618035176"
+      (contact_first_name con) `shouldBe` "Hilbert"
+
   describe "/sendChatAction" $ do
     it "should set typing action" $ do
       Right ChatActionResponse { action_result = res} <-

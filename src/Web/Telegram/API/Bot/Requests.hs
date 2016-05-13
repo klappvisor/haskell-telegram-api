@@ -18,6 +18,8 @@ module Web.Telegram.API.Bot.Requests
     , SendVideoRequest               (..)
     , SendVoiceRequest               (..)
     , SendLocationRequest            (..)
+    , SendVenueRequest               (..)
+    , SendContactRequest             (..)
     , SendChatActionRequest          (..)
     , ChatAction                     (..)
     , AnswerInlineQueryRequest       (..)
@@ -181,6 +183,42 @@ instance ToJSON SendLocationRequest where
   toJSON = toJsonDrop 9
 
 instance FromJSON SendLocationRequest where
+  parseJSON = parseJsonDrop 9
+
+-- | This object represents request for 'sendVenue'
+data SendVenueRequest = SendVenueRequest
+  {
+    _venue_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _venue_latitude            :: Float -- ^ Latitude of the venue
+  , _venue_longitude           :: Float -- ^ Longitude of the venue
+  , _venue_title               :: Text -- ^ Name of the venue
+  , _venue_address             :: Text -- ^ Address of the venue
+  , _venue_foursquare_id       :: Maybe Text -- ^ Foursquare identifier of the venue
+  , _venue_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _venue_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+  } deriving (Show, Generic)
+
+instance ToJSON SendVenueRequest where
+  toJSON = toJsonDrop 7
+
+instance FromJSON SendVenueRequest where
+  parseJSON = parseJsonDrop 7
+
+-- | This object represents request for 'sendContact'
+data SendContactRequest = SendContactRequest
+  {
+    _contact_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _contact_phone_number        :: Text       -- ^ Contact's phone number
+  , _contact_first_name          :: Text       -- ^ Contact's first name
+  , _contact_last_name           :: Maybe Text -- ^ Contact's last name
+  , _contact_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _contact_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+  } deriving (Show, Generic)
+
+instance ToJSON SendContactRequest where
+  toJSON = toJsonDrop 9
+
+instance FromJSON SendContactRequest where
   parseJSON = parseJsonDrop 9
 
 -- | Type of action to broadcast.
