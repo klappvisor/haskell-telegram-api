@@ -64,8 +64,8 @@ data ForwardMessageRequest = ForwardMessageRequest
   {
     forward_chat_id :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , forward_from_chat_id :: Text -- ^ Unique identifier for the chat where the original message was sent (or channel username in the format @@channelusername@)
-  , forward_mesage_id :: Int -- ^ Unique message identifier
   , forward_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , forward_message_id :: Int -- ^ Unique message identifier
   } deriving (Show, Generic)
 
 instance ToJSON ForwardMessageRequest where
@@ -77,12 +77,12 @@ instance FromJSON ForwardMessageRequest where
 -- | This object represents request for 'sendPhoto'
 data SendPhotoRequest = SendPhotoRequest
   {
-    photo_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , photo_photo               :: Text -- ^ Photo to send. Pass a file_id as String to resend a photo that is already on the Telegram servers
-  , photo_caption             :: Maybe Text -- ^ Photo caption (may also be used when resending photos by file_id), 0-200 characters.
+    photo_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , photo_photo                :: Text -- ^ Photo to send. Pass a file_id as String to resend a photo that is already on the Telegram servers
+  , photo_caption              :: Maybe Text -- ^ Photo caption (may also be used when resending photos by file_id), 0-200 characters.
   , photo_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , photo_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , photo_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+  , photo_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , photo_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendPhotoRequest where
@@ -94,14 +94,14 @@ instance FromJSON SendPhotoRequest where
 -- | This object represents request for 'sendAudio'
 data SendAudioRequest = SendAudioRequest
   {
-    _audio_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _audio_audio               :: Text -- ^ Audio file to send. Pass a file_id as String to resend an audio that is already on the Telegram servers.
-  , _audio_duration            :: Maybe Int -- ^ Duration of the audio in seconds
-  , _audio_performer           :: Maybe Text -- ^ Performer
-  , _audio_title               :: Maybe Text -- ^ Track name
-  , _audio_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _audio_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    _audio_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _audio_audio                :: Text -- ^ Audio file to send. Pass a file_id as String to resend an audio that is already on the Telegram servers.
+  , _audio_duration             :: Maybe Int -- ^ Duration of the audio in seconds
+  , _audio_performer            :: Maybe Text -- ^ Performer
+  , _audio_title                :: Maybe Text -- ^ Track name
   , _audio_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _audio_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _audio_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendAudioRequest where
@@ -198,15 +198,15 @@ instance FromJSON SendLocationRequest where
 -- | This object represents request for 'sendVenue'
 data SendVenueRequest = SendVenueRequest
   {
-    _venue_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _venue_latitude            :: Float -- ^ Latitude of the venue
-  , _venue_longitude           :: Float -- ^ Longitude of the venue
-  , _venue_title               :: Text -- ^ Name of the venue
-  , _venue_address             :: Text -- ^ Address of the venue
-  , _venue_foursquare_id       :: Maybe Text -- ^ Foursquare identifier of the venue
-  , _venue_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _venue_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    _venue_chat_id               :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _venue_latitude              :: Float -- ^ Latitude of the venue
+  , _venue_longitude             :: Float -- ^ Longitude of the venue
+  , _venue_title                 :: Text -- ^ Name of the venue
+  , _venue_address               :: Text -- ^ Address of the venue
+  , _venue_foursquare_id         :: Maybe Text -- ^ Foursquare identifier of the venue
   , _venue_disable_notification  :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _venue_reply_to_message_id   :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _venue_reply_markup          :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendVenueRequest where
@@ -218,13 +218,13 @@ instance FromJSON SendVenueRequest where
 -- | This object represents request for 'sendContact'
 data SendContactRequest = SendContactRequest
   {
-    _contact_chat_id             :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _contact_phone_number        :: Text       -- ^ Contact's phone number
-  , _contact_first_name          :: Text       -- ^ Contact's first name
-  , _contact_last_name           :: Maybe Text -- ^ Contact's last name
-  , _contact_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _contact_reply_markup        :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    _contact_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _contact_phone_number         :: Text       -- ^ Contact's phone number
+  , _contact_first_name           :: Text       -- ^ Contact's first name
+  , _contact_last_name            :: Maybe Text -- ^ Contact's last name
   , _contact_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _contact_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _contact_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendContactRequest where
