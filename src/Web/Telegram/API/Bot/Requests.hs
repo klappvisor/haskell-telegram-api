@@ -30,6 +30,25 @@ module Web.Telegram.API.Bot.Requests
     , EditMessageReplyMarkupRequest  (..)
      -- * Functions
     , sendMessageRequest
+    , forwardMessageRequest
+    , sendPhotoRequest
+    , sendAudioRequest
+    , sendDocumentRequest
+    , sendStickerRequest
+    , sendVideoRequest
+    , sendVoiceRequest
+    , sendLocationRequest
+    , sendVenueRequest
+    , sendContactRequest
+    , sendChatActionRequest
+    , answerInlineQueryRequest
+    , answerCallbackQueryRequest
+    , replyKeyboardMarkup
+    , replyKeyboardHide
+    , forceReply
+    , editMessageTextRequest
+    , editMessageCaptionRequest
+    , editMessageReplyMarkupRequest
     ) where
 
 import           Data.Aeson
@@ -390,11 +409,11 @@ instance FromJSON ReplyKeyboard where
 replyKeyboardMarkup :: [[KeyboardButton]] -> ReplyKeyboard
 replyKeyboardMarkup keyboard = ReplyKeyboardMarkup keyboard Nothing Nothing Nothing
 
-replyKeyboardHide :: Bool -> ReplyKeyboard
-replyKeyboardHide hide = ReplyKeyboardHide hide Nothing
+replyKeyboardHide :: ReplyKeyboard
+replyKeyboardHide = ReplyKeyboardHide True Nothing
 
-forceReply :: Bool -> ReplyKeyboard
-forceReply force = ForceReply force Nothing
+forceReply :: ReplyKeyboard
+forceReply = ForceReply True Nothing
 
 data EditMessageTextRequest = EditMessageTextRequest
   {
