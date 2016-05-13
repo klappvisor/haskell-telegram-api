@@ -1,3 +1,9 @@
+## 0.3.1.0
+
+Features:
+
+* Added possibility to upload and send photo
+
 ## 0.3.0.0
 
 Bugfixes:
