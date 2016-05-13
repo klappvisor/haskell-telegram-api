@@ -31,6 +31,7 @@ module Web.Telegram.API.Bot.Data
     , ChatType                      (..)
     , ParseMode                     (..)
     , InputMessageContent           (..)
+    , KeyboardButton                (..)
     ) where
 
 import           Data.Aeson
@@ -511,3 +512,16 @@ instance ToJSON Venue where
 
 instance FromJSON Venue where
   parseJSON = parseJsonDrop 6
+
+data KeyboardButton = KeyboardButton
+  {
+    kb_text             :: Text -- ^ Text of the button. If none of the optional fields are used, it will be sent to the bot as a message when the button is pressed
+  , kb_request_contact  :: Maybe Bool -- ^ If True, the user's phone number will be sent as a contact when the button is pressed. Available in private chats only
+  , kb_request_location :: Maybe Bool -- ^ If True, the user's current location will be sent when the button is pressed. Available in private chats only
+  } deriving (Show, Generic)
+
+instance ToJSON KeyboardButton where
+  toJSON = toJsonDrop 3
+
+instance FromJSON KeyboardButton where
+  parseJSON = parseJsonDrop 3

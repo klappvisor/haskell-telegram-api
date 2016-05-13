@@ -51,7 +51,10 @@ spec token chatId botName = do
       (text m) `shouldBe` (Just "text bold italic github")
 
     it "should set keyboard" $ do
-      res <- sendMessage token (SendMessageRequest chatId "set keyboard" Nothing Nothing Nothing Nothing (Just (ReplyKeyboardMarkup [["A", "B"], ["C"]] Nothing Nothing Nothing))) manager
+      let kbA = KeyboardButton "A" Nothing Nothing
+          kbB = KeyboardButton "B" Nothing Nothing
+          kbC = KeyboardButton "C" Nothing Nothing
+      res <- sendMessage token (SendMessageRequest chatId "set keyboard" Nothing Nothing Nothing Nothing (Just (ReplyKeyboardMarkup [[kbA, kbB], [kbC]] Nothing Nothing Nothing))) manager
       success res
       let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "set keyboard")
