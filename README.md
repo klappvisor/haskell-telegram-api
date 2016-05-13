@@ -20,7 +20,8 @@ See list of supported methods below in TODO section.
 `getMe` example
 
 ```haskell
-import qualified Data.Text.IO             as T
+{-# LANGUAGE OverloadedStrings #-}
+
 import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Web.Telegram.API.Bot
@@ -44,7 +45,6 @@ main = do
 ```haskell
 {-# LANGUAGE OverloadedStrings #-}
 
-import qualified Data.Text.IO             as T
 import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Web.Telegram.API.Bot
