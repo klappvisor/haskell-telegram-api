@@ -240,11 +240,11 @@ instance FromJSON InlineQuery where
 -- | This object represents a result of an inline query that was chosen by the user and sent to their chat partner.
 data ChosenInlineResult = ChosenInlineResult
   {
-    chosen_result_id          :: Text -- ^ Unique identifier for this query
-  , chosen_from               :: User -- ^ Sender
-  , chosen_location           :: Maybe Location -- ^ Sender location, only for bots that request user location
+    chosen_result_id          :: Text -- ^ The unique identifier for the result that was chosen
+  , chosen_from               :: User -- ^ The user that chose the result
+  , chosen_location           :: Maybe Location -- ^ Sender location, only for bots that require user location
   , chosen_inline_message_id  :: Maybe Text -- ^ Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
-  , chosen_query              :: Text -- ^ Text of the query
+  , chosen_query              :: Text -- ^ The query that was used to obtain the result
   } deriving (Show, Generic)
 
 instance ToJSON ChosenInlineResult where
