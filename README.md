@@ -27,8 +27,9 @@ import Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
+  manager <- runIO $ newManager tlsManagerSettings
   Right GetMeResponse { user_result = u } <-
-    getMe token
+    getMe token manager
   T.putStrLn (user_first_name u)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
@@ -43,13 +44,38 @@ import Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
+  manager <- runIO $ newManager tlsManagerSettings
+  let request = sendMessageRequest chatId message {
+    message_parse_mode = Just Markdown
+  }
   Right MessageResponse { message_result = m } <-
-    sendMessage token (SendMessageRequest chatId message (Just Markdown) Nothing Nothing Nothing)
+    sendMessage token request manager
   T.putStrLn (message_id m)
   T.putStrLn (text m)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
         chatId = "<chat_id> or <@channelusername>" 
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
+```
+
+#### Note on requests:
+
+Many request data records have a lot of optional parameters which are usually redundant.
+There is two way of creating requests:In order to solve this issue new way of creating request is introduced:
+
+With data type constructor:
+```haskell
+let request = SendMessageRequest "chatId" "text" Nothing (Just True) Nothing Nothing Nothing
+```
+Using default instance:
+
+```haskell
+let request = sendMessageRequest "chatId" "text" -- only with required fields
+```
+
+```haskell
+let request = (sendMessageRequest "chatId" "text") {
+  message_disable_notification = Just True -- with optional fields
+}
 ```
 
 ## Contribution

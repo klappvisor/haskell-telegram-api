@@ -32,6 +32,9 @@ module Web.Telegram.API.Bot.Data
     , ParseMode                     (..)
     , InputMessageContent           (..)
     , KeyboardButton                (..)
+      -- * Functions
+    , inlineKeyboardButton
+    , keyboardButton
     ) where
 
 import           Data.Aeson
@@ -400,6 +403,9 @@ instance ToJSON InlineKeyboardButton where
 instance FromJSON InlineKeyboardButton where
   parseJSON = parseJsonDrop 4
 
+inlineKeyboardButton :: Text -> InlineKeyboardButton
+inlineKeyboardButton text = InlineKeyboardButton text Nothing Nothing Nothing
+
 data CallbackQuery = CallbackQuery
   {
     cq_id :: Text
@@ -530,3 +536,6 @@ instance ToJSON KeyboardButton where
 
 instance FromJSON KeyboardButton where
   parseJSON = parseJsonDrop 3
+
+keyboardButton :: Text -> KeyboardButton
+keyboardButton text = KeyboardButton text Nothing Nothing

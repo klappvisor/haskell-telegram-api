@@ -28,6 +28,27 @@ module Web.Telegram.API.Bot.Requests
     , EditMessageTextRequest         (..)
     , EditMessageCaptionRequest      (..)
     , EditMessageReplyMarkupRequest  (..)
+     -- * Functions
+    , sendMessageRequest
+    , forwardMessageRequest
+    , sendPhotoRequest
+    , sendAudioRequest
+    , sendDocumentRequest
+    , sendStickerRequest
+    , sendVideoRequest
+    , sendVoiceRequest
+    , sendLocationRequest
+    , sendVenueRequest
+    , sendContactRequest
+    , sendChatActionRequest
+    , answerInlineQueryRequest
+    , answerCallbackQueryRequest
+    , replyKeyboardMarkup
+    , replyKeyboardHide
+    , forceReply
+    , editMessageTextRequest
+    , editMessageCaptionRequest
+    , editMessageReplyMarkupRequest
     ) where
 
 import           Data.Aeson
@@ -40,6 +61,7 @@ import           GHC.Generics
 import           GHC.TypeLits
 import           Web.Telegram.API.Bot.JsonExt
 import           Web.Telegram.API.Bot.Data
+
 
 -- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
@@ -59,6 +81,9 @@ instance ToJSON SendMessageRequest where
 instance FromJSON SendMessageRequest where
   parseJSON = parseJsonDrop 8
 
+sendMessageRequest :: Text -> Text -> SendMessageRequest
+sendMessageRequest chatId text = SendMessageRequest chatId text Nothing Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'forwardMessage'
 data ForwardMessageRequest = ForwardMessageRequest
   {
@@ -73,6 +98,9 @@ instance ToJSON ForwardMessageRequest where
 
 instance FromJSON ForwardMessageRequest where
   parseJSON = parseJsonDrop 8
+
+forwardMessageRequest :: Text -> Text -> Int -> ForwardMessageRequest
+forwardMessageRequest chatId fromChatId forwardMessageId = ForwardMessageRequest chatId fromChatId Nothing forwardMessageId
 
 -- | This object represents request for 'sendPhoto'
 data SendPhotoRequest = SendPhotoRequest
@@ -90,6 +118,9 @@ instance ToJSON SendPhotoRequest where
 
 instance FromJSON SendPhotoRequest where
   parseJSON = parseJsonDrop 6
+
+sendPhotoRequest :: Text -> Text -> SendPhotoRequest
+sendPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendAudio'
 data SendAudioRequest = SendAudioRequest
@@ -110,6 +141,9 @@ instance ToJSON SendAudioRequest where
 instance FromJSON SendAudioRequest where
   parseJSON = parseJsonDrop 7
 
+sendAudioRequest :: Text -> Text -> SendAudioRequest
+sendAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendSticker'
 data SendStickerRequest = SendStickerRequest
   {
@@ -125,6 +159,9 @@ instance ToJSON SendStickerRequest where
 
 instance FromJSON SendStickerRequest where
   parseJSON = parseJsonDrop 8
+
+sendStickerRequest :: Text -> Text -> SendStickerRequest
+sendStickerRequest chatId sticker = SendStickerRequest chatId sticker Nothing Nothing Nothing
 
 -- | This object represents request for 'sendDocument'
 data SendDocumentRequest = SendDocumentRequest
@@ -142,6 +179,9 @@ instance ToJSON SendDocumentRequest where
 
 instance FromJSON SendDocumentRequest where
   parseJSON = parseJsonDrop 9
+
+sendDocumentRequest :: Text -> Text -> SendDocumentRequest
+sendDocumentRequest chatId document = SendDocumentRequest chatId document Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendVideo'
 data SendVideoRequest = SendVideoRequest
@@ -161,6 +201,9 @@ instance ToJSON SendVideoRequest where
 instance FromJSON SendVideoRequest where
   parseJSON = parseJsonDrop 7
 
+sendVideoRequest :: Text -> Text -> SendVideoRequest
+sendVideoRequest chatId video = SendVideoRequest chatId video Nothing Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendVoice'
 data SendVoiceRequest = SendVoiceRequest
   {
@@ -178,6 +221,9 @@ instance ToJSON SendVoiceRequest where
 instance FromJSON SendVoiceRequest where
   parseJSON = parseJsonDrop 7
 
+sendVoiceRequest :: Text -> Text -> SendVoiceRequest
+sendVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
   {
@@ -194,6 +240,9 @@ instance ToJSON SendLocationRequest where
 
 instance FromJSON SendLocationRequest where
   parseJSON = parseJsonDrop 9
+
+sendLocationRequest :: Text -> Float -> Float -> SendLocationRequest
+sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing
 
 -- | This object represents request for 'sendVenue'
 data SendVenueRequest = SendVenueRequest
@@ -215,6 +264,9 @@ instance ToJSON SendVenueRequest where
 instance FromJSON SendVenueRequest where
   parseJSON = parseJsonDrop 7
 
+sendVenueRequest :: Text -> Float -> Float -> Text -> Text -> SendVenueRequest
+sendVenueRequest chatId latitude longitude title address = SendVenueRequest chatId latitude longitude title address Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendContact'
 data SendContactRequest = SendContactRequest
   {
@@ -232,6 +284,9 @@ instance ToJSON SendContactRequest where
 
 instance FromJSON SendContactRequest where
   parseJSON = parseJsonDrop 9
+
+sendContactRequest :: Text -> Text -> Text -> SendContactRequest
+sendContactRequest chatId phoneNumber firstName = SendContactRequest chatId phoneNumber firstName Nothing Nothing Nothing Nothing
 
 -- | Type of action to broadcast.
 data ChatAction = Typing
@@ -277,6 +332,8 @@ instance ToJSON SendChatActionRequest where
 instance FromJSON SendChatActionRequest where
   parseJSON = parseJsonDrop 7
 
+sendChatActionRequest :: Text -> ChatAction -> SendChatActionRequest
+sendChatActionRequest chatId action = SendChatActionRequest chatId action
 
 data AnswerInlineQueryRequest = AnswerInlineQueryRequest
   {
@@ -302,6 +359,9 @@ instance ToJSON AnswerInlineQueryRequest where
 instance FromJSON AnswerInlineQueryRequest where
   parseJSON = parseJsonDrop 6
 
+answerInlineQueryRequest :: Text -> [InlineQueryResult] -> AnswerInlineQueryRequest
+answerInlineQueryRequest queryId results = AnswerInlineQueryRequest queryId results Nothing Nothing Nothing Nothing Nothing
+
 data AnswerCallbackQueryRequest = AnswerCallbackQueryRequest
   {
     cq_callback_query_id :: Text -- ^ Unique identifier for the query to be answered
@@ -314,6 +374,9 @@ instance ToJSON AnswerCallbackQueryRequest where
 
 instance FromJSON AnswerCallbackQueryRequest where
   parseJSON = parseJsonDrop 3
+
+answerCallbackQueryRequest :: Text -> AnswerCallbackQueryRequest
+answerCallbackQueryRequest chatId = AnswerCallbackQueryRequest chatId Nothing Nothing
 
 data ReplyKeyboard =
   -- | This object represents a custom keyboard with reply options
@@ -343,6 +406,15 @@ instance ToJSON ReplyKeyboard where
 instance FromJSON ReplyKeyboard where
   parseJSON = parseJsonDrop 6
 
+replyKeyboardMarkup :: [[KeyboardButton]] -> ReplyKeyboard
+replyKeyboardMarkup keyboard = ReplyKeyboardMarkup keyboard Nothing Nothing Nothing
+
+replyKeyboardHide :: ReplyKeyboard
+replyKeyboardHide = ReplyKeyboardHide True Nothing
+
+forceReply :: ReplyKeyboard
+forceReply = ForceReply True Nothing
+
 data EditMessageTextRequest = EditMessageTextRequest
   {
     emt_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
@@ -360,6 +432,12 @@ instance ToJSON EditMessageTextRequest where
 instance FromJSON EditMessageTextRequest where
   parseJSON = parseJsonDrop 4
 
+editMessageTextRequest :: Text -> Int -> Text -> EditMessageTextRequest
+editMessageTextRequest chatId messageId text = EditMessageTextRequest (Just chatId) (Just messageId) Nothing text Nothing Nothing Nothing
+
+editInlineMessageTextRequest :: Text -> Text -> EditMessageTextRequest
+editInlineMessageTextRequest inlineMessageId text = EditMessageTextRequest Nothing Nothing (Just inlineMessageId) text Nothing Nothing Nothing
+
 data EditMessageCaptionRequest = EditMessageCaptionRequest
   {
     emc_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
@@ -375,6 +453,12 @@ instance ToJSON EditMessageCaptionRequest where
 instance FromJSON EditMessageCaptionRequest where
   parseJSON = parseJsonDrop 4
 
+editMessageCaptionRequest :: Text -> Int -> Maybe Text -> EditMessageCaptionRequest
+editMessageCaptionRequest chatId messageId caption = EditMessageCaptionRequest (Just chatId) (Just messageId) Nothing caption Nothing
+
+editInlineMessageCaptionRequest :: Text -> Maybe Text -> EditMessageCaptionRequest
+editInlineMessageCaptionRequest inlineMessageId caption = EditMessageCaptionRequest Nothing Nothing (Just inlineMessageId) caption Nothing
+
 data EditMessageReplyMarkupRequest = EditMessageReplyMarkupRequest
   {
     emrm_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
@@ -388,3 +472,9 @@ instance ToJSON EditMessageReplyMarkupRequest where
 
 instance FromJSON EditMessageReplyMarkupRequest where
   parseJSON = parseJsonDrop 5
+
+editMessageReplyMarkupRequest :: Text -> Int -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
+editMessageReplyMarkupRequest chatId messageId keyboard = EditMessageReplyMarkupRequest (Just chatId) (Just messageId) Nothing keyboard
+
+editInlineMessageReplyMarkupRequest :: Text -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
+editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyMarkupRequest Nothing Nothing (Just inlineMessageId) keyboard
