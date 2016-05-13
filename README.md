@@ -57,6 +57,27 @@ main = do
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
 ```
 
+#### Note on requests:
+
+Many request data records have a lot of optional parameters which are usually redundant.
+There is two way of creating requests:In order to solve this issue new way of creating request is introduced:
+
+With data type constructor:
+```haskell
+let request = SendMessageRequest "chatId" "text" Nothing (Just True) Nothing Nothing Nothing
+```
+Using default instance:
+
+```haskell
+let request = sendMessageRequest "chatId" "text" -- only with required fields
+```
+
+```haskell
+let request = (sendMessageRequest "chatId" "text") {
+  message_disable_notification = Just True -- with optional fields
+}
+```
+
 ## Contribution
 
 Contributions are welcome!
