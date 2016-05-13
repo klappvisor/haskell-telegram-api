@@ -226,6 +226,7 @@ data InlineQuery = InlineQuery
   {
     query_id        :: Text -- ^ Unique identifier for this query
   , query_from      :: User -- ^ Sender
+  , query_location  :: Maybe Location -- ^ Sender location, only for bots that request user location
   , query_query     :: Text -- ^ Text of the query
   , query_offset    :: Text -- ^ Offset of the results to be returned, can be controlled by the bot
   } deriving (Show, Generic)
@@ -241,6 +242,8 @@ data ChosenInlineResult = ChosenInlineResult
   {
     chosen_result_id :: Text -- ^ Unique identifier for this query
   , chosen_from      :: User -- ^ Sender
+  , chosen_location  :: Maybe Location -- ^ Sender location, only for bots that request user location
+  , chosen_inline_message_id  :: Maybe Text -- ^ Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
   , chosen_query     :: Text -- ^ Text of the query
   } deriving (Show, Generic)
 
