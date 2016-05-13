@@ -27,8 +27,9 @@ import Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
+  manager <- runIO $ newManager tlsManagerSettings
   Right GetMeResponse { user_result = u } <-
-    getMe token
+    getMe token manager
   T.putStrLn (user_first_name u)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
 ```
@@ -43,8 +44,12 @@ import Web.Telegram.API.Bot
 
 main :: IO ()
 main = do
+  manager <- runIO $ newManager tlsManagerSettings
+  let request = sendMessageRequest chatId message {
+    message_parse_mode = Just Markdown
+  }
   Right MessageResponse { message_result = m } <-
-    sendMessage token (SendMessageRequest chatId message (Just Markdown) Nothing Nothing Nothing)
+    sendMessage token request manager
   T.putStrLn (message_id m)
   T.putStrLn (text m)
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
