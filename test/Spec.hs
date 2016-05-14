@@ -3,12 +3,14 @@
 
 module Main (main) where
 
+import           Control.Monad                (when)
 import           Data.Maybe                   (fromMaybe)
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified MainSpec
 import           Options.Applicative
-import           System.Environment           (withArgs)
+import           System.Environment           (getArgs, withArgs)
+import           System.Exit                  (exitSuccess)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 import           Web.Telegram.API.Bot
@@ -45,6 +47,12 @@ options = Options
 
 main :: IO ()
 main = do
+    args <- getArgs
+    -- If called with -t -b -c with no actual arguments
+    -- don't test but return success.
+    when (length args == 3) $ do
+      putStrLn "Empty options, exiting with success"
+      exitSuccess
     Options{..} <- execParser opts
     let token = Token ("bot" <> T.pack opt_token)
         chatId = T.pack opt_chatId
