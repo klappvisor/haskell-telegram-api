@@ -1,45 +1,66 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Main (main) where
 
-import           Control.Monad
-import           Data.Monoid
-import           Web.Telegram.API.Bot
-import           Test.Hspec
-import           Data.Text (Text)
-import qualified Data.Text as T
-import           Servant.Client
-import           Servant.API
-import           Network.HTTP.Types.Status
-import           System.Environment
+import           Data.Maybe                   (fromMaybe)
+import           Data.Text                    (Text)
+import qualified Data.Text                    as T
 import qualified MainSpec
-import qualified InlineSpec
+import           Options.Applicative
+import           System.Environment           (withArgs)
+import           Test.Hspec
+import qualified Text.PrettyPrint.ANSI.Leijen as PP
+import           Web.Telegram.API.Bot
+
+-- | Command line options for test suite
+data Options = Options
+  {
+    opt_token     :: String   -- ^ Bot token from BotFather
+  , opt_chatId    :: String   -- ^ Id of a chat or of your bot
+  , opt_botName   :: String   -- ^ Bot name
+  , opt_hSpecOtps :: Maybe [String] -- ^ Command line options to pass to hSpec
+  }
+
+options :: Parser Options
+options = Options
+    <$> strOption
+         ( long "token"
+        <> short 't'
+        <> metavar "BOT_TOKEN"
+        <> help "Bot Token" )
+    <*> strOption
+         ( long "chatid"
+        <> short 'c'
+        <> metavar "CHAT_ID"
+        <> help "Chat Id" )
+    <*> strOption
+         ( long "botname"
+        <> short 'b'
+        <> metavar "BOT_NAME"
+        <> help "Bot Name" )
+    <*> (optional (some (argument str
+         ( metavar "HSPEC_ARGS"
+        <> help "Hspec arguments"))))
 
 main :: IO ()
 main = do
-    args <- getArgs
-    withArgs [] $ hspec (runSpec args)
-
--- Don't run integration tests if no token and chat id provided
-runSpec :: [String] -> SpecWith ()
-runSpec [] = do
-  describe "NoTests" $ do
-    it "Does not run integration tests if no token, chat id and boot name provided" $ do
-      pending
-
-runSpec [tkn,cId,bNm] = do
-    let token = Token ("bot" <> T.pack tkn)
-    let chatId = T.pack cId
-    let botName = T.pack bNm
-    runSpec' token chatId botName
-
+    Options{..} <- execParser opts
+    let token = Token ("bot" <> T.pack opt_token)
+        chatId = T.pack opt_chatId
+        botName = T.pack opt_botName
+        hspecArgs = fromMaybe [] opt_hSpecOtps
+    withArgs hspecArgs $ hspec (runSpec' token chatId botName)
+    where opts = info (helper <*> options)
+            ( fullDesc
+           <> progDescDoc description)
 runSpec' :: Token -> Text -> Text -> SpecWith ()
-runSpec' token chatId botName = do
+runSpec' token chatId botName =
     describe "Main" $ MainSpec.spec token chatId botName
     --describe "Inline" $ InlineSpec.spec token chatId botName
 
+description ::  Maybe PP.Doc
+description = Just $
+           (PP.text  "Run the haskell-telegram-api tests")
+    PP.<$> ((PP.text "Running with stack: ") PP.<> (PP.text "stack test --test-arguments=\"-t asd128903uiasbfì1023u -c 1235122 -b MyTeleBot -- -m send\""))
+    PP.<$> ((PP.red . PP.text $ "WARNING: ") PP.<> (PP.text "the HSPEC_ARGS are optional but if present MUST be at the end and seperated from the other options with a -- "))
