@@ -523,6 +523,13 @@ data InlineQueryResult =
   } deriving (Show, Generic)
 
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
+tagModifier "InlineQueryResultCachedMpeg4Gif" = "mpeg4_gif"
+dropCached :: Text -> Text
+dropCached name
+  | T.null back = name
+  | otherwise = T.concat [T.drop 6 back]
+    where
+      (_, back) = breakOn "Cached" name
 tagModifier x = ((drop 17) . (fmap (Char.toLower))) x
 
 inlineQueryJSONOptions :: Options
