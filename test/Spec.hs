@@ -19,7 +19,7 @@ data Options = Options
     opt_token     :: String   -- ^ Bot token from BotFather
   , opt_chatId    :: String   -- ^ Id of a chat or of your bot
   , opt_botName   :: String   -- ^ Bot name
-  , opt_hSpecOtps :: Maybe [String] -- ^ Command line options to pass to hSpec
+  , opt_hSpecOpts :: Maybe [String] -- ^ Command line options to pass to hSpec
   }
 
 options :: Parser Options
@@ -49,7 +49,7 @@ main = do
     let token = Token ("bot" <> T.pack opt_token)
         chatId = T.pack opt_chatId
         botName = T.pack opt_botName
-        hspecArgs = fromMaybe [] opt_hSpecOtps
+        hspecArgs = fromMaybe [] opt_hSpecOpts
     withArgs hspecArgs $ hspec (runSpec' token chatId botName)
     where opts = info (helper <*> options)
             ( fullDesc
