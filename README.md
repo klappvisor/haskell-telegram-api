@@ -99,6 +99,10 @@ Contributions are welcome!
 5. ??????
 6. PROFIT
 
+Bear in mind that the CI build may fail since the necessary environment
+variables (`$BOT_TOKEN`, `$CHAT_ID` and `$BOT_NAME`) aren't exported when a fork
+starts the build.
+
 You can use `stack` to build project
 
 ```
