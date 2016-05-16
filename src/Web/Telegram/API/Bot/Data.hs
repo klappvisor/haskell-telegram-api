@@ -543,38 +543,38 @@ instance ToJSON InlineQueryResult where
 instance FromJSON InlineQueryResult where
   parseJSON = genericParseJSON inlineQueryJSONOptions
 
-newInlineQueryResultArticle :: Text -> Text -> InputMessageContent -> InlineQueryResult
-newInlineQueryResultArticle id title content = InlineQueryResultArticle id (Just title) (Just content) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultArticle :: Text -> Text -> InputMessageContent -> InlineQueryResult
+inlineQueryResultArticle id title content = InlineQueryResultArticle id (Just title) (Just content) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
-newInlineQueryResultPhoto :: Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultPhoto id photoUrl thumbUlr = InlineQueryResultPhoto id photoUrl (Just thumbUlr) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultPhoto :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultPhoto id photoUrl thumbUlr = InlineQueryResultPhoto id photoUrl (Just thumbUlr) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
-newInlineQueryResultGif :: Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultGif id gifUrl thumbUrl = InlineQueryResultGif id gifUrl Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+inlineQueryResultGif :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultGif id gifUrl thumbUrl = InlineQueryResultGif id gifUrl Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
 
-newInlineQueryResultMpeg4Gif :: Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id mpeg4Url Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+inlineQueryResultMpeg4Gif :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id mpeg4Url Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
 
-newInlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
-newInlineQueryResultAudio :: Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultAudio id audioUrl title = InlineQueryResultAudio id audioUrl (Just title) Nothing Nothing Nothing Nothing
+inlineQueryResultAudio :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultAudio id audioUrl title = InlineQueryResultAudio id audioUrl (Just title) Nothing Nothing Nothing Nothing
 
-newInlineQueryResultVoice :: Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultVoice id voiceUrl title = InlineQueryResultVoice id voiceUrl (Just title) Nothing Nothing Nothing
+inlineQueryResultVoice :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultVoice id voiceUrl title = InlineQueryResultVoice id voiceUrl (Just title) Nothing Nothing Nothing
 
-newInlineQueryResultDocument :: Text -> Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultDocument id title docUrl mimeType = InlineQueryResultDocument id (Just title) Nothing docUrl mimeType Nothing Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultDocument :: Text -> Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultDocument id title docUrl mimeType = InlineQueryResultDocument id (Just title) Nothing docUrl mimeType Nothing Nothing Nothing Nothing Nothing Nothing
 
-newInlineQueryResultLocation :: Text -> Float -> Float -> Text -> InlineQueryResult
-newInlineQueryResultLocation id lat lon title = InlineQueryResultLocation id lat lon (Just title) Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultLocation :: Text -> Float -> Float -> Text -> InlineQueryResult
+inlineQueryResultLocation id lat lon title = InlineQueryResultLocation id lat lon (Just title) Nothing Nothing Nothing Nothing Nothing
 
-newInlineQueryResultVenue :: Text -> Float -> Float -> Text -> Text -> InlineQueryResult
-newInlineQueryResultVenue id lat lon title address = InlineQueryResultVenue id lat lon (Just title) address Nothing Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultVenue :: Text -> Float -> Float -> Text -> Text -> InlineQueryResult
+inlineQueryResultVenue id lat lon title address = InlineQueryResultVenue id lat lon (Just title) address Nothing Nothing Nothing Nothing Nothing Nothing
 
-newInlineQueryResultContact :: Text -> Text -> Text -> InlineQueryResult
-newInlineQueryResultContact id phoneNumber firstName = InlineQueryResultContact id phoneNumber firstName Nothing Nothing Nothing Nothing Nothing Nothing
+inlineQueryResultContact :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultContact id phoneNumber firstName = InlineQueryResultContact id phoneNumber firstName Nothing Nothing Nothing Nothing Nothing Nothing
 
 data InlineKeyboardMarkup = InlineKeyboardMarkup
   {
