@@ -522,14 +522,11 @@ data InlineQueryResult =
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the audio
   } deriving (Show, Generic)
 
+dropCached :: Text -> Text
+dropCached name = if T.isPrefixOf "Cached" name then T.drop 6 name else name
+
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
 tagModifier "InlineQueryResultCachedMpeg4Gif" = "mpeg4_gif"
-dropCached :: Text -> Text
-dropCached name
-  | T.null back = name
-  | otherwise = T.concat [T.drop 6 back]
-    where
-      (_, back) = breakOn "Cached" name
 tagModifier x = ((drop 17) . (fmap (Char.toLower))) x
 
 inlineQueryJSONOptions :: Options
@@ -545,6 +542,21 @@ instance ToJSON InlineQueryResult where
 
 instance FromJSON InlineQueryResult where
   parseJSON = genericParseJSON inlineQueryJSONOptions
+
+newInlineQueryResultArticle :: Text -> Text -> InputMessageContent -> InlineQueryResult
+newInlineQueryResultArticle id title content = InlineQueryResultArticle id (Just title) (Just content) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+newInlineQueryResultPhoto :: Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultPhoto id photoUrl thumbUlr = InlineQueryResultPhoto id photoUrl (Just thumbUlr) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+newInlineQueryResultGif :: Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultGif id gifUrl thumbUrl = InlineQueryResultGif id gifUrl Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+
+newInlineQueryResultMpeg4Gif :: Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id mpeg4Url Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+
+newInlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 data InlineKeyboardMarkup = InlineKeyboardMarkup
   {
