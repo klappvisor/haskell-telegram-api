@@ -67,11 +67,11 @@ runSpec' integration token chatId botName = do
     describe "Unit tests" $
               it "Unit tests" $
                 -- TODO: add unit tests
-                pending -- "Unit tests are not implemented"
+                pendingWith "There are no unit tests yet"
     -- TODO: replace that
     if integration then runIntegrationSpec token chatId botName
     else describe "Integration tests" $ it "skipping..." $
-        pending
+        pendingWith "Use --integration switch to run integration tests"
 
 
 runIntegrationSpec :: Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
@@ -79,7 +79,7 @@ runIntegrationSpec (Just token) (Just chatId) (Just botName) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ = describe "Integration tests" $ do
-    fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
+        fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
 
 description ::  Maybe PP.Doc
 description = Just $
