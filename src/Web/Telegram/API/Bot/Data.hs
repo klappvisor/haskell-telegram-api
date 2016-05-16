@@ -558,6 +558,24 @@ newInlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id
 newInlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryResult
 newInlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
+newInlineQueryResultAudio :: Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultAudio id audioUrl title = InlineQueryResultAudio id audioUrl (Just title) Nothing Nothing Nothing Nothing
+
+newInlineQueryResultVoice :: Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultVoice id voiceUrl title = InlineQueryResultVoice id voiceUrl (Just title) Nothing Nothing Nothing
+
+newInlineQueryResultDocument :: Text -> Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultDocument id title docUrl mimeType = InlineQueryResultDocument id (Just title) Nothing docUrl mimeType Nothing Nothing Nothing Nothing Nothing Nothing
+
+newInlineQueryResultLocation :: Text -> Float -> Float -> Text -> InlineQueryResult
+newInlineQueryResultLocation id lat lon title = InlineQueryResultLocation id lat lon (Just title) Nothing Nothing Nothing Nothing Nothing
+
+newInlineQueryResultVenue :: Text -> Float -> Float -> Text -> Text -> InlineQueryResult
+newInlineQueryResultVenue id lat lon title address = InlineQueryResultVenue id lat lon (Just title) address Nothing Nothing Nothing Nothing Nothing Nothing
+
+newInlineQueryResultContact :: Text -> Text -> Text -> InlineQueryResult
+newInlineQueryResultContact id phoneNumber firstName = InlineQueryResultContact id phoneNumber firstName Nothing Nothing Nothing Nothing Nothing Nothing
+
 data InlineKeyboardMarkup = InlineKeyboardMarkup
   {
     inline_keyboard :: [[InlineKeyboardButton]]
