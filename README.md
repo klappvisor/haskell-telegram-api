@@ -99,9 +99,10 @@ Contributions are welcome!
 5. ??????
 6. PROFIT
 
-Bear in mind that the CI build may fail since the necessary environment
+Bear in mind that the CI build won't run integration test suite against your pull request since the necessary environment
 variables (`$BOT_TOKEN`, `$CHAT_ID` and `$BOT_NAME`) aren't exported when a fork
-starts the build.
+starts the build (for security reasons). If you do want to run them before creating RP, you can integration your fork 
+with CircleCI.
 
 You can use `stack` to build project
 
@@ -112,7 +113,7 @@ stack build
 To run test you have to create your own bot. Go to [BotFather](https://telegram.me/botfather) and create the bot. As the result you will have private bot's access token. Keep it safe!
 
 ```
-stack test --test-arguments "-t BOT_TOKEN -c CHAT_ID -b BOT_NAME -- HSPEC_ARGS"
+stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -b BOT_NAME -- HSPEC_ARGS"
 ```
 
 where
@@ -122,11 +123,11 @@ where
 * `BOT_NAME` is the name of your bot
 * `HSPEC_ARGS` are the normal `hspec` arguments you can find [here][hspec-args]
 
-The help option is availabe for the tests and for hspec:
+The help option is available for the tests and for hspec:
 
 ``` 
 stack test --test-arguments "-h"
-stack test --test-arguments "-t BOT_TOKEN -c CHAT_ID -v BOT_NAME -- -h"
+stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -v BOT_NAME -- -h"
 ```
 
 Note: Inline Spec is disabled for now...
