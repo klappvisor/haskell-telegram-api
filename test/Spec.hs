@@ -8,6 +8,7 @@ import           Data.Maybe                   (fromMaybe)
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified MainSpec
+import qualified JsonSpec
 import           Options.Applicative
 import           System.Environment           (getArgs, withArgs)
 import           System.Exit                  (exitSuccess)
@@ -64,11 +65,8 @@ main = do
            <> progDescDoc description)
 runSpec' :: Bool -> Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
 runSpec' integration token chatId botName = do
-    describe "Unit tests" $
-              it "Unit tests" $
-                -- TODO: add unit tests
-                pendingWith "There are no unit tests yet"
-    -- TODO: replace that
+    describe "Unit tests" $ do
+      describe "Json tests" $ JsonSpec.spec
     if integration then runIntegrationSpec token chatId botName
     else describe "Integration tests" $ it "skipping..." $
         pendingWith "Use --integration switch to run integration tests"

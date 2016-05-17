@@ -35,6 +35,26 @@ module Web.Telegram.API.Bot.Data
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
+    , inlineQueryResultArticle
+    , inlineQueryResultAudio
+    , inlineQueryResultContact
+    , inlineQueryResultDocument
+    , inlineQueryResultGif
+    , inlineQueryResultLocation
+    , inlineQueryResultMpeg4Gif
+    , inlineQueryResultPhoto
+    , inlineQueryResultVenue
+    , inlineQueryResultVideo
+    , inlineQueryResultVoice
+    , inlineQueryResultCachedAudio
+    , inlineQueryResultCachedDocument
+    , inlineQueryResultCachedGif
+    , inlineQueryResultCachedMpeg4Gif
+    , inlineQueryResultCachedPhoto
+    , inlineQueryResultCachedSticker
+    , inlineQueryResultCachedVideo
+    , inlineQueryResultCachedVoice
+
     ) where
 
 import           Data.Aeson
@@ -522,12 +542,12 @@ data InlineQueryResult =
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the audio
   } deriving (Show, Generic)
 
-dropCached :: Text -> Text
-dropCached name = if T.isPrefixOf "Cached" name then T.drop 6 name else name
+dropCached :: String -> String
+dropCached name = if isPrefixOf "Cached" name then drop 6 name else name
 
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
 tagModifier "InlineQueryResultCachedMpeg4Gif" = "mpeg4_gif"
-tagModifier x = ((drop 17) . (fmap (Char.toLower))) x
+tagModifier x = ((fmap (Char.toLower)) . dropCached . (drop 17)) x
 
 inlineQueryJSONOptions :: Options
 inlineQueryJSONOptions = defaultOptions {
@@ -575,6 +595,30 @@ inlineQueryResultVenue id lat lon title address = InlineQueryResultVenue id lat 
 
 inlineQueryResultContact :: Text -> Text -> Text -> InlineQueryResult
 inlineQueryResultContact id phoneNumber firstName = InlineQueryResultContact id phoneNumber firstName Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedPhoto :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedPhoto id fileId = InlineQueryResultCachedPhoto id fileId Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedGif :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedGif id fileId = InlineQueryResultCachedGif id fileId Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedMpeg4Gif :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedMpeg4Gif id fileId = InlineQueryResultCachedMpeg4Gif id fileId Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedSticker :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedSticker id fileId = InlineQueryResultCachedSticker id fileId Nothing Nothing
+
+inlineQueryResultCachedDocument :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultCachedDocument id fileId title = InlineQueryResultCachedDocument id (Just title) fileId Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedVideo :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultCachedVideo id fileId title = InlineQueryResultCachedVideo id fileId (Just title) Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedVoice :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultCachedVoice id fileId title = InlineQueryResultCachedVoice id fileId (Just title) Nothing Nothing
+
+inlineQueryResultCachedAudio :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedAudio id fileId = InlineQueryResultCachedAudio id fileId Nothing Nothing
 
 data InlineKeyboardMarkup = InlineKeyboardMarkup
   {
