@@ -8,6 +8,7 @@ import           Data.Maybe                   (fromMaybe)
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified MainSpec
+import qualified JsonSpec
 import           Options.Applicative
 import           System.Environment           (getArgs, withArgs)
 import           System.Exit                  (exitSuccess)
@@ -64,14 +65,11 @@ main = do
            <> progDescDoc description)
 runSpec' :: Bool -> Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
 runSpec' integration token chatId botName = do
-    describe "Unit tests" $
-              it "Unit tests" $
-                -- TODO: add unit tests
-                pending -- "Unit tests are not implemented"
-    -- TODO: replace that
+    describe "Unit tests" $ do
+      describe "Json tests" $ JsonSpec.spec
     if integration then runIntegrationSpec token chatId botName
     else describe "Integration tests" $ it "skipping..." $
-        pending
+        pendingWith "Use --integration switch to run integration tests"
 
 
 runIntegrationSpec :: Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
@@ -79,7 +77,7 @@ runIntegrationSpec (Just token) (Just chatId) (Just botName) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ = describe "Integration tests" $ do
-    fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
+        fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
 
 description ::  Maybe PP.Doc
 description = Just $

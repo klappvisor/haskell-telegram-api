@@ -35,6 +35,26 @@ module Web.Telegram.API.Bot.Data
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
+    , inlineQueryResultArticle
+    , inlineQueryResultAudio
+    , inlineQueryResultContact
+    , inlineQueryResultDocument
+    , inlineQueryResultGif
+    , inlineQueryResultLocation
+    , inlineQueryResultMpeg4Gif
+    , inlineQueryResultPhoto
+    , inlineQueryResultVenue
+    , inlineQueryResultVideo
+    , inlineQueryResultVoice
+    , inlineQueryResultCachedAudio
+    , inlineQueryResultCachedDocument
+    , inlineQueryResultCachedGif
+    , inlineQueryResultCachedMpeg4Gif
+    , inlineQueryResultCachedPhoto
+    , inlineQueryResultCachedSticker
+    , inlineQueryResultCachedVideo
+    , inlineQueryResultCachedVoice
+
     ) where
 
 import           Data.Aeson
@@ -365,10 +385,169 @@ data InlineQueryResult =
   , iq_res_description                     :: Maybe Text -- ^ Short description of the result
   , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video
+  }
+  -- | Represents a link to an mp3 audio file. By default, this audio file will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
+  | InlineQueryResultAudio
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_audio_url :: Text -- ^ A valid URL for the audio file
+  , iq_res_title :: Maybe Text -- ^ Title
+  , iq_res_performer :: Maybe Text -- ^ Performer
+  , iq_res_audio_duration :: Maybe Int -- ^ Audio duration in seconds
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the audio
+  }
+  -- | Represents a link to a voice recording in an .ogg container encoded with OPUS. By default, this voice recording will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the the voice message.
+  | InlineQueryResultVoice
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_voice_url :: Text -- ^ A valid URL for the voice recording
+  , iq_res_title :: Maybe Text -- ^ Recording title
+  , iq_res_voice_duration :: Maybe Int -- ^ Recording duration in seconds
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the voice recording
+  }
+  -- | Represents a link to a file. By default, this file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the file. Currently, only .PDF and .ZIP files can be sent using this method.
+  | InlineQueryResultDocument
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_title :: Maybe Text -- ^ Title for the result
+  , iq_res_caption :: Maybe Text -- ^ Caption of the document to be sent, 0-200 characters
+  , iq_res_document_url :: Text -- ^ A valid URL for the file
+  , iq_res_mime_type :: Text -- ^ Mime type of the content of the file, either “application/pdf” or “application/zip”
+  , iq_res_description :: Maybe Text -- ^ Short description of the result
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the file
+  , iq_res_thumb_url :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the file
+  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  }
+  -- | Represents a location on a map. By default, the location will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the location.
+  | InlineQueryResultLocation
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_latitude :: Float -- ^ Location latitude in degrees
+  , iq_res_longitude :: Float -- ^ Location longitude in degrees
+  , iq_res_title :: Maybe Text -- ^ Location title
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the location
+  , iq_res_thumb_url :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  }
+  -- | Represents a venue. By default, the venue will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the venue.
+  | InlineQueryResultVenue
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_latitude :: Float -- ^ Latitude of the venue location in degrees
+  , iq_res_longitude :: Float -- ^ Longitude of the venue location in degrees
+  , iq_res_title :: Maybe Text -- ^ Title of the venue
+  , iq_res_address :: Text -- ^ Address of the venue
+  , iq_res_foursquare_id :: Maybe Text -- ^ Foursquare identifier of the venue if known
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the venue
+  , iq_res_thumb_url :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  }
+  -- | Represents a link to a photo stored on the Telegram servers. By default, this photo will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
+  | InlineQueryResultContact
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_phone_number :: Text -- ^ Contact's phone number
+  , iq_res_first_name :: Text -- ^ Contact's first name
+  , iq_res_last_name :: Maybe Text -- ^ Contact's last name
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the contact
+  , iq_res_thumb_url :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  }
+  -- | Represents a link to a photo stored on the Telegram servers. By default, this photo will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
+  | InlineQueryResultCachedPhoto
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_photo_file_id :: Text -- ^ A valid file identifier of the photo
+  , iq_res_title :: Maybe Text -- ^ Title for the result
+  , iq_res_description :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the photo
+  }
+  -- | Represents a link to an animated GIF file stored on the Telegram servers. By default, this animated GIF file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with specified content instead of the animation.
+  | InlineQueryResultCachedGif
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_gif_file_id :: Text -- ^ A valid file identifier for the GIF file
+  , iq_res_title :: Maybe Text -- ^ Title for the result
+  , iq_res_caption :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the GIF animation
+  }
+  -- | Represents a link to a video animation (H.264/MPEG-4 AVC video without sound) stored on the Telegram servers. By default, this animated MPEG-4 file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the animation.
+  | InlineQueryResultCachedMpeg4Gif
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_mpeg4_file_id :: Text -- ^ A valid file identifier for the MP4 file
+  , iq_res_title :: Maybe Text -- ^ Title for the result
+  , iq_res_caption :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video animation
+  }
+  -- | Represents a link to a sticker stored on the Telegram servers. By default, this sticker will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the sticker.
+  | InlineQueryResultCachedSticker
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_sticker_file_id :: Text -- ^ A valid file identifier of the sticker
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the sticker
+  }
+  -- | Represents a link to a file stored on the Telegram servers. By default, this file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the file. Currently, only pdf-files and zip archives can be sent using this method.
+  | InlineQueryResultCachedDocument
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_title :: Maybe Text -- ^ Title for the result
+  , iq_res_document_file_id :: Text -- ^ A valid file identifier for the file
+  , iq_res_description :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption :: Maybe Text -- ^ Caption of the document to be sent, 0-200 characters
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the file
+  }
+  -- | Represents a link to a video file stored on the Telegram servers. By default, this video file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the video.
+  | InlineQueryResultCachedVideo
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_video_file_id :: Text -- ^ A valid file identifier for the video file
+  , iq_res_title :: Maybe Text -- ^ Title for the result
+  , iq_res_description :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video
+  }
+  -- | Represents a link to a voice message stored on the Telegram servers. By default, this voice message will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the voice message.
+  | InlineQueryResultCachedVoice
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_voice_file_id :: Text -- ^ A valid file identifier for the voice message
+  , iq_res_title :: Maybe Text -- ^ Voice message title
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the voice message
+  }
+  -- | Represents a link to an mp3 audio file stored on the Telegram servers. By default, this audio file will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
+  | InlineQueryResultCachedAudio
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_audio_file_id :: Text -- ^ A valid file identifier for the audio file
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the audio
   } deriving (Show, Generic)
 
+dropCached :: String -> String
+dropCached name = if isPrefixOf "Cached" name then drop 6 name else name
+
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
-tagModifier x = ((drop 17) . (fmap (Char.toLower))) x
+tagModifier "InlineQueryResultCachedMpeg4Gif" = "mpeg4_gif"
+tagModifier x = ((fmap (Char.toLower)) . dropCached . (drop 17)) x
 
 inlineQueryJSONOptions :: Options
 inlineQueryJSONOptions = defaultOptions {
@@ -383,6 +562,63 @@ instance ToJSON InlineQueryResult where
 
 instance FromJSON InlineQueryResult where
   parseJSON = genericParseJSON inlineQueryJSONOptions
+
+inlineQueryResultArticle :: Text -> Text -> InputMessageContent -> InlineQueryResult
+inlineQueryResultArticle id title content = InlineQueryResultArticle id (Just title) (Just content) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultPhoto :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultPhoto id photoUrl thumbUlr = InlineQueryResultPhoto id photoUrl (Just thumbUlr) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultGif :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultGif id gifUrl thumbUrl = InlineQueryResultGif id gifUrl Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+
+inlineQueryResultMpeg4Gif :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id mpeg4Url Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+
+inlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultAudio :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultAudio id audioUrl title = InlineQueryResultAudio id audioUrl (Just title) Nothing Nothing Nothing Nothing
+
+inlineQueryResultVoice :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultVoice id voiceUrl title = InlineQueryResultVoice id voiceUrl (Just title) Nothing Nothing Nothing
+
+inlineQueryResultDocument :: Text -> Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultDocument id title docUrl mimeType = InlineQueryResultDocument id (Just title) Nothing docUrl mimeType Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultLocation :: Text -> Float -> Float -> Text -> InlineQueryResult
+inlineQueryResultLocation id lat lon title = InlineQueryResultLocation id lat lon (Just title) Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultVenue :: Text -> Float -> Float -> Text -> Text -> InlineQueryResult
+inlineQueryResultVenue id lat lon title address = InlineQueryResultVenue id lat lon (Just title) address Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultContact :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultContact id phoneNumber firstName = InlineQueryResultContact id phoneNumber firstName Nothing Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedPhoto :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedPhoto id fileId = InlineQueryResultCachedPhoto id fileId Nothing Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedGif :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedGif id fileId = InlineQueryResultCachedGif id fileId Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedMpeg4Gif :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedMpeg4Gif id fileId = InlineQueryResultCachedMpeg4Gif id fileId Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedSticker :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedSticker id fileId = InlineQueryResultCachedSticker id fileId Nothing Nothing
+
+inlineQueryResultCachedDocument :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultCachedDocument id fileId title = InlineQueryResultCachedDocument id (Just title) fileId Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedVideo :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultCachedVideo id fileId title = InlineQueryResultCachedVideo id fileId (Just title) Nothing Nothing Nothing Nothing
+
+inlineQueryResultCachedVoice :: Text -> Text -> Text -> InlineQueryResult
+inlineQueryResultCachedVoice id fileId title = InlineQueryResultCachedVoice id fileId (Just title) Nothing Nothing
+
+inlineQueryResultCachedAudio :: Text -> Text -> InlineQueryResult
+inlineQueryResultCachedAudio id fileId = InlineQueryResultCachedAudio id fileId Nothing Nothing
 
 data InlineKeyboardMarkup = InlineKeyboardMarkup
   {
