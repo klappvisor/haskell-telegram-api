@@ -16,6 +16,7 @@ data-files:          test-data/christmas-cat.jpg
 
 extra-source-files:
   README.md
+  CHANGELOG.md
 
 library
   hs-source-dirs:      src
