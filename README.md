@@ -101,7 +101,7 @@ Contributions are welcome!
 
 Bear in mind that the CI build won't run integration test suite against your pull request since the necessary environment
 variables (`$BOT_TOKEN`, `$CHAT_ID` and `$BOT_NAME`) aren't exported when a fork
-starts the build (for security reasons). If you do want to run them before creating RP, you can integration your fork 
+starts the build (for security reasons). If you do want to run them before creating RP, you can integration your fork
 with CircleCI.
 
 You can use `stack` to build project
@@ -125,7 +125,7 @@ where
 
 The help option is available for the tests and for hspec:
 
-``` 
+```
 stack test --test-arguments "-h"
 stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -v BOT_NAME -- -h"
 ```

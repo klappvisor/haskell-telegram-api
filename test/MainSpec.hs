@@ -16,6 +16,9 @@ import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Servant.Client
 import           Network.HTTP.Types.Status
+import           System.FilePath
+
+import           Paths_telegram_api
 
 -- to print out remote response if response success not match
 success, nosuccess :: (Show a, Show b) =>Either a b ->Expectation
@@ -34,7 +37,7 @@ spec token chatId botName = do
   describe "/sendMessage" $ do
     it "should send message" $ do
       res <- sendMessage token (sendMessageRequest chatId "test message") manager
-      success res 
+      success res
       let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "test message")
 
@@ -95,11 +98,20 @@ spec token chatId botName = do
       let photo = (sendPhotoRequest "" "photo_id") {
         photo_caption = Just "photo caption"
       }
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendPhoto token photo manager
+      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
       msg `shouldBe` "Bad Request"
-    it "should send photo" $ do
-      let photo = (sendPhotoRequest chatId catPic) {
+    it "should upload photo and resend it by id" $ do
+      dataDir <- getDataDir
+      let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
+      let upload = (uploadPhotoRequest chatId fileUpload) {
+        photo_caption = Just "uploaded photo"
+      }
+      Right MessageResponse { message_result = Message { caption = Just cpt, photo = Just photos } } <-
+        uploadPhoto token upload manager
+      cpt `shouldBe` "uploaded photo"
+      -- resend by id
+      let id = (photo_file_id . last) photos
+      let photo = (sendPhotoRequest chatId id) {
         photo_caption = Just "photo caption"
       }
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
@@ -212,16 +224,16 @@ spec token chatId botName = do
       txt' `shouldBe` Just "edited veritas"
 
     it "should edit caption" $ do
-      let originalMessage = (sendPhotoRequest chatId catPic) {
+      dataDir <- getDataDir
+      let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
+      let originalMessage = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "cat picture"
       }
       Right MessageResponse { message_result = Message { message_id = msg_id, caption = Just cpt } } <-
-        sendPhoto token originalMessage manager
+        uploadPhoto token originalMessage manager
       let editRequest = editMessageCaptionRequest chatId msg_id $ Just $ "edited " <> cpt
       Right MessageResponse { message_result = Message { caption = Just cpt' } } <-
         editMessageCaption token editRequest manager
       cpt' `shouldBe` "edited cat picture"
 
     -- it "should edit caption" $ do ... after inline query tests are on place
-
-catPic = "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAS0kQ9gsy1eDh2FAAIC"

@@ -9,6 +9,7 @@ module Web.Telegram.API.Bot.API
     getMe
   , sendMessage
   , forwardMessage
+  , uploadPhoto
   , sendPhoto
   , sendAudio
   , sendDocument
@@ -52,6 +53,7 @@ import           Network.HTTP.Client (Manager)
 import           Servant.API
 import           Servant.Client
 import           Web.HttpApiData
+import           Servant.Client.MultipartFormData
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.Responses
 import           Web.Telegram.API.Bot.Requests
@@ -77,7 +79,10 @@ type TelegramBotAPI =
          :> ReqBody '[JSON] ForwardMessageRequest
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendPhoto"
-         :> ReqBody '[JSON] SendPhotoRequest
+         :> MultipartFormDataReqBody (SendPhotoRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendPhoto"
+         :> ReqBody '[JSON] (SendPhotoRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendAudio"
          :> ReqBody '[JSON] SendAudioRequest
@@ -155,7 +160,8 @@ api = Proxy
 getMe_                     :: Token -> Manager -> BaseUrl -> ExceptT ServantError IO GetMeResponse
 sendMessage_               :: Token -> SendMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 forwardMessage_            :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendPhoto_                 :: Token -> SendPhotoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendPhoto_                 :: Token -> SendPhotoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendAudio_                 :: Token -> SendAudioRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendDocument_              :: Token -> SendDocumentRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendSticker_               :: Token -> SendStickerRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
@@ -179,6 +185,7 @@ editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> Manager 
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
+  :<|> uploadPhoto_
   :<|> sendPhoto_
   :<|> sendAudio_
   :<|> sendDocument_
@@ -215,8 +222,12 @@ sendMessage = run telegramBaseUrl sendMessage_
 forwardMessage :: Token -> ForwardMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
 forwardMessage = run telegramBaseUrl forwardMessage_
 
--- | Use this method to send photos. On success, the sent 'Message' is returned.
-sendPhoto :: Token -> SendPhotoRequest -> Manager -> IO (Either ServantError MessageResponse)
+-- | Use this method to upload and send photos. On success, the sent 'Message' is returned.
+uploadPhoto :: Token -> SendPhotoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadPhoto = run telegramBaseUrl uploadPhoto_
+
+-- | Use this method to send photos that have already been uploaded. On success, the sent 'Message' is returned.
+sendPhoto :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendPhoto = run telegramBaseUrl sendPhoto_
 
 -- | Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
