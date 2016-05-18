@@ -17,6 +17,9 @@ module Web.Telegram.API.Bot.Responses
     , UserProfilePhotosResponse (..)
     , SetWebhookResponse        (..)
     , InlineQueryResponse       (..)
+    , CallbackQueryResponse     (..)
+    , KickChatMemberResponse    (..)
+    , UnbanChatMemberResponse   (..)
     ) where
 
 import           Data.Aeson
@@ -124,4 +127,40 @@ instance ToJSON InlineQueryResponse where
   toJSON = toJsonDrop 6
 
 instance FromJSON InlineQueryResponse where
+  parseJSON = parseJsonDrop 6
+
+-- | This object represents 'answerCallbackQuery' response
+data CallbackQueryResponse = CallbackQueryResponse
+  {
+    callback_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON CallbackQueryResponse where
+  toJSON = toJsonDrop 7
+
+instance FromJSON CallbackQueryResponse where
+  parseJSON = parseJsonDrop 7
+
+-- | This object represents 'kickChatMember' response
+data KickChatMemberResponse = KickChatMemberResponse
+  {
+    kick_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON KickChatMemberResponse where
+  toJSON = toJsonDrop 5
+
+instance FromJSON KickChatMemberResponse where
+  parseJSON = parseJsonDrop 5
+
+-- | This object represents 'unbanChatMember' response
+data UnbanChatMemberResponse = UnbanChatMemberResponse
+  {
+    unban_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON UnbanChatMemberResponse where
+  toJSON = toJsonDrop 6
+
+instance FromJSON UnbanChatMemberResponse where
   parseJSON = parseJsonDrop 6
