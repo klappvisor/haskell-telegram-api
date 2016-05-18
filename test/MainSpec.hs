@@ -95,26 +95,28 @@ spec token chatId botName = do
 
   describe "/sendPhoto" $ do
     it "should return error message" $ do
-      let photo = (sendPhotoByIdRequest "" "photo_id") {
+      let photo = (sendPhotoRequest "" "photo_id") {
         photo_caption = Just "photo caption"
       }
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendPhotoById token photo manager
+      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
       msg `shouldBe` "Bad Request"
-    it "should send photo with file_id" $ do
-      let photo = (sendPhotoByIdRequest chatId catPic) {
-        photo_caption = Just "photo caption"
-      }
-      Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhotoById token photo manager
-      cpt `shouldBe` "photo caption"
-    it "should send uploaded photo" $ do
+    it "should upload photo and resend it by id" $ do
       dataDir <- getDataDir
       let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
-      let s = (sendPhotoRequest chatId fileUpload)
+      let upload = (uploadPhotoRequest chatId fileUpload) {
+        photo_caption = Just "uploaded photo"
+      }
+      Right MessageResponse { message_result = Message { caption = Just cpt, photo = Just photos } } <-
+        uploadPhoto token upload manager
+      cpt `shouldBe` "uploaded photo"
+      -- resend by id
+      let id = (photo_file_id . last) photos
+      let photo = (sendPhotoRequest chatId id) {
+        photo_caption = Just "photo caption"
+      }
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhoto token (SendPhotoRequest chatId fileUpload (Just "photo caption 2") Nothing Nothing Nothing) manager
-      cpt `shouldBe` "photo caption 2"
+        sendPhoto token photo manager
+      cpt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
@@ -233,5 +235,3 @@ spec token chatId botName = do
       cpt' `shouldBe` "edited cat picture"
 
     -- it "should edit caption" $ do ... after inline query tests are on place
-
-catPic = "AgADBAADv6cxGybVMgABtZ_EOpBSdxYD5xwZAAS0kQ9gsy1eDh2FAAIC"

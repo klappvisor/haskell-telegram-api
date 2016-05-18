@@ -9,8 +9,8 @@ module Web.Telegram.API.Bot.API
     getMe
   , sendMessage
   , forwardMessage
+  , uploadPhoto
   , sendPhoto
-  , sendPhotoById
   , sendAudio
   , sendDocument
   , sendSticker
@@ -160,8 +160,8 @@ api = Proxy
 getMe_                     :: Token -> Manager -> BaseUrl -> ExceptT ServantError IO GetMeResponse
 sendMessage_               :: Token -> SendMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 forwardMessage_            :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendPhoto_                 :: Token -> SendPhotoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendPhotoById_             :: Token -> SendPhotoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendPhoto_                 :: Token -> SendPhotoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendAudio_                 :: Token -> SendAudioRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendDocument_              :: Token -> SendDocumentRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendSticker_               :: Token -> SendStickerRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
@@ -185,8 +185,8 @@ editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> Manager 
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
+  :<|> uploadPhoto_
   :<|> sendPhoto_
-  :<|> sendPhotoById_
   :<|> sendAudio_
   :<|> sendDocument_
   :<|> sendSticker_
@@ -223,12 +223,12 @@ forwardMessage :: Token -> ForwardMessageRequest -> Manager -> IO (Either Servan
 forwardMessage = run telegramBaseUrl forwardMessage_
 
 -- | Use this method to upload and send photos. On success, the sent 'Message' is returned.
-sendPhoto :: Token -> SendPhotoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-sendPhoto = run telegramBaseUrl sendPhoto_
+uploadPhoto :: Token -> SendPhotoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadPhoto = run telegramBaseUrl uploadPhoto_
 
 -- | Use this method to send photos that have already been uploaded. On success, the sent 'Message' is returned.
-sendPhotoById :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendPhotoById = run telegramBaseUrl sendPhotoById_
+sendPhoto :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendPhoto = run telegramBaseUrl sendPhoto_
 
 -- | Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --

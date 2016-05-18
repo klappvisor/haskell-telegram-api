@@ -12,7 +12,7 @@ category:            Web
 build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
-data-files:          test-data/klappvisor.jpg
+data-files:          test-data/christmas-cat.jpg
 
 extra-source-files:
   README.md

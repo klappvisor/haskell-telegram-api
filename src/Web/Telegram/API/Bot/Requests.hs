@@ -35,7 +35,7 @@ module Web.Telegram.API.Bot.Requests
     , sendMessageRequest
     , forwardMessageRequest
     , sendPhotoRequest
-    , sendPhotoByIdRequest
+    , uploadPhotoRequest
     , sendAudioRequest
     , sendDocumentRequest
     , sendStickerRequest
@@ -155,11 +155,11 @@ instance ToJSON (SendPhotoRequest Text) where
 instance FromJSON (SendPhotoRequest Text) where
   parseJSON = parseJsonDrop 6
 
-sendPhotoByIdRequest :: Text -> Text -> SendPhotoRequest Text
-sendPhotoByIdRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
-
-sendPhotoRequest :: Text -> FileUpload -> SendPhotoRequest FileUpload
+sendPhotoRequest :: Text -> Text -> SendPhotoRequest Text
 sendPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
+
+uploadPhotoRequest :: Text -> FileUpload -> SendPhotoRequest FileUpload
+uploadPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
 
 instance ToMultipartFormData (SendPhotoRequest FileUpload) where
   toMultipartFormData sendPhotoReq =

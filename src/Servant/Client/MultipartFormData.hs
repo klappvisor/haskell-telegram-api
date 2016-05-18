@@ -67,7 +67,7 @@ performRequest' :: (Req -> BaseUrl -> IO Request)
                -> ClientM ( Int, ByteString, MediaType
                           , [HTTP.Header], Response ByteString)
 performRequest' reqToRequest' reqMethod req manager reqHost = do
-  partialRequest <- liftIO $ reqToRequest req reqHost
+  partialRequest <- liftIO $ reqToRequest' req reqHost
 
   let request = partialRequest { Client.method = reqMethod
                                , checkStatus = \ _status _headers _cookies -> Nothing
