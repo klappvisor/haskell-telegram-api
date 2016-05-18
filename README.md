@@ -13,7 +13,7 @@ Both `getUpdates` request or webhook can be used to receive updates for your bot
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
 
-**Almost full support of []Bot-2.0 API][bot-2.0]**
+**Almost full support of [Bot-2.0 API][bot-2.0]**
 
 See TODO section for details.
 

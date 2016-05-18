@@ -12,7 +12,7 @@ dependencies:
 
 test:
   override:
-    - if [[ ! -z $CI_PULL_REQUEST ]] ; then stack test --test-arguments "--integration --token $BOT_TOKEN --chatid $CHAT_ID --botname $BOT_NAME" ; else stack test ; fi
+    - if [[ ! -z $CI_PULL_REQUEST ]] ; then stack test --test-arguments \"--integration --token $BOT_TOKEN --chatid $CHAT_ID --botname $BOT_NAME\" ; else stack test ; fi
 
 deployment:
   master:
