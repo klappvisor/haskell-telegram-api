@@ -224,11 +224,13 @@ spec token chatId botName = do
       txt' `shouldBe` Just "edited veritas"
 
     it "should edit caption" $ do
-      let originalMessage = (sendPhotoRequest chatId catPic) {
+      dataDir <- getDataDir
+      let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
+      let originalMessage = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "cat picture"
       }
       Right MessageResponse { message_result = Message { message_id = msg_id, caption = Just cpt } } <-
-        sendPhoto token originalMessage manager
+        uploadPhoto token originalMessage manager
       let editRequest = editMessageCaptionRequest chatId msg_id $ Just $ "edited " <> cpt
       Right MessageResponse { message_result = Message { caption = Just cpt' } } <-
         editMessageCaption token editRequest manager
