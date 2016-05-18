@@ -8,10 +8,12 @@
 ![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 
-High-level bindings to the [Telegram Bot API][telegram-bot-api] based on [servant][servant] library. 
+High-level bindings to the [Telegram Bot API][telegram-bot-api] based on [servant][servant] library.
 Both `getUpdates` request or webhook can be used to receive updates for your bot. 
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
+
+**Almost full support of Bot-2.0 API**
 
 See list of supported methods below in TODO section.
 
@@ -136,32 +138,7 @@ If everything is fine after running the tests you will receive a few new message
 
 ## TODO
 
-* Uploading of Files, Documents, Stickers, etc
-
-### Methods
-
-##### Currently supported:
-
-* `getMe`
-* `sendMessage`
-* `forwardMessage`
-* `sendPhoto` - without upload
-* `sendAudio` - without upload
-* `sendDocument` - without upload
-* `sendSticker` - without upload
-* `sendVideo` - without upload
-* `sendVoice` - without upload
-* `sendLocation`
-* `getUpdates`
-* `getFile`
-* `sendChatAction`
-* `getUserProfilePhotos`
-* `setWebhook` - without uploading certificate
-* `answerInlineQuery`
-
-##### To be done:
-
-* `sendPhoto` - upload photo
+* ~~`sendPhoto` - upload photo~~ done
 * `sendAudio` - upload audio
 * `sendDocument` - upload documents
 * `sendSticker` - upload stickers

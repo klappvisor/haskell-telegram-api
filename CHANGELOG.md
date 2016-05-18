@@ -1,3 +1,17 @@
+## 0.4.0.0 [Breaking]
+
+Features:
+
+* Bot-2.0 API support is almost complete. Everything from [announce](https://core.telegram.org/bots/2-0-intro) is on place except file upload (works for photo BTW).
+  * Inline keyboards
+  * Updating messages
+  * Send Location and Phone number
+  * Inline Bots 2.0
+  * Group Admins
+  * and many others
+* Added new and more convenient way to create request data records avoiding many optional parameters.
+* migrated to servant 0.7.*
+
 ## 0.3.1.0
 
 Features:
