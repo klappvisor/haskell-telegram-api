@@ -5,12 +5,15 @@
 {-# LANGUAGE TypeOperators     #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 -- | This module contains data objects which represents requests to Telegram Bot API
 module Web.Telegram.API.Bot.Requests
     ( -- * Types
       SendMessageRequest             (..)
     , ForwardMessageRequest          (..)
+    , FileUpload                     (..)
+    , FileUploadContent              (..)
     , SendPhotoRequest               (..)
     , SendAudioRequest               (..)
     , SendDocumentRequest            (..)
@@ -32,6 +35,7 @@ module Web.Telegram.API.Bot.Requests
     , sendMessageRequest
     , forwardMessageRequest
     , sendPhotoRequest
+    , sendPhotoByIdRequest
     , sendAudioRequest
     , sendDocumentRequest
     , sendStickerRequest
@@ -53,15 +57,47 @@ module Web.Telegram.API.Bot.Requests
 
 import           Data.Aeson
 import           Data.Aeson.Types
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as LBS
 import           Data.Maybe
 import           Data.Proxy
 import           Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import           GHC.Generics
 import           GHC.TypeLits
+import           Network.HTTP.Client.MultipartFormData
+import           Network.HTTP.Types.Header (hContentType)
+import           Network.Mime
+import           Servant.Client.MultipartFormData (ToMultipartFormData (..))
 import           Web.Telegram.API.Bot.JsonExt
 import           Web.Telegram.API.Bot.Data
 
+
+-- | This object represents data (image, video, ...) to upload.
+data FileUploadContent =
+    FileUploadFile FilePath
+  | FileUploadBS BS.ByteString
+  | FileUploadLBS LBS.ByteString
+
+-- | This object represents data (image, video, ...) with mime type to upload.
+data FileUpload = FileUpload
+  {
+    fileUpload_type    :: MimeType          -- ^ Mime type of the upload.
+  , fileUpload_content :: FileUploadContent -- ^ The payload/source to upload.
+  }
+
+fileUploadToPart :: Text -> FileUpload -> Part
+fileUploadToPart inputName fileUpload =
+  let part =
+        case fileUpload_content fileUpload of
+          FileUploadFile path -> partFileSource inputName path
+          FileUploadBS bs -> partBS inputName bs
+          FileUploadLBS lbs -> partLBS inputName lbs
+  in part { partContentType = Just (fileUpload_type fileUpload) }
+
+utf8Part :: Text -> Text -> Part
+utf8Part inputName = partBS inputName . T.encodeUtf8
 
 -- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
@@ -103,24 +139,37 @@ forwardMessageRequest :: Text -> Text -> Int -> ForwardMessageRequest
 forwardMessageRequest chatId fromChatId forwardMessageId = ForwardMessageRequest chatId fromChatId Nothing forwardMessageId
 
 -- | This object represents request for 'sendPhoto'
-data SendPhotoRequest = SendPhotoRequest
+data SendPhotoRequest payload = SendPhotoRequest
   {
     photo_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , photo_photo                :: Text -- ^ Photo to send. Pass a file_id as String to resend a photo that is already on the Telegram servers
+  , photo_photo                :: payload -- ^ Photo to send. You can either pass a file_id as String to resend a photo that is already on the Telegram servers, or upload a new photo.
   , photo_caption              :: Maybe Text -- ^ Photo caption (may also be used when resending photos by file_id), 0-200 characters.
   , photo_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , photo_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
   , photo_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
-instance ToJSON SendPhotoRequest where
+instance ToJSON (SendPhotoRequest Text) where
   toJSON = toJsonDrop 6
 
-instance FromJSON SendPhotoRequest where
+instance FromJSON (SendPhotoRequest Text) where
   parseJSON = parseJsonDrop 6
 
-sendPhotoRequest :: Text -> Text -> SendPhotoRequest
+sendPhotoByIdRequest :: Text -> Text -> SendPhotoRequest Text
+sendPhotoByIdRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
+
+sendPhotoRequest :: Text -> FileUpload -> SendPhotoRequest FileUpload
 sendPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
+
+instance ToMultipartFormData (SendPhotoRequest FileUpload) where
+  toMultipartFormData sendPhotoReq =
+    [ utf8Part "chat_id" (photo_chat_id sendPhotoReq) ] ++
+    catMaybes
+    [ utf8Part "caption" <$> photo_caption sendPhotoReq
+    , utf8Part "reply_to_message_id" . T.pack . show <$> photo_reply_to_message_id sendPhotoReq
+    , partLBS "reply_markup" . encode <$> photo_reply_markup sendPhotoReq
+    ] ++
+    [ fileUploadToPart "photo" (photo_photo sendPhotoReq) ]
 
 -- | This object represents request for 'sendAudio'
 data SendAudioRequest = SendAudioRequest
@@ -345,11 +394,11 @@ data AnswerInlineQueryRequest = AnswerInlineQueryRequest
   , query_switch_pm_text      :: Maybe Text -- ^ If passed, clients will display a button with specified text that switches the user to a private chat with the bot and sends the bot a start message with the parameter switch_pm_parameter
   , query_switch_pm_parameter :: Maybe Text -- ^ Parameter for the start message sent to the bot when user presses the switch button
                                             --
-                                            -- Example: An inline bot that sends YouTube videos can ask the user to connect the bot to 
-                                            -- their YouTube account to adapt search results accordingly. To do this, it displays a 
-                                            -- ‘Connect your YouTube account’ button above the results, or even before showing any. 
-                                            -- The user presses the button, switches to a private chat with the bot and, in doing so, 
-                                            -- passes a start parameter that instructs the bot to return an oauth link. Once done, 
+                                            -- Example: An inline bot that sends YouTube videos can ask the user to connect the bot to
+                                            -- their YouTube account to adapt search results accordingly. To do this, it displays a
+                                            -- ‘Connect your YouTube account’ button above the results, or even before showing any.
+                                            -- The user presses the button, switches to a private chat with the bot and, in doing so,
+                                            -- passes a start parameter that instructs the bot to return an oauth link. Once done,
                                             -- the bot can offer a switch_inline button so that the user can easily return to the chat where they wanted to use the bot's inline capabilities.
   } deriving (Show, Generic)
 

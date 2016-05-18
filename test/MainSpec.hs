@@ -16,6 +16,9 @@ import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Servant.Client
 import           Network.HTTP.Types.Status
+import           System.FilePath
+
+import           Paths_telegram_api
 
 -- to print out remote response if response success not match
 success, nosuccess :: (Show a, Show b) =>Either a b ->Expectation
@@ -34,7 +37,7 @@ spec token chatId botName = do
   describe "/sendMessage" $ do
     it "should send message" $ do
       res <- sendMessage token (sendMessageRequest chatId "test message") manager
-      success res 
+      success res
       let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "test message")
 
@@ -92,19 +95,26 @@ spec token chatId botName = do
 
   describe "/sendPhoto" $ do
     it "should return error message" $ do
-      let photo = (sendPhotoRequest "" "photo_id") {
+      let photo = (sendPhotoByIdRequest "" "photo_id") {
         photo_caption = Just "photo caption"
       }
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
-        sendPhoto token photo manager
+        sendPhotoById token photo manager
       msg `shouldBe` "Bad Request"
-    it "should send photo" $ do
-      let photo = (sendPhotoRequest chatId catPic) {
+    it "should send photo with file_id" $ do
+      let photo = (sendPhotoByIdRequest chatId catPic) {
         photo_caption = Just "photo caption"
       }
       Right MessageResponse { message_result = Message { caption = Just cpt } } <-
-        sendPhoto token photo manager
+        sendPhotoById token photo manager
       cpt `shouldBe` "photo caption"
+    it "should send uploaded photo" $ do
+      dataDir <- getDataDir
+      let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
+      let s = (sendPhotoRequest chatId fileUpload)
+      Right MessageResponse { message_result = Message { caption = Just cpt } } <-
+        sendPhoto token (SendPhotoRequest chatId fileUpload (Just "photo caption 2") Nothing Nothing Nothing) manager
+      cpt `shouldBe` "photo caption 2"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
