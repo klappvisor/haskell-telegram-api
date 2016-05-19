@@ -1,3 +1,9 @@
+## 0.4.0.2
+
+Bugfixes:
+
+* Exposed constrictors for inline edit requests
+
 ## 0.4.0.1
 
 Bugfixes:

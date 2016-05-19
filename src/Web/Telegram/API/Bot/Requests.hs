@@ -51,8 +51,11 @@ module Web.Telegram.API.Bot.Requests
     , replyKeyboardHide
     , forceReply
     , editMessageTextRequest
+    , editInlineMessageTextRequest
     , editMessageCaptionRequest
+    , editInlineMessageCaptionRequest
     , editMessageReplyMarkupRequest
+    , editInlineMessageReplyMarkupRequest
     ) where
 
 import           Data.Aeson
