@@ -139,11 +139,11 @@ If everything is fine after running the tests you will receive a few new message
 ## TODO
 
 * ~~`sendPhoto` - upload photo~~ done
-* `sendAudio` - upload audio
-* `sendDocument` - upload documents
-* `sendSticker` - upload stickers
-* `sendVideo` - upload video
-* `sendVoice` - upload voice
+* ~~`sendAudio` - upload audio~~ done
+* ~~`sendDocument` - upload documents~~ done
+* ~~`sendSticker` - upload stickers~~ done
+* ~~`sendVideo` - upload video~~ done
+* ~~`sendVoice` - upload voice~~ done
 * `setWebhook` - upload certificate
 
 [telegram-bot-api]: https://core.telegram.org/bots/api

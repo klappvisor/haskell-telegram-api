@@ -37,10 +37,15 @@ module Web.Telegram.API.Bot.Requests
     , sendPhotoRequest
     , uploadPhotoRequest
     , sendAudioRequest
+    , uploadAudioRequest
     , sendDocumentRequest
+    , uploadDocumentRequest
     , sendStickerRequest
+    , uploadStickerRequest
     , sendVideoRequest
+    , uploadVideoRequest
     , sendVoiceRequest
+    , uploadVoiceRequest
     , sendLocationRequest
     , sendVenueRequest
     , sendContactRequest
@@ -162,20 +167,21 @@ uploadPhotoRequest :: Text -> FileUpload -> SendPhotoRequest FileUpload
 uploadPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
 
 instance ToMultipartFormData (SendPhotoRequest FileUpload) where
-  toMultipartFormData sendPhotoReq =
-    [ utf8Part "chat_id" (photo_chat_id sendPhotoReq) ] ++
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (photo_chat_id req) ] ++
     catMaybes
-    [ utf8Part "caption" <$> photo_caption sendPhotoReq
-    , utf8Part "reply_to_message_id" . T.pack . show <$> photo_reply_to_message_id sendPhotoReq
-    , partLBS "reply_markup" . encode <$> photo_reply_markup sendPhotoReq
+    [ utf8Part "caption" <$> photo_caption req
+    , partLBS "disable_notification" . encode <$> photo_disable_notification req
+    , utf8Part "reply_to_message_id" . T.pack . show <$> photo_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> photo_reply_markup req
     ] ++
-    [ fileUploadToPart "photo" (photo_photo sendPhotoReq) ]
+    [ fileUploadToPart "photo" (photo_photo req) ]
 
 -- | This object represents request for 'sendAudio'
-data SendAudioRequest = SendAudioRequest
+data SendAudioRequest payload = SendAudioRequest
   {
     _audio_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _audio_audio                :: Text -- ^ Audio file to send. Pass a file_id as String to resend an audio that is already on the Telegram servers.
+  , _audio_audio                :: payload -- ^ Audio to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
   , _audio_duration             :: Maybe Int -- ^ Duration of the audio in seconds
   , _audio_performer            :: Maybe Text -- ^ Performer
   , _audio_title                :: Maybe Text -- ^ Track name
@@ -184,59 +190,102 @@ data SendAudioRequest = SendAudioRequest
   , _audio_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
-instance ToJSON SendAudioRequest where
+instance ToJSON (SendAudioRequest Text) where
   toJSON = toJsonDrop 7
 
-instance FromJSON SendAudioRequest where
+instance FromJSON (SendAudioRequest Text) where
   parseJSON = parseJsonDrop 7
 
-sendAudioRequest :: Text -> Text -> SendAudioRequest
+instance ToMultipartFormData (SendAudioRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (_audio_chat_id req) ] ++
+    catMaybes
+    [ utf8Part "duration" . T.pack . show <$> _audio_duration req
+    , utf8Part "performer" <$> _audio_performer req
+    , utf8Part "title" <$> _audio_title req
+    , partLBS "disable_notification" . encode <$> _audio_disable_notification req
+    , utf8Part "reply_to_message_id" . T.pack . show <$> _audio_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> _audio_reply_markup req
+    ] ++
+    [ fileUploadToPart "audio" (_audio_audio req) ]
+
+sendAudioRequest :: Text -> Text -> SendAudioRequest Text
 sendAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing
 
+uploadAudioRequest :: Text -> FileUpload -> SendAudioRequest FileUpload
+uploadAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendSticker'
-data SendStickerRequest = SendStickerRequest
+data SendStickerRequest payload = SendStickerRequest
   {
     sticker_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , sticker_sticker                  :: Text -- ^ Sticker to send. A file_id as String to resend a sticker that is already on the Telegram servers
+  , sticker_sticker                  :: payload -- ^ Sticker to send. You can either pass a file_id as String to resend a sticker that is already on the Telegram servers, or upload a new sticker.
   , sticker_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , sticker_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
   , sticker_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
-instance ToJSON SendStickerRequest where
+instance ToJSON (SendStickerRequest Text) where
   toJSON = toJsonDrop 8
 
-instance FromJSON SendStickerRequest where
+instance FromJSON (SendStickerRequest Text) where
   parseJSON = parseJsonDrop 8
 
-sendStickerRequest :: Text -> Text -> SendStickerRequest
+instance ToMultipartFormData (SendStickerRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (sticker_chat_id req) ] ++
+    catMaybes
+    [ partLBS "disable_notification" . encode <$> sticker_disable_notification req
+    , utf8Part "reply_to_message_id" . T.pack . show <$> sticker_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> sticker_reply_markup req
+    ] ++
+    [ fileUploadToPart "sticker" (sticker_sticker req) ]
+
+sendStickerRequest :: Text -> Text -> SendStickerRequest Text
 sendStickerRequest chatId sticker = SendStickerRequest chatId sticker Nothing Nothing Nothing
 
+uploadStickerRequest :: Text -> FileUpload -> SendStickerRequest FileUpload
+uploadStickerRequest chatId sticker = SendStickerRequest chatId sticker Nothing Nothing Nothing
+
 -- | This object represents request for 'sendDocument'
-data SendDocumentRequest = SendDocumentRequest
+data SendDocumentRequest payload = SendDocumentRequest
   {
     document_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , document_document                 :: Text -- ^ File to send. A file_id as String to resend a file that is already on the Telegram servers
+  , document_document                 :: payload -- ^ File to send. You can either pass a file_id as String to resend a file that is already on the Telegram servers, or upload a new file.
   , document_caption                  :: Maybe Text -- ^ Document caption (may also be used when resending documents by file_id), 0-200 characters
   , document_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , document_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
   , document_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
-instance ToJSON SendDocumentRequest where
+instance ToJSON (SendDocumentRequest Text) where
   toJSON = toJsonDrop 9
 
-instance FromJSON SendDocumentRequest where
+instance FromJSON (SendDocumentRequest Text) where
   parseJSON = parseJsonDrop 9
 
-sendDocumentRequest :: Text -> Text -> SendDocumentRequest
+instance ToMultipartFormData (SendDocumentRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (document_chat_id req) ] ++
+    catMaybes
+    [ utf8Part "caption" <$> document_caption req
+    , partLBS "disable_notification" . encode <$> document_disable_notification req
+    , utf8Part "reply_to_message_id" . T.pack . show <$> document_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> document_reply_markup req
+    ] ++
+    [ fileUploadToPart "document" (document_document req) ]
+
+sendDocumentRequest :: Text -> Text -> SendDocumentRequest Text
 sendDocumentRequest chatId document = SendDocumentRequest chatId document Nothing Nothing Nothing Nothing
 
+uploadDocumentRequest :: Text -> FileUpload -> SendDocumentRequest FileUpload
+uploadDocumentRequest chatId document = SendDocumentRequest chatId document Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendVideo'
-data SendVideoRequest = SendVideoRequest
+data SendVideoRequest payload = SendVideoRequest
   {
     _video_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _video_video                    :: Text -- ^ Video to send. A file_id as String to resend a video that is already on the Telegram servers
+  , _video_video                    :: payload -- ^ Video to send. You can either pass a file_id as String to resend a video that is already on the Telegram servers, or upload a new video.
   , _video_duration                 :: Maybe Int -- ^ Duration of sent video in seconds
   , _video_caption                  :: Maybe Text -- ^ Video caption, 0-200 characters.
   , _video_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
@@ -244,34 +293,63 @@ data SendVideoRequest = SendVideoRequest
   , _video_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
-instance ToJSON SendVideoRequest where
+instance ToJSON (SendVideoRequest Text) where
   toJSON = toJsonDrop 7
 
-instance FromJSON SendVideoRequest where
+instance FromJSON (SendVideoRequest Text) where
   parseJSON = parseJsonDrop 7
 
-sendVideoRequest :: Text -> Text -> SendVideoRequest
+instance ToMultipartFormData (SendVideoRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (_video_chat_id req) ] ++
+    catMaybes
+    [ partLBS "duration" . encode <$> _video_duration req
+    , utf8Part "caption" <$> _video_caption req
+    , partLBS "disable_notification" . encode <$> _video_disable_notification req
+    , utf8Part "reply_to_message_id" . T.pack . show <$> _video_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> _video_reply_markup req
+    ] ++
+    [ fileUploadToPart "video" (_video_video req) ]
+
+sendVideoRequest :: Text -> Text -> SendVideoRequest Text
 sendVideoRequest chatId video = SendVideoRequest chatId video Nothing Nothing Nothing Nothing Nothing
 
+uploadVideoRequest :: Text -> FileUpload -> SendVideoRequest FileUpload
+uploadVideoRequest chatId video = SendVideoRequest chatId video Nothing Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendVoice'
-data SendVoiceRequest = SendVoiceRequest
+data SendVoiceRequest payload = SendVoiceRequest
   {
     _voice_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _voice_voice                    :: Text -- ^ Audio file to send. A file_id as String to resend an audio that is already on the Telegram servers
+  , _voice_voice                    :: payload -- ^ Audio file to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
   , _voice_duration                 :: Maybe Int -- ^ Duration of sent audio in seconds
   , _voice_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , _voice_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
   , _voice_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
-instance ToJSON SendVoiceRequest where
+instance ToJSON (SendVoiceRequest Text) where
   toJSON = toJsonDrop 7
 
-instance FromJSON SendVoiceRequest where
+instance FromJSON (SendVoiceRequest Text) where
   parseJSON = parseJsonDrop 7
 
-sendVoiceRequest :: Text -> Text -> SendVoiceRequest
+instance ToMultipartFormData (SendVoiceRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (_voice_chat_id req) ] ++
+    catMaybes
+    [ partLBS "duration" . encode <$> _voice_duration req
+    , partLBS "disable_notification" . encode <$> _voice_disable_notification req
+    , utf8Part "reply_to_message_id" . T.pack . show <$> _voice_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> _voice_reply_markup req
+    ] ++
+    [ fileUploadToPart "voice" (_voice_voice req) ]
+
+sendVoiceRequest :: Text -> Text -> SendVoiceRequest Text
 sendVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing
+
+uploadVoiceRequest :: Text -> FileUpload -> SendVoiceRequest FileUpload
+uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest

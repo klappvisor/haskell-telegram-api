@@ -2,7 +2,7 @@
 
 Features:
 
-* Bot-2.0 API support is almost complete. Everything from [announce](https://core.telegram.org/bots/2-0-intro) is on place except file upload (works for photo BTW).
+* Bot-2.0 API support is almost complete. Everything from [announce](https://core.telegram.org/bots/2-0-intro) is on place except certificate upload in setWebhook.
   * Inline keyboards
   * Updating messages
   * Send Location and Phone number
