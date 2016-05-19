@@ -136,10 +136,10 @@ data CallbackQueryResponse = CallbackQueryResponse
   } deriving (Show, Generic)
 
 instance ToJSON CallbackQueryResponse where
-  toJSON = toJsonDrop 7
+  toJSON = toJsonDrop 9
 
 instance FromJSON CallbackQueryResponse where
-  parseJSON = parseJsonDrop 7
+  parseJSON = parseJsonDrop 9
 
 -- | This object represents 'kickChatMember' response
 data KickChatMemberResponse = KickChatMemberResponse
