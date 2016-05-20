@@ -11,10 +11,15 @@ module Web.Telegram.API.Bot.API
   , forwardMessage
   , uploadPhoto
   , sendPhoto
+  , uploadAudio
   , sendAudio
+  , uploadDocument
   , sendDocument
+  , uploadSticker
   , sendSticker
+  , uploadVideo
   , sendVideo
+  , uploadVoice
   , sendVoice
   , sendLocation
   , sendVenue
@@ -85,19 +90,34 @@ type TelegramBotAPI =
          :> ReqBody '[JSON] (SendPhotoRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendAudio"
-         :> ReqBody '[JSON] SendAudioRequest
+         :> MultipartFormDataReqBody (SendAudioRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendAudio"
+         :> ReqBody '[JSON] (SendAudioRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendDocument"
-         :> ReqBody '[JSON] SendDocumentRequest
+         :> MultipartFormDataReqBody (SendDocumentRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendDocument"
+         :> ReqBody '[JSON] (SendDocumentRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendSticker"
-         :> ReqBody '[JSON] SendStickerRequest
+         :> MultipartFormDataReqBody (SendStickerRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendSticker"
+         :> ReqBody '[JSON] (SendStickerRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendVideo"
-         :> ReqBody '[JSON] SendVideoRequest
+         :> MultipartFormDataReqBody (SendVideoRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendVideo"
+         :> ReqBody '[JSON] (SendVideoRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendVoice"
-         :> ReqBody '[JSON] SendVoiceRequest
+         :> MultipartFormDataReqBody (SendVoiceRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendVoice"
+         :> ReqBody '[JSON] (SendVoiceRequest Text)
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendLocation"
          :> ReqBody '[JSON] SendLocationRequest
@@ -162,11 +182,16 @@ sendMessage_               :: Token -> SendMessageRequest -> Manager -> BaseUrl 
 forwardMessage_            :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendPhoto_                 :: Token -> SendPhotoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendAudio_                 :: Token -> SendAudioRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendDocument_              :: Token -> SendDocumentRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendSticker_               :: Token -> SendStickerRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVideo_                 :: Token -> SendVideoRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVoice_                 :: Token -> SendVoiceRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadAudio_               :: Token -> SendAudioRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendAudio_                 :: Token -> SendAudioRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadDocument_            :: Token -> SendDocumentRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendDocument_              :: Token -> SendDocumentRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadSticker_             :: Token -> SendStickerRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendSticker_               :: Token -> SendStickerRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadVideo_               :: Token -> SendVideoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendVideo_                 :: Token -> SendVideoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+uploadVoice_               :: Token -> SendVoiceRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
+sendVoice_                 :: Token -> SendVoiceRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendLocation_              :: Token -> SendLocationRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendVenue_                 :: Token -> SendVenueRequest-> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
 sendContact_               :: Token -> SendContactRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
@@ -187,10 +212,15 @@ getMe_
   :<|> forwardMessage_
   :<|> uploadPhoto_
   :<|> sendPhoto_
+  :<|> uploadAudio_
   :<|> sendAudio_
+  :<|> uploadDocument_
   :<|> sendDocument_
+  :<|> uploadSticker_
   :<|> sendSticker_
+  :<|> uploadVideo_
   :<|> sendVideo_
+  :<|> uploadVoice_
   :<|> sendVoice_
   :<|> sendLocation_
   :<|> sendVenue_
@@ -230,26 +260,48 @@ uploadPhoto = run telegramBaseUrl uploadPhoto_
 sendPhoto :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendPhoto = run telegramBaseUrl sendPhoto_
 
--- | Use this method to send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+-- | Use this method to upload and send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
 --       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
-sendAudio :: Token -> SendAudioRequest -> Manager -> IO (Either ServantError MessageResponse)
+uploadAudio :: Token -> SendAudioRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadAudio = run telegramBaseUrl uploadAudio_
+
+-- | Use this method to send audio files that are already on the Telegram servers, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+--
+--       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
+sendAudio :: Token -> SendAudioRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendAudio = run telegramBaseUrl sendAudio_
 
--- | Use this method to send general files. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
-sendDocument :: Token -> SendDocumentRequest -> Manager -> IO (Either ServantError MessageResponse)
+-- | Use this method to upload and send general files. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+uploadDocument :: Token -> SendDocumentRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadDocument = run telegramBaseUrl uploadDocument_
+
+-- | Use this method to send general files that have already been uploaded. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+sendDocument :: Token -> SendDocumentRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendDocument = run telegramBaseUrl sendDocument_
 
--- | Use this method to send .webp stickers. On success, the sent 'Message' is returned.
-sendSticker :: Token -> SendStickerRequest -> Manager -> IO (Either ServantError MessageResponse)
+-- | Use this method to upload and send .webp stickers. On success, the sent 'Message' is returned.
+uploadSticker :: Token -> SendStickerRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadSticker = run telegramBaseUrl uploadSticker_
+
+-- | Use this method to send .webp stickers that are already on the Telegram servers. On success, the sent 'Message' is returned.
+sendSticker :: Token -> SendStickerRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendSticker = run telegramBaseUrl sendSticker_
 
--- | Use this method to send video files, Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
-sendVideo :: Token -> SendVideoRequest -> Manager -> IO (Either ServantError MessageResponse)
+-- | Use this method to upload and send video files. Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+uploadVideo :: Token -> SendVideoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadVideo = run telegramBaseUrl uploadVideo_
+
+-- | Use this method to send video files that are already on the Telegram servers. Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+sendVideo :: Token -> SendVideoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendVideo = run telegramBaseUrl sendVideo_
 
--- | Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
-sendVoice :: Token -> SendVoiceRequest -> Manager -> IO (Either ServantError MessageResponse)
+-- | Use this method to upload and send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+uploadVoice :: Token -> SendVoiceRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadVoice = run telegramBaseUrl uploadVoice_
+
+-- | Use this method to send audio files that are already on the telegram server, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+sendVoice :: Token -> SendVoiceRequest Text -> Manager -> IO (Either ServantError MessageResponse)
 sendVoice = run telegramBaseUrl sendVoice_
 
 -- | Use this method to send point on the map. On success, the sent 'Message' is returned.

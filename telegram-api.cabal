@@ -1,5 +1,5 @@
 name:                telegram-api
-version:             0.4.0.1
+version:             0.4.1.0
 synopsis:            Telegram Bot API bindings
 description:         High-level bindings to the Telegram Bot API
 homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
@@ -13,6 +13,11 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 data-files:          test-data/christmas-cat.jpg
+                   , test-data/haskell-logo.webp
+                   , test-data/lego-video.mp4
+                   , test-data/Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
+                   , test-data/concerto-for-2-trumpets-in-c-major.mp3
+                   , test-data/wikipedia-telegram.txt
 
 extra-source-files:
   README.md
