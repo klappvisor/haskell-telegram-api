@@ -1,4 +1,8 @@
-## 0.4.0.2
+## 0.4.1.0
+
+Features:
+
+* Implemented file uploading for audio, voice, sticker, video and documents
 
 Bugfixes:
 

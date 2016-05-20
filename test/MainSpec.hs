@@ -28,6 +28,8 @@ nosuccess e = e `shouldSatisfy` isLeft
 spec :: Token -> Text -> Text -> Spec
 spec token chatId botName = do
   manager <- runIO $ newManager tlsManagerSettings
+  dataDir <- runIO getDataDir
+  let testFile name = dataDir </> "test-data" </> name
   describe "/getMe" $ do
     it "responds with correct bot's name" $ do
       Right GetMeResponse { user_result = u } <-
@@ -101,8 +103,7 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
       msg `shouldBe` "Bad Request"
     it "should upload photo and resend it by id" $ do
-      dataDir <- getDataDir
-      let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
+      let fileUpload = localFileUpload (testFile "christmas-cat.jpg")
       let upload = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "uploaded photo"
       }
@@ -128,10 +129,20 @@ spec token chatId botName = do
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
     it "should send audio" $ do
+      -- audio source: https://musopen.org/music/2698/antonio-vivaldi/concerto-for-2-trumpets-in-c-major-rv-537-trumpet-and-organ-arr/
       let audio = sendAudioRequest chatId "BQADBAADAQQAAiBOnQHThzc4cz1-IwI"
       Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
         sendAudio token audio manager
       title `shouldBe` "The Nutcracker Suite - Act II, No.12. Pas de Deux variations"
+    it "should upload audio" $ do
+      let fileUpload = localFileUpload (testFile "concerto-for-2-trumpets-in-c-major.mp3")
+          audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
+          audioPerformer = "Michel Rondeau"
+          audio = (uploadAudioRequest chatId fileUpload) { _audio_performer = Just audioPerformer, _audio_title = Just audioTitle }
+      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title, audio_performer = Just performer } } } <-
+        uploadAudio token audio manager
+      title `shouldBe` audioTitle
+      performer `shouldBe` audioPerformer
 
   describe "/sendSticker" $ do
     it "should send sticker" $ do
@@ -139,6 +150,39 @@ spec token chatId botName = do
       Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
         sendSticker token sticker manager
       (sticker_file_id sticker) `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
+    it "should upload sticker" $ do
+      let fileUpload = localFileUpload (testFile "haskell-logo.webp")
+          stickerReq = uploadStickerRequest chatId fileUpload 
+      Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
+        uploadSticker token stickerReq manager
+      (sticker_height sticker) `shouldBe` 128 
+  
+  describe "/sendVoice" $ do
+    it "should upload voice" $ do
+      -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
+      let fileUpload = localFileUpload (testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg")
+          voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
+      Right MessageResponse { message_result = Message { voice = Just voice } } <-
+        uploadVoice token voiceReq manager
+      voice_duration voice `shouldBe` 10
+
+  describe "/sendVideo" $ do
+    it "should upload video" $ do
+      -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
+      let fileUpload = localFileUpload (testFile "lego-video.mp4")
+          videoReq = uploadVideoRequest chatId fileUpload
+      Right MessageResponse { message_result = Message { video = Just video } } <-
+        uploadVideo token videoReq manager
+      video_width video `shouldBe` 560
+
+  describe "/sendDocument" $ do
+    it "should upload document" $ do
+      let fileUpload = localFileUpload (testFile "wikipedia-telegram.txt")
+          documentReq = uploadDocumentRequest chatId fileUpload
+      Right MessageResponse { message_result = Message { document = Just document } } <-
+        uploadDocument token documentReq manager
+      doc_mime_type document `shouldBe` Just "text/plain"
+      doc_file_name document `shouldBe` Just "wikipedia-telegram.txt"
 
   describe "/sendLocation" $ do
     it "should send location" $ do
@@ -225,7 +269,7 @@ spec token chatId botName = do
 
     it "should edit caption" $ do
       dataDir <- getDataDir
-      let fileUpload = FileUpload "image/jpeg" (FileUploadFile (dataDir </> "test-data/christmas-cat.jpg"))
+      let fileUpload = localFileUpload (testFile "christmas-cat.jpg")
       let originalMessage = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "cat picture"
       }
