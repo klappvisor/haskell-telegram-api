@@ -129,6 +129,7 @@ spec token chatId botName = do
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
     it "should send audio" $ do
+      -- audio source: https://musopen.org/music/2698/antonio-vivaldi/concerto-for-2-trumpets-in-c-major-rv-537-trumpet-and-organ-arr/
       let audio = sendAudioRequest chatId "BQADBAADAQQAAiBOnQHThzc4cz1-IwI"
       Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
         sendAudio token audio manager
@@ -155,6 +156,34 @@ spec token chatId botName = do
       Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
         uploadSticker token stickerReq manager
       (sticker_height sticker) `shouldBe` 128 
+  
+  describe "/sendVoice" $ do
+    it "should upload voice" $ do
+      -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
+      let fileUpload = FileUpload "audio/ogg" (FileUploadFile (testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg"))
+          voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
+      Right MessageResponse { message_result = Message { voice = Just voice } } <-
+        uploadVoice token voiceReq manager
+      voice_duration voice `shouldBe` 10
+
+  describe "/sendVideo" $ do
+    it "should upload video" $ do
+      -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
+      let fileUpload = FileUpload "video/mp4" (FileUploadFile (testFile "lego-video.mp4"))
+          videoReq = uploadVideoRequest chatId fileUpload
+      Right MessageResponse { message_result = Message { video = Just video } } <-
+        uploadVideo token videoReq manager
+      video_width video `shouldBe` 560
+
+  describe "/sendDocument" $ do
+    it "should upload document" $ do
+      let fileUpload = FileUpload "text/plain" (FileUploadFile (testFile "wikipedia-telegram.txt"))
+          documentReq = uploadDocumentRequest chatId fileUpload
+      Right MessageResponse { message_result = Message { document = Just document } } <-
+        uploadDocument token documentReq manager
+      doc_mime_type document `shouldBe` Just "text/plain"
+      doc_file_name document `shouldBe` Just "wikipedia-telegram.txt"
+
   describe "/sendLocation" $ do
     it "should send location" $ do
       let location = sendLocationRequest chatId 52.38 4.9
