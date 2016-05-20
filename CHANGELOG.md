@@ -1,3 +1,9 @@
+## 0.4.0.1
+
+Bugfixes:
+
+* Parsing issue with answer callback query response
+
 ## 0.4.0.0 [Breaking]
 
 Features:
