@@ -1,3 +1,7 @@
+## HEAD
+
+* Implemented file uploading for audio, voice, sticker, video and documents
+
 ## 0.4.0.1
 
 Bugfixes:
@@ -8,7 +12,7 @@ Bugfixes:
 
 Features:
 
-* Bot-2.0 API support is almost complete. Everything from [announce](https://core.telegram.org/bots/2-0-intro) is on place except certificate upload in setWebhook.
+* Bot-2.0 API support is almost complete. Everything from [announce](https://core.telegram.org/bots/2-0-intro) is on place except file upload (works for photo BTW).
   * Inline keyboards
   * Updating messages
   * Send Location and Phone number
