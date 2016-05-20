@@ -32,6 +32,7 @@ module Web.Telegram.API.Bot.Requests
     , EditMessageCaptionRequest      (..)
     , EditMessageReplyMarkupRequest  (..)
      -- * Functions
+    , localFileUpload
     , sendMessageRequest
     , forwardMessageRequest
     , sendPhotoRequest
@@ -88,8 +89,15 @@ data FileUploadContent =
 -- | This object represents data (image, video, ...) with mime type to upload.
 data FileUpload = FileUpload
   {
-    fileUpload_type    :: MimeType          -- ^ Mime type of the upload.
+    fileUpload_type    :: Maybe MimeType    -- ^ Mime type of the upload.
   , fileUpload_content :: FileUploadContent -- ^ The payload/source to upload.
+  }
+
+localFileUpload :: FilePath -> FileUpload
+localFileUpload path =
+  FileUpload
+  { fileUpload_type = Nothing
+  , fileUpload_content = FileUploadFile path
   }
 
 fileUploadToPart :: Text -> FileUpload -> Part
@@ -99,7 +107,7 @@ fileUploadToPart inputName fileUpload =
           FileUploadFile path -> partFileSource inputName path
           FileUploadBS bs -> partBS inputName bs
           FileUploadLBS lbs -> partLBS inputName lbs
-  in part { partContentType = Just (fileUpload_type fileUpload) }
+  in part { partContentType = fileUpload_type fileUpload }
 
 utf8Part :: Text -> Text -> Part
 utf8Part inputName = partBS inputName . T.encodeUtf8
