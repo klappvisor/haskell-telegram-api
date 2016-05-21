@@ -47,6 +47,7 @@ library
                      , bytestring
                      , string-conversions
   default-language:    Haskell2010
+  ghc-options:         -O2 -Wall -fno-warn-name-shadowing -fno-warn-unused-binds
 
 test-suite telegram-api-test
   type:                exitcode-stdio-1.0
@@ -72,7 +73,7 @@ test-suite telegram-api-test
                      , text
                      , transformers
                      , utf8-string
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall -fno-warn-name-shadowing
   default-language:    Haskell2010
 
 source-repository head

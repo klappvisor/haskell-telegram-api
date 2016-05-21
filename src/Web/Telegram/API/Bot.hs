@@ -1,10 +1,3 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE DeriveAnyClass    #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
-
 -- | This module provides Telegram Bot API
 module Web.Telegram.API.Bot
   (

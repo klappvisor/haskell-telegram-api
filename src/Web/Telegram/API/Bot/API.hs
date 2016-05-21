@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE DeriveGeneric              #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TypeOperators              #-}
@@ -43,23 +42,13 @@ module Web.Telegram.API.Bot.API
   , Token             (..)
   ) where
 
-import           Control.Applicative
-import           Control.Monad.Trans.Either
 import           Control.Monad.Trans.Except (ExceptT, runExceptT)
-import           Data.Aeson
-import           Data.Aeson.Types
-import           Data.Maybe
 import           Data.Proxy
 import           Data.Text (Text)
-import qualified Data.Text as T
-import           GHC.Generics
-import           GHC.TypeLits
 import           Network.HTTP.Client (Manager)
 import           Servant.API
 import           Servant.Client
-import           Web.HttpApiData
 import           Servant.Client.MultipartFormData
-import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.Responses
 import           Web.Telegram.API.Bot.Requests
 

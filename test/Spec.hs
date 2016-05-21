@@ -3,15 +3,13 @@
 
 module Main (main) where
 
-import           Control.Monad                (when)
 import           Data.Maybe                   (fromMaybe)
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified MainSpec
 import qualified JsonSpec
 import           Options.Applicative
-import           System.Environment           (getArgs, withArgs)
-import           System.Exit                  (exitSuccess)
+import           System.Environment           (withArgs)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 import           Web.Telegram.API.Bot
@@ -52,7 +50,6 @@ options = Options
 
 main :: IO ()
 main = do
-    args <- getArgs
     Options{..} <- execParser opts
     let integration = opt_integration
         token = fmap (\x -> Token ("bot" <> T.pack x)) opt_token

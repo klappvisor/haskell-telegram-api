@@ -1,10 +1,5 @@
-{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE FlexibleContexts  #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 -- | This module contains data objects which represents requests to Telegram Bot API
@@ -65,18 +60,14 @@ module Web.Telegram.API.Bot.Requests
     ) where
 
 import           Data.Aeson
-import           Data.Aeson.Types
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as LBS
 import           Data.Maybe
-import           Data.Proxy
 import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           GHC.Generics
-import           GHC.TypeLits
 import           Network.HTTP.Client.MultipartFormData
-import           Network.HTTP.Types.Header (hContentType)
 import           Network.Mime
 import           Servant.Client.MultipartFormData (ToMultipartFormData (..))
 import           Web.Telegram.API.Bot.JsonExt
