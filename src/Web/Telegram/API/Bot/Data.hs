@@ -14,6 +14,7 @@ module Web.Telegram.API.Bot.Data
     , Sticker                       (..)
     , Video                         (..)
     , Voice                         (..)
+    , Venue                         (..)
     , Contact                       (..)
     , Location                      (..)
     , Update                        (..)

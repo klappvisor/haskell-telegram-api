@@ -128,21 +128,19 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
-    it "should send audio" $ do
-      -- audio source: https://musopen.org/music/2698/antonio-vivaldi/concerto-for-2-trumpets-in-c-major-rv-537-trumpet-and-organ-arr/
-      let audio = sendAudioRequest chatId "BQADBAADAQQAAiBOnQHThzc4cz1-IwI"
-      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title } } } <-
-        sendAudio token audio manager
-      title `shouldBe` "The Nutcracker Suite - Act II, No.12. Pas de Deux variations"
-    it "should upload audio" $ do
+    it "should upload audio and resend it by id" $ do
       let fileUpload = localFileUpload (testFile "concerto-for-2-trumpets-in-c-major.mp3")
           audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
           audioPerformer = "Michel Rondeau"
           audio = (uploadAudioRequest chatId fileUpload) { _audio_performer = Just audioPerformer, _audio_title = Just audioTitle }
-      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title, audio_performer = Just performer } } } <-
+      Right MessageResponse { message_result = Message { audio = Just Audio { audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer } } } <-
         uploadAudio token audio manager
       title `shouldBe` audioTitle
       performer `shouldBe` audioPerformer
+      let audio = sendAudioRequest chatId file_id
+      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title' } } } <-
+        sendAudio token audio manager
+      title' `shouldBe` audioTitle
 
   describe "/sendSticker" $ do
     it "should send sticker" $ do
