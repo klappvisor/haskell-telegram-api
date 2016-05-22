@@ -32,7 +32,7 @@ spec token chatId botName = do
   let testFile name = dataDir </> "test-data" </> name
   describe "/getMe" $
     it "responds with correct bot's name" $ do
-      Right GetMeResponse { user_result = u } <-
+      Right Response { result = u } <-
         getMe token manager
       user_first_name u `shouldBe` botName -- f.e. "TelegramAPIBot"
 
@@ -40,7 +40,7 @@ spec token chatId botName = do
     it "should send message" $ do
       res <- sendMessage token (sendMessageRequest chatId "test message") manager
       success res
-      let Right MessageResponse { message_result = m } = res
+      let Right Response { result = m } = res
       text m `shouldBe` Just "test message"
 
     it "should return error message" $ do
@@ -55,7 +55,7 @@ spec token chatId botName = do
         }
       res <- sendMessage token request manager
       success res
-      let Right MessageResponse { message_result = m } = res
+      let Right Response { result = m } = res
       text m `shouldBe` Just "text bold italic github"
 
     it "should set keyboard" $ do
@@ -67,7 +67,7 @@ spec token chatId botName = do
       }
       res <- sendMessage token message manager
       success res
-      let Right MessageResponse { message_result = m } = res
+      let Right Response { result = m } = res
       text m `shouldBe` Just "set keyboard"
 
     it "should remove keyboard" $ do
@@ -76,7 +76,7 @@ spec token chatId botName = do
       }
       res <- sendMessage token message manager
       success res
-      let Right MessageResponse { message_result = m } = res
+      let Right Response { result = m } = res
       text m `shouldBe` Just "remove keyboard"
 
     it "should send message with inline keyboard" $ do
@@ -88,7 +88,7 @@ spec token chatId botName = do
       }
       res <- sendMessage token message manager
       success res
-      let Right MessageResponse { message_result = m } = res
+      let Right Response { result = m } = res
       text m `shouldBe` Just "set inline keyboard"
 
     it "should force reply" $ do
@@ -97,7 +97,7 @@ spec token chatId botName = do
       }
       res <- sendMessage token message manager
       success res
-      let Right MessageResponse { message_result = m } = res
+      let Right Response { result = m } = res
       text m `shouldBe` Just "force reply"
 
   describe "/forwardMessage" $
@@ -119,7 +119,7 @@ spec token chatId botName = do
       let upload = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "uploaded photo"
       }
-      Right MessageResponse { message_result = Message { caption = Just cpt, photo = Just photos } } <-
+      Right Response { result = Message { caption = Just cpt, photo = Just photos } } <-
         uploadPhoto token upload manager
       cpt `shouldBe` "uploaded photo"
       -- resend by id
@@ -127,7 +127,7 @@ spec token chatId botName = do
       let photo = (sendPhotoRequest chatId id) {
         photo_caption = Just "photo caption"
       }
-      Right MessageResponse { message_result = Message { caption = Just cpt } } <-
+      Right Response { result = Message { caption = Just cpt } } <-
         sendPhoto token photo manager
       cpt `shouldBe` "photo caption"
 
@@ -145,25 +145,25 @@ spec token chatId botName = do
           audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
           audioPerformer = "Michel Rondeau"
           audio = (uploadAudioRequest chatId fileUpload) { _audio_performer = Just audioPerformer, _audio_title = Just audioTitle }
-      Right MessageResponse { message_result = Message { audio = Just Audio { audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer } } } <-
+      Right Response { result = Message { audio = Just Audio { audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer } } } <-
         uploadAudio token audio manager
       title `shouldBe` audioTitle
       performer `shouldBe` audioPerformer
       let audio = sendAudioRequest chatId file_id
-      Right MessageResponse { message_result = Message { audio = Just Audio { audio_title = Just title' } } } <-
+      Right Response { result = Message { audio = Just Audio { audio_title = Just title' } } } <-
         sendAudio token audio manager
       title' `shouldBe` audioTitle
 
   describe "/sendSticker" $ do
     it "should send sticker" $ do
       let sticker = sendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
-      Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
+      Right Response { result = Message { sticker = Just sticker } } <-
         sendSticker token sticker manager
       sticker_file_id sticker `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
       let fileUpload = localFileUpload (testFile "haskell-logo.webp")
           stickerReq = uploadStickerRequest chatId fileUpload 
-      Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
+      Right Response { result = Message { sticker = Just sticker } } <-
         uploadSticker token stickerReq manager
       sticker_height sticker `shouldBe` 128
   
@@ -172,7 +172,7 @@ spec token chatId botName = do
       -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
       let fileUpload = localFileUpload (testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg")
           voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
-      Right MessageResponse { message_result = Message { voice = Just voice } } <-
+      Right Response { result = Message { voice = Just voice } } <-
         uploadVoice token voiceReq manager
       voice_duration voice `shouldBe` 10
 
@@ -181,7 +181,7 @@ spec token chatId botName = do
       -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
       let fileUpload = localFileUpload (testFile "lego-video.mp4")
           videoReq = uploadVideoRequest chatId fileUpload
-      Right MessageResponse { message_result = Message { video = Just video } } <-
+      Right Response { result = Message { video = Just video } } <-
         uploadVideo token videoReq manager
       video_width video `shouldBe` 560
 
@@ -189,7 +189,7 @@ spec token chatId botName = do
     it "should upload document" $ do
       let fileUpload = localFileUpload (testFile "wikipedia-telegram.txt")
           documentReq = uploadDocumentRequest chatId fileUpload
-      Right MessageResponse { message_result = Message { document = Just document } } <-
+      Right Response { result = Message { document = Just document } } <-
         uploadDocument token documentReq manager
       doc_mime_type document `shouldBe` Just "text/plain"
       doc_file_name document `shouldBe` Just "wikipedia-telegram.txt"
@@ -197,7 +197,7 @@ spec token chatId botName = do
   describe "/sendLocation" $
     it "should send location" $ do
       let location = sendLocationRequest chatId 52.38 4.9
-      Right MessageResponse { message_result = Message { location = Just loc } } <-
+      Right Response { result = Message { location = Just loc } } <-
         sendLocation token location manager
       latitude loc `shouldSatisfy` liftM2 (&&) (> 52) (< 52.4)
       longitude loc `shouldSatisfy` liftM2 (&&) (> 4.89) (< 5)
@@ -205,7 +205,7 @@ spec token chatId botName = do
   describe "/sendVenue" $
     it "should send a venue" $ do
       let venue = sendVenueRequest chatId 52.38 4.9 "Amsterdam Centraal" "Amsterdam"
-      Right MessageResponse { message_result = Message { location = Just loc } } <-
+      Right Response { result = Message { location = Just loc } } <-
         sendVenue token venue manager
       latitude loc `shouldSatisfy` liftM2 (&&) (> 52) (< 52.4)
       longitude loc `shouldSatisfy` liftM2 (&&) (> 4.89) (< 5)
@@ -213,7 +213,7 @@ spec token chatId botName = do
   describe "/sendContact" $
     it "should send a contact" $ do
       let contact = sendContactRequest chatId "06-18035176" "Hilbert"
-      Right MessageResponse { message_result = Message { contact = Just con } } <-
+      Right Response { result = Message { contact = Just con } } <-
         sendContact token contact manager
       -- Telegram seems to remove any non numeric characters from the sent phone number (at least it removed my '-')
       contact_phone_number con `shouldBe` "0618035176"
@@ -221,27 +221,27 @@ spec token chatId botName = do
 
   describe "/sendChatAction" $ do
     it "should set typing action" $ do
-      Right ChatActionResponse { action_result = res} <-
+      Right Response { result = res} <-
         sendChatAction token (SendChatActionRequest chatId Typing) manager
       res `shouldBe` True
     it "should set find location action" $ do
-      Right ChatActionResponse { action_result = res} <-
+      Right Response { result = res} <-
         sendChatAction token (SendChatActionRequest chatId FindLocation) manager
       res `shouldBe` True
     it "should set upload photo action" $ do
-      Right ChatActionResponse { action_result = res} <-
+      Right Response { result = res} <-
         sendChatAction token (SendChatActionRequest chatId UploadPhoto) manager
       res `shouldBe` True
 
   describe "/getUpdates" $
     it "should get all messages" $ do
-      Right UpdatesResponse { update_result = updates} <-
+      Right Response { result = updates} <-
         getUpdates token Nothing Nothing Nothing manager
       length updates `shouldSatisfy` (>= 0)
 
   describe "/getFile" $ do
     it "should get file" $ do
-      Right FileResponse { file_result = file } <-
+      Right Response { result = file } <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC" manager
       fmap (T.take 10) (file_path file) `shouldBe` Just "thumb/file"
 
@@ -252,28 +252,28 @@ spec token chatId botName = do
 
   describe "/getUserProfilePhotos" $
    it "should get user profile photos" $ do
-     Right UserProfilePhotosResponse { photos_result = photos } <-
+     Right Response { result = photos } <-
        getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager
      total_count photos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook" $ do
     it "should set webhook" $ do
-      Right SetWebhookResponse { webhook_result = res } <-
+      Right Response { result = res } <-
         setWebhook token (Just "https://example.com/secret_token") manager
       res `shouldBe` True
 
     it "should remove webhook" $ do
-      Right SetWebhookResponse { webhook_result = res } <-
+      Right Response { result = res } <-
         setWebhook token Nothing manager
       res `shouldBe` True
 
   describe "/editTextMessage" $ do
     it "should edit message" $ do
       let originalMessage = sendMessageRequest chatId "veritas"
-      Right MessageResponse { message_result = Message { message_id = msg_id, text = Just txt } } <-
+      Right Response { result = Message { message_id = msg_id, text = Just txt } } <-
         sendMessage token originalMessage manager
       let editRequest = editMessageTextRequest chatId msg_id $ "edited " <> txt
-      Right MessageResponse { message_result = Message { text = txt' } } <-
+      Right Response { result = Message { text = txt' } } <-
         editMessageText token editRequest manager
       txt' `shouldBe` Just "edited veritas"
 
@@ -282,10 +282,10 @@ spec token chatId botName = do
       let originalMessage = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "cat picture"
       }
-      Right MessageResponse { message_result = Message { message_id = msg_id, caption = Just cpt } } <-
+      Right Response { result = Message { message_id = msg_id, caption = Just cpt } } <-
         uploadPhoto token originalMessage manager
       let editRequest = editMessageCaptionRequest chatId msg_id $ Just $ "edited " <> cpt
-      Right MessageResponse { message_result = Message { caption = Just cpt' } } <-
+      Right Response { result = Message { caption = Just cpt' } } <-
         editMessageCaption token editRequest manager
       cpt' `shouldBe` "edited cat picture"
 
