@@ -5,23 +5,30 @@
 -- | This module contains responses from Telegram Bot API
 module Web.Telegram.API.Bot.Responses
     ( -- * Types
-      GetMeResponse             (..)
-    , MessageResponse           (..)
-    , ChatActionResponse        (..)
-    , UpdatesResponse           (..)
-    , FileResponse              (..)
-    , UserProfilePhotosResponse (..)
-    , SetWebhookResponse        (..)
-    , InlineQueryResponse       (..)
-    , CallbackQueryResponse     (..)
-    , KickChatMemberResponse    (..)
-    , UnbanChatMemberResponse   (..)
+      GetMeResponse                   (..)
+    , MessageResponse                 (..)
+    , ChatActionResponse              (..)
+    , UpdatesResponse                 (..)
+    , FileResponse                    (..)
+    , UserProfilePhotosResponse       (..)
+    , SetWebhookResponse              (..)
+    , InlineQueryResponse             (..)
+    , CallbackQueryResponse           (..)
+    , KickChatMemberResponse          (..)
+    , LeaveChatResponse               (..)
+    , UnbanChatMemberResponse         (..)
+    , GetChatResponse                 (..)
+    , GetChatAdministratorsResponse   (..)
+    , GetChatMembersCountResponse     (..)
+    , GetChatMemberResponse           (..)
     ) where
 
 import           Data.Aeson
 import           GHC.Generics
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.JsonExt
+
+-- TODO: use generic response i.e. `data Response a = Response `
 
 -- | This object represents 'getMe' response
 data GetMeResponse = GetMeResponse
@@ -143,6 +150,17 @@ instance ToJSON KickChatMemberResponse where
 instance FromJSON KickChatMemberResponse where
   parseJSON = parseJsonDrop 5
 
+data LeaveChatResponse = LeaveChatResponse
+  {
+    leave_result :: Bool
+  } deriving (Show, Generic)
+
+instance ToJSON LeaveChatResponse where
+  toJSON = toJsonDrop 6
+
+instance FromJSON LeaveChatResponse where
+  parseJSON = parseJsonDrop 6
+
 -- | This object represents 'unbanChatMember' response
 data UnbanChatMemberResponse = UnbanChatMemberResponse
   {
@@ -154,3 +172,47 @@ instance ToJSON UnbanChatMemberResponse where
 
 instance FromJSON UnbanChatMemberResponse where
   parseJSON = parseJsonDrop 6
+
+data GetChatResponse = GetChatResponse
+  {
+    chat_result :: Chat
+  } deriving (Show, Generic)
+
+instance ToJSON GetChatResponse where
+  toJSON = toJsonDrop 5
+
+instance FromJSON GetChatResponse where
+  parseJSON = parseJsonDrop 5
+
+data GetChatAdministratorsResponse = GetChatAdministratorsResponse
+  {
+    ca_result :: [ChatMember]
+  } deriving (Show, Generic)
+
+instance ToJSON GetChatAdministratorsResponse where
+  toJSON = toJsonDrop 3
+
+instance FromJSON GetChatAdministratorsResponse where
+  parseJSON = parseJsonDrop 3
+
+data GetChatMembersCountResponse = GetChatMembersCountResponse
+  {
+    cmc_result :: Int
+  } deriving (Show, Generic)
+
+instance ToJSON GetChatMembersCountResponse where
+  toJSON = toJsonDrop 4
+
+instance FromJSON GetChatMembersCountResponse where
+  parseJSON = parseJsonDrop 4
+
+data GetChatMemberResponse = GetChatMemberResponse
+  {
+    gcm_result :: Int
+  } deriving (Show, Generic)
+
+instance ToJSON GetChatMemberResponse where
+  toJSON = toJsonDrop 4
+
+instance FromJSON GetChatMemberResponse where
+  parseJSON = parseJsonDrop 4

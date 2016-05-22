@@ -6,6 +6,7 @@
 module Web.Telegram.API.Bot.Data
     ( -- * Types
       User                          (..)
+    , ChatMember                    (..)
     , Chat                          (..)
     , Message                       (..)
     , PhotoSize                     (..)
@@ -688,7 +689,19 @@ data UserProfilePhotos = UserProfilePhotos
   {
     total_count :: Int      -- ^ Total number of profile pictures the target user has
   , photos :: [[PhotoSize]] -- ^ Requested profile pictures (in up to 4 sizes each)
-  }  deriving (FromJSON, ToJSON, Show, Generic)
+  } deriving (FromJSON, ToJSON, Show, Generic)
+
+data ChatMember = ChatMember
+  {
+    cm_user :: User -- ^ Information about the user
+  , cm_status :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+  } deriving (Show, Generic)
+
+instance ToJSON ChatMember where
+  toJSON = toJsonDrop 3
+
+instance FromJSON ChatMember where
+  parseJSON = parseJsonDrop 3
 
 -- | This object represents a message.
 data Message = Message
