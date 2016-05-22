@@ -1,3 +1,11 @@
+## 0.4.2.0
+
+Features:
+
+* Bot-2.1 support
+  * Added new methods: `getChat`, `leaveChat`, `getChatAdministrators`, `getChatMember`, `getChatMembersCount`.
+  * Added support for edited messages and new mentions from Telegram v.3.9. New fields: `edited_message` in `Update`, `edit_date` in `Message, user in `MessageEntity`. New value `text_mention` for the type field in `MessageEntity`.
+
 ## 0.4.1.0
 
 Features:
