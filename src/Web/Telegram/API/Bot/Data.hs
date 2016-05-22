@@ -6,6 +6,7 @@
 module Web.Telegram.API.Bot.Data
     ( -- * Types
       User                          (..)
+    , ChatMember                    (..)
     , Chat                          (..)
     , Message                       (..)
     , PhotoSize                     (..)
@@ -658,6 +659,7 @@ data Update = Update
   {
     update_id            :: Int   -- ^ The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using 'setWebhooks', since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
   , message              :: Maybe Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
+  , edited_message       :: Maybe Message -- ^ New version of a message that is known to the bot and was edited
   , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
   , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
   , callback_query       :: Maybe CallbackQuery -- ^ This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
@@ -687,7 +689,19 @@ data UserProfilePhotos = UserProfilePhotos
   {
     total_count :: Int      -- ^ Total number of profile pictures the target user has
   , photos :: [[PhotoSize]] -- ^ Requested profile pictures (in up to 4 sizes each)
-  }  deriving (FromJSON, ToJSON, Show, Generic)
+  } deriving (FromJSON, ToJSON, Show, Generic)
+
+data ChatMember = ChatMember
+  {
+    cm_user :: User -- ^ Information about the user
+  , cm_status :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+  } deriving (Show, Generic)
+
+instance ToJSON ChatMember where
+  toJSON = toJsonDrop 3
+
+instance FromJSON ChatMember where
+  parseJSON = parseJsonDrop 3
 
 -- | This object represents a message.
 data Message = Message
@@ -700,6 +714,7 @@ data Message = Message
   , forward_from_chat :: Maybe Chat       -- ^ For messages forwarded from a channel, information about the original channel
   , forward_date :: Maybe Int             -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message :: Maybe Message     -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
+  , edit_date :: Maybe Int                -- ^ Date the message was last edited in Unix time
   , text :: Maybe Text                    -- ^ For text messages, the actual UTF-8 text of the message
   , entities :: Maybe [MessageEntity]     -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
   , audio :: Maybe Audio                  -- ^ Message is an audio file, information about the file
@@ -728,10 +743,11 @@ data Message = Message
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
 data MessageEntity = MessageEntity
   {
-    me_type :: Text      -- ^ Type of the entity. One of mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs)
-  , me_offset :: Int     -- ^ Offset in UTF-16 code units to the start of the entity
-  , me_length :: Int     -- ^ Length of the entity in UTF-16 code units
-  , me_url :: Maybe Text -- ^ For “text_link” only, url that will be opened after user taps on the text
+    me_type :: Text       -- ^ Type of the entity. Can be mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs), text_mention (for users without usernames)
+  , me_offset :: Int      -- ^ Offset in UTF-16 code units to the start of the entity
+  , me_length :: Int      -- ^ Length of the entity in UTF-16 code units
+  , me_url :: Maybe Text  -- ^ For “text_link” only, url that will be opened after user taps on the text
+  , me_user :: Maybe User -- ^ For “text_mention” only, the mentioned user
   } deriving (Show, Generic)
 
 instance ToJSON MessageEntity where
