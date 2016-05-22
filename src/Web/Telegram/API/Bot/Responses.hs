@@ -1,10 +1,6 @@
-{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE FlexibleContexts  #-}
 
 -- | This module contains responses from Telegram Bot API
 module Web.Telegram.API.Bot.Responses
@@ -23,13 +19,7 @@ module Web.Telegram.API.Bot.Responses
     ) where
 
 import           Data.Aeson
-import           Data.Aeson.Types
-import           Data.Maybe
-import           Data.Proxy
-import           Data.Text (Text)
-import qualified Data.Text as T
 import           GHC.Generics
-import           GHC.TypeLits
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.JsonExt
 

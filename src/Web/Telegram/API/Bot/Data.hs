@@ -1,9 +1,6 @@
-{-# LANGUAGE DataKinds         #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
 
 -- | This module contains objects which represent data of Telegram Bot API responses
 module Web.Telegram.API.Bot.Data
@@ -17,6 +14,7 @@ module Web.Telegram.API.Bot.Data
     , Sticker                       (..)
     , Video                         (..)
     , Voice                         (..)
+    , Venue                         (..)
     , Contact                       (..)
     , Location                      (..)
     , Update                        (..)
@@ -59,13 +57,9 @@ module Web.Telegram.API.Bot.Data
 
 import           Data.Aeson
 import           Data.Aeson.Types
-import           Data.Maybe
-import           Data.Proxy
 import           Data.Text (Text)
-import qualified Data.Text as T
 import qualified Data.Char as Char
 import           GHC.Generics
-import           GHC.TypeLits
 import           Data.List
 import           Web.Telegram.API.Bot.JsonExt
 
@@ -545,9 +539,10 @@ data InlineQueryResult =
 dropCached :: String -> String
 dropCached name = if isPrefixOf "Cached" name then drop 6 name else name
 
+tagModifier :: String -> String
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
 tagModifier "InlineQueryResultCachedMpeg4Gif" = "mpeg4_gif"
-tagModifier x = ((fmap (Char.toLower)) . dropCached . (drop 17)) x
+tagModifier x = ((fmap Char.toLower) . dropCached . (drop 17)) x
 
 inlineQueryJSONOptions :: Options
 inlineQueryJSONOptions = defaultOptions {

@@ -1,25 +1,17 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
-{-# LANGUAGE TemplateHaskell   #-}
 
 module JsonSpec (spec) where
 
-import           Control.Monad
 import           Web.Telegram.API.Bot
 import           Test.Hspec
-import           Data.Text (Text)
 import qualified Data.Text as T
-import           System.Environment
 import           Data.Aeson.Encode
 import           Text.JSON.JPath
 import           Data.ByteString.Lazy.UTF8
 
 spec :: Spec
 spec = do
-  let getType = \q -> jPath (T.unpack "type") (toString (encode q))
+  let getType q = jPath (T.unpack "type") (toString (encode q))
   describe "type of serialized inline query result" $ do
     it "should be article" $ do
       (getType iq_article) `shouldBe` ["\"article\""]
@@ -59,23 +51,59 @@ spec = do
     it "should be photo" $ do
       (getType cached_photo) `shouldBe` ["\"photo\""]
 
+message_content :: InputMessageContent
 message_content = InputTextMessageContent "test message content" Nothing Nothing
 
+iq_article :: InlineQueryResult
 iq_article = inlineQueryResultArticle "" "text article content" message_content
+
+iq_photo :: InlineQueryResult
 iq_photo = inlineQueryResultPhoto "" "" ""
+
+iq_gif :: InlineQueryResult
 iq_gif = inlineQueryResultGif "" "" ""
+
+iq_mpeg :: InlineQueryResult
 iq_mpeg = inlineQueryResultMpeg4Gif "" "" ""
+
+iq_video :: InlineQueryResult
 iq_video = inlineQueryResultVideo "" "" "video/mpeg" "" ""
+
+iq_audio :: InlineQueryResult
 iq_audio = inlineQueryResultAudio "" "" ""
+
+iq_contact :: InlineQueryResult
 iq_contact = inlineQueryResultContact "" "" ""
+
+iq_document :: InlineQueryResult
 iq_document = inlineQueryResultDocument "" "" "" ""
+
+iq_location :: InlineQueryResult
 iq_location = inlineQueryResultLocation "" 0.0 0.0 ""
+
+iq_venue :: InlineQueryResult
 iq_venue = inlineQueryResultVenue "" 0.0 0.0 "" ""
+
+cached_audio :: InlineQueryResult
 cached_audio = inlineQueryResultCachedAudio "" ""
+
+cached_voice :: InlineQueryResult
 cached_voice = inlineQueryResultCachedVoice "" "" ""
+
+cached_video :: InlineQueryResult
 cached_video = inlineQueryResultCachedVideo "" "" ""
+
+cached_doc :: InlineQueryResult
 cached_doc = inlineQueryResultCachedDocument "" "" ""
+
+cached_sticker :: InlineQueryResult
 cached_sticker = inlineQueryResultCachedSticker "" ""
+
+cached_mpeg :: InlineQueryResult
 cached_mpeg = inlineQueryResultCachedMpeg4Gif "" ""
+
+cached_gif :: InlineQueryResult
 cached_gif = inlineQueryResultCachedGif "" ""
+
+cached_photo :: InlineQueryResult
 cached_photo = inlineQueryResultCachedPhoto "" ""
