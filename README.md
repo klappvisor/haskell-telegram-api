@@ -103,7 +103,7 @@ Contributions are welcome!
 
 Bear in mind that the CI build won't run integration test suite against your pull request since the necessary environment
 variables (`$BOT_TOKEN`, `$CHAT_ID` and `$BOT_NAME`) aren't exported when a fork
-starts the build (for security reasons). If you do want to run them before creating RP, you can integration your fork
+starts the build (for security reasons). If you do want to run them before creating RP, you can setup integration of your fork
 with CircleCI.
 
 You can use `stack` to build project
