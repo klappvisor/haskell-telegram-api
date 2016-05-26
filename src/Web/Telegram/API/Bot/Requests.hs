@@ -462,7 +462,7 @@ instance FromJSON SendChatActionRequest where
   parseJSON = parseJsonDrop 7
 
 sendChatActionRequest :: Text -> ChatAction -> SendChatActionRequest
-sendChatActionRequest chatId action = SendChatActionRequest chatId action
+sendChatActionRequest = SendChatActionRequest
 
 data AnswerInlineQueryRequest = AnswerInlineQueryRequest
   {
