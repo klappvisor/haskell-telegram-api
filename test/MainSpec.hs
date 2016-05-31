@@ -30,18 +30,18 @@ spec token chatId botName = do
   manager <- runIO $ newManager tlsManagerSettings
   dataDir <- runIO getDataDir
   let testFile name = dataDir </> "test-data" </> name
-  describe "/getMe" $ do
+  describe "/getMe" $
     it "responds with correct bot's name" $ do
       Right GetMeResponse { user_result = u } <-
         getMe token manager
-      (user_first_name u) `shouldBe` botName -- f.e. "TelegramAPIBot"
+      user_first_name u `shouldBe` botName -- f.e. "TelegramAPIBot"
 
   describe "/sendMessage" $ do
     it "should send message" $ do
       res <- sendMessage token (sendMessageRequest chatId "test message") manager
       success res
       let Right MessageResponse { message_result = m } = res
-      (text m) `shouldBe` (Just "test message")
+      text m `shouldBe` Just "test message"
 
     it "should return error message" $ do
       res <- sendMessage token (sendMessageRequest "" "test message") manager
@@ -56,7 +56,7 @@ spec token chatId botName = do
       res <- sendMessage token request manager
       success res
       let Right MessageResponse { message_result = m } = res
-      (text m) `shouldBe` (Just "text bold italic github")
+      text m `shouldBe` Just "text bold italic github"
 
     it "should set keyboard" $ do
       let kbA = keyboardButton "A"
@@ -68,7 +68,7 @@ spec token chatId botName = do
       res <- sendMessage token message manager
       success res
       let Right MessageResponse { message_result = m } = res
-      (text m) `shouldBe` (Just "set keyboard")
+      text m `shouldBe` Just "set keyboard"
 
     it "should remove keyboard" $ do
       let message = (sendMessageRequest chatId "remove keyboard") {
@@ -77,7 +77,7 @@ spec token chatId botName = do
       res <- sendMessage token message manager
       success res
       let Right MessageResponse { message_result = m } = res
-      (text m) `shouldBe` (Just "remove keyboard")
+      text m `shouldBe` Just "remove keyboard"
 
     it "should send message with inline keyboard" $ do
       let kbA = (inlineKeyboardButton "A") { ikb_callback_data = Just "A" }
@@ -89,7 +89,7 @@ spec token chatId botName = do
       res <- sendMessage token message manager
       success res
       let Right MessageResponse { message_result = m } = res
-      (text m) `shouldBe` (Just "set inline keyboard")
+      text m `shouldBe` Just "set inline keyboard"
 
     it "should force reply" $ do
       let message = (sendMessageRequest chatId "force reply") {
@@ -98,9 +98,9 @@ spec token chatId botName = do
       res <- sendMessage token message manager
       success res
       let Right MessageResponse { message_result = m } = res
-      (text m) `shouldBe` (Just "force reply")
+      text m `shouldBe` Just "force reply"
 
-  describe "/forwardMessage" $ do
+  describe "/forwardMessage" $
     it "should forward message" $ do
       res <- forwardMessage token (forwardMessageRequest chatId chatId 123000) manager
       nosuccess res
@@ -159,15 +159,15 @@ spec token chatId botName = do
       let sticker = sendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
       Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
         sendSticker token sticker manager
-      (sticker_file_id sticker) `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
+      sticker_file_id sticker `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
       let fileUpload = localFileUpload (testFile "haskell-logo.webp")
           stickerReq = uploadStickerRequest chatId fileUpload 
       Right MessageResponse { message_result = Message { sticker = Just sticker } } <-
         uploadSticker token stickerReq manager
-      (sticker_height sticker) `shouldBe` 128 
+      sticker_height sticker `shouldBe` 128
   
-  describe "/sendVoice" $ do
+  describe "/sendVoice" $
     it "should upload voice" $ do
       -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
       let fileUpload = localFileUpload (testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg")
@@ -176,7 +176,7 @@ spec token chatId botName = do
         uploadVoice token voiceReq manager
       voice_duration voice `shouldBe` 10
 
-  describe "/sendVideo" $ do
+  describe "/sendVideo" $
     it "should upload video" $ do
       -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
       let fileUpload = localFileUpload (testFile "lego-video.mp4")
@@ -185,7 +185,7 @@ spec token chatId botName = do
         uploadVideo token videoReq manager
       video_width video `shouldBe` 560
 
-  describe "/sendDocument" $ do
+  describe "/sendDocument" $
     it "should upload document" $ do
       let fileUpload = localFileUpload (testFile "wikipedia-telegram.txt")
           documentReq = uploadDocumentRequest chatId fileUpload
@@ -194,30 +194,30 @@ spec token chatId botName = do
       doc_mime_type document `shouldBe` Just "text/plain"
       doc_file_name document `shouldBe` Just "wikipedia-telegram.txt"
 
-  describe "/sendLocation" $ do
+  describe "/sendLocation" $
     it "should send location" $ do
       let location = sendLocationRequest chatId 52.38 4.9
       Right MessageResponse { message_result = Message { location = Just loc } } <-
         sendLocation token location manager
-      (latitude loc) `shouldSatisfy` (liftM2 (&&) (> 52) (< 52.4))
-      (longitude loc) `shouldSatisfy` (liftM2 (&&) (> 4.89) (< 5))
+      latitude loc `shouldSatisfy` liftM2 (&&) (> 52) (< 52.4)
+      longitude loc `shouldSatisfy` liftM2 (&&) (> 4.89) (< 5)
 
-  describe "/sendVenue" $ do
+  describe "/sendVenue" $
     it "should send a venue" $ do
       let venue = sendVenueRequest chatId 52.38 4.9 "Amsterdam Centraal" "Amsterdam"
       Right MessageResponse { message_result = Message { location = Just loc } } <-
         sendVenue token venue manager
-      (latitude loc) `shouldSatisfy` (liftM2 (&&) (> 52) (< 52.4))
-      (longitude loc) `shouldSatisfy` (liftM2 (&&) (> 4.89) (< 5))
+      latitude loc `shouldSatisfy` liftM2 (&&) (> 52) (< 52.4)
+      longitude loc `shouldSatisfy` liftM2 (&&) (> 4.89) (< 5)
 
-  describe "/sendContact" $ do
+  describe "/sendContact" $
     it "should send a contact" $ do
       let contact = sendContactRequest chatId "06-18035176" "Hilbert"
       Right MessageResponse { message_result = Message { contact = Just con } } <-
         sendContact token contact manager
       -- Telegram seems to remove any non numeric characters from the sent phone number (at least it removed my '-')
-      (contact_phone_number con) `shouldBe` "0618035176"
-      (contact_first_name con) `shouldBe` "Hilbert"
+      contact_phone_number con `shouldBe` "0618035176"
+      contact_first_name con `shouldBe` "Hilbert"
 
   describe "/sendChatAction" $ do
     it "should set typing action" $ do
@@ -233,28 +233,28 @@ spec token chatId botName = do
         sendChatAction token (SendChatActionRequest chatId UploadPhoto) manager
       res `shouldBe` True
 
-  describe "/getUpdates" $ do
+  describe "/getUpdates" $
     it "should get all messages" $ do
       Right UpdatesResponse { update_result = updates} <-
         getUpdates token Nothing Nothing Nothing manager
-      (length updates) `shouldSatisfy` (>= 0)
+      length updates `shouldSatisfy` (>= 0)
 
   describe "/getFile" $ do
     it "should get file" $ do
       Right FileResponse { file_result = file } <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC" manager
-      (fmap (T.take 10) (file_path file)) `shouldBe` (Just "thumb/file")
+      fmap (T.take 10) (file_path file) `shouldBe` Just "thumb/file"
 
     it "should return error" $ do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm" manager
       msg `shouldBe` "Bad Request"
 
-  describe "/getUserProfilePhotos" $ do
+  describe "/getUserProfilePhotos" $
    it "should get user profile photos" $ do
      Right UserProfilePhotosResponse { photos_result = photos } <-
        getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager
-     (total_count photos) `shouldSatisfy` (>= 0)
+     total_count photos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook" $ do
     it "should set webhook" $ do
@@ -278,7 +278,6 @@ spec token chatId botName = do
       txt' `shouldBe` Just "edited veritas"
 
     it "should edit caption" $ do
-      dataDir <- getDataDir
       let fileUpload = localFileUpload (testFile "christmas-cat.jpg")
       let originalMessage = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "cat picture"
