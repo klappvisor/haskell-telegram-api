@@ -1,3 +1,9 @@
+## 0.4.3.0
+
+Features:
+
+* Added Inline Keyboard to messages
+
 ## 0.4.2.0
 
 Features:
