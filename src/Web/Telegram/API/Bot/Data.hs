@@ -57,6 +57,7 @@ module Web.Telegram.API.Bot.Data
     ) where
 
 import           Data.Aeson
+import           Data.Maybe
 import           Data.Aeson.Types
 import           Data.Text (Text)
 import qualified Data.Char as Char
@@ -138,8 +139,8 @@ instance ToJSON ParseMode where
   toJSON HTML = "HTML"
 
 instance FromJSON ParseMode where
-  parseJSON "Markdown" = pure $ Markdown
-  parseJSON "HTML" = pure $ HTML
+  parseJSON "Markdown" = pure Markdown
+  parseJSON "HTML" = pure HTML
   parseJSON _          = fail "Failed to parse ParseMode"
 
 -- | This object represents one size of a photo or a 'File' / 'Sticker' thumbnail.
@@ -305,7 +306,23 @@ data InputMessageContent =
   } deriving (Show, Generic)
 
 instance ToJSON InputMessageContent where
-  toJSON = toJsonDrop 4
+  toJSON (InputTextMessageContent txt mode preview) = object $
+    ("message_text" .= txt) : catMaybes [
+    ("parse_mode" .=) <$> mode,
+    ("disable_web_page_preview" .=) <$> preview]
+  toJSON (InputLocationMessageContent lat lon) = object [
+    "latitude" .= lat,
+    "longitude" .= lon ]
+  toJSON (InputVenueMessageContent lat lon title addr fsq_id) = object $ [
+    "latitude" .= lat,
+    "longitude" .= lon,
+    "title" .= title,
+    "address" .= addr ] ++ maybeToList
+    (("foursquare_id" .=) <$> fsq_id)
+  toJSON (InputContactMessageContent phone fName lName) = object $ [
+    "phone_number" .= phone,
+    "first_name" .= fName] ++ maybeToList
+    (("last_name" .=) <$> lName)
 
 instance FromJSON InputMessageContent where
   parseJSON = parseJsonDrop 4
@@ -538,12 +555,12 @@ data InlineQueryResult =
   } deriving (Show, Generic)
 
 dropCached :: String -> String
-dropCached name = if isPrefixOf "Cached" name then drop 6 name else name
+dropCached name = if "Cached" `isPrefixOf` name then drop 6 name else name
 
 tagModifier :: String -> String
 tagModifier "InlineQueryResultMpeg4Gif" = "mpeg4_gif"
 tagModifier "InlineQueryResultCachedMpeg4Gif" = "mpeg4_gif"
-tagModifier x = ((fmap Char.toLower) . dropCached . (drop 17)) x
+tagModifier x = (fmap Char.toLower . dropCached . drop 17) x
 
 inlineQueryJSONOptions :: Options
 inlineQueryJSONOptions = defaultOptions {
