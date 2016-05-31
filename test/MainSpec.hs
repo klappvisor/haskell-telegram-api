@@ -79,6 +79,18 @@ spec token chatId botName = do
       let Right MessageResponse { message_result = m } = res
       (text m) `shouldBe` (Just "remove keyboard")
 
+    it "should send message with inline keyboard" $ do
+      let kbA = (inlineKeyboardButton "A") { ikb_callback_data = Just "A" }
+          kbB = (inlineKeyboardButton "B") { ikb_callback_data = Just "B" }
+          kbC = (inlineKeyboardButton "C") { ikb_callback_data = Just "C" }
+      let message = (sendMessageRequest chatId "set inline keyboard") {
+        message_reply_markup = Just $ inlineKeyboardMarkup [[kbA, kbB, kbC]]
+      }
+      res <- sendMessage token message manager
+      success res
+      let Right MessageResponse { message_result = m } = res
+      (text m) `shouldBe` (Just "set inline keyboard")
+
     it "should force reply" $ do
       let message = (sendMessageRequest chatId "force reply") {
         message_reply_markup = Just forceReply
