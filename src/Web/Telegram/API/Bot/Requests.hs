@@ -48,6 +48,7 @@ module Web.Telegram.API.Bot.Requests
     , sendChatActionRequest
     , answerInlineQueryRequest
     , answerCallbackQueryRequest
+    , inlineKeyboardMarkup
     , replyKeyboardMarkup
     , replyKeyboardHide
     , forceReply
@@ -509,7 +510,11 @@ answerCallbackQueryRequest chatId = AnswerCallbackQueryRequest chatId Nothing No
 
 data ReplyKeyboard =
   -- | This object represents a custom keyboard with reply options
-  ReplyKeyboardMarkup
+  ReplyInlineKeyboardMarkup
+  {
+    reply_inline_keyboard      :: [[InlineKeyboardButton]] -- ^ Array of button rows, each represented by an Array of InlineKeyboardButton objects
+  }
+  | ReplyKeyboardMarkup
   {
     reply_keyboard             :: [[KeyboardButton]] -- ^ Array of button rows, each represented by an Array of 'KeyboardButton' objects
   , reply_resize_keyboard      :: Maybe Bool -- ^ Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
@@ -534,6 +539,9 @@ instance ToJSON ReplyKeyboard where
 
 instance FromJSON ReplyKeyboard where
   parseJSON = parseJsonDrop 6
+
+inlineKeyboardMarkup :: [[InlineKeyboardButton]] -> ReplyKeyboard
+inlineKeyboardMarkup = ReplyInlineKeyboardMarkup
 
 replyKeyboardMarkup :: [[KeyboardButton]] -> ReplyKeyboard
 replyKeyboardMarkup keyboard = ReplyKeyboardMarkup keyboard Nothing Nothing Nothing
