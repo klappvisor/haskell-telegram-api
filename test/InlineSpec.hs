@@ -2,17 +2,11 @@
 
 module InlineSpec (spec) where
 
-import           Control.Monad
 import           Web.Telegram.API.Bot
 import           Test.Hspec
 import           Data.Text (Text)
-import qualified Data.Text as T
 import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
-import           Servant.Client
-import           Servant.API
-import           Network.HTTP.Types.Status
-import           System.Environment
 
 spec :: Token -> Text -> Spec
 spec token chatId = do
@@ -41,7 +35,7 @@ spec token chatId = do
         answerInlineQuery token (answerInlineQueryRequest inline_query_id [inline_video]) manager
       res `shouldBe` True
 
-  describe "/answerInlineQuery" $ do
+  describe "/answerInlineQuery" $
     it "should get updates and answer" $ do
       Right Response { result = updates} <-
         getUpdates token Nothing Nothing Nothing manager
