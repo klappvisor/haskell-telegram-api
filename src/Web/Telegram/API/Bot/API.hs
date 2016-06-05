@@ -40,6 +40,9 @@ module Web.Telegram.API.Bot.API
   , editMessageText
   , editMessageCaption
   , editMessageReplyMarkup
+  , editInlineMessageText
+  , editInlineMessageCaption
+  , editInlineMessageReplyMarkup
     -- * API
   , TelegramBotAPI
   , api
@@ -180,7 +183,15 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "editMessageReplyMarkup"
          :> ReqBody '[JSON] EditMessageReplyMarkupRequest
          :> Post '[JSON] MessageResponse
-
+    :<|> TelegramToken :> "editMessageText"
+         :> ReqBody '[JSON] EditMessageTextRequest
+         :> Post '[JSON] (Response Bool)
+    :<|> TelegramToken :> "editMessageCaption"
+         :> ReqBody '[JSON] EditMessageCaptionRequest
+         :> Post '[JSON] (Response Bool)
+    :<|> TelegramToken :> "editMessageReplyMarkup"
+         :> ReqBody '[JSON] EditMessageReplyMarkupRequest
+         :> Post '[JSON] (Response Bool)
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI
@@ -221,6 +232,9 @@ getChatMember_             :: Token -> Maybe Text -> Maybe Int -> Manager -> Bas
 editMessageText_           :: Token -> EditMessageTextRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
 editMessageCaption_        :: Token -> EditMessageCaptionRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
 editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
+editMessageText__          :: Token -> EditMessageTextRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO (Response Bool)
+editMessageCaption__       :: Token -> EditMessageCaptionRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO (Response Bool)
+editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO (Response Bool)
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -255,7 +269,10 @@ getMe_
   :<|> getChatMember_
   :<|> editMessageText_
   :<|> editMessageCaption_
-  :<|> editMessageReplyMarkup_ =
+  :<|> editMessageReplyMarkup_
+  :<|> editMessageText__
+  :<|> editMessageCaption__
+  :<|> editMessageReplyMarkup__ =
       client api
 
 -- | A simple method for testing your bot's auth token. Requires no parameters.
@@ -327,11 +344,11 @@ sendVoice = run telegramBaseUrl sendVoice_
 sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ServantError MessageResponse)
 sendLocation = run telegramBaseUrl sendLocation_
 
--- | Use this method to send information about a venue. On success, the sent Message is returned.
+-- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
 sendVenue :: Token -> SendVenueRequest -> Manager -> IO (Either ServantError MessageResponse)
 sendVenue = run telegramBaseUrl sendVenue_
 
--- | Use this method to send information about a venue. On success, the sent Message is returned.
+-- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
 sendContact :: Token -> SendContactRequest -> Manager -> IO (Either ServantError MessageResponse)
 sendContact = run telegramBaseUrl sendContact_
 
@@ -386,29 +403,41 @@ unbanChatMember token chat_id user_id manager = runExceptT $ unbanChatMember_ to
 getChat :: Token -> Text -> Manager -> IO (Either ServantError GetChatResponse)
 getChat token chat_id manager = runExceptT $ getChat_ token (Just chat_id) manager telegramBaseUrl
 
--- | Use this method to get a list of administrators in a chat. On success, returns an Array of ChatMember objects that contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
+-- | Use this method to get a list of administrators in a chat. On success, returns an Array of 'ChatMember' objects that contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
 getChatAdministrators :: Token -> Text -> Manager -> IO (Either ServantError GetChatAdministratorsResponse)
 getChatAdministrators token chat_id manager = runExceptT $ getChatAdministrators_ token (Just chat_id) manager telegramBaseUrl
 
--- | Use this method to get the number of members in a chat. Returns Int on success.
+-- | Use this method to get the number of members in a chat. Returns 'Int' on success.
 getChatMembersCount :: Token -> Text -> Manager -> IO (Either ServantError GetChatMembersCountResponse)
 getChatMembersCount token chat_id manager = runExceptT $ getChatMembersCount_ token (Just chat_id) manager telegramBaseUrl
 
--- | Use this method to get information about a member of a chat. Returns a ChatMember object on success.
+-- | Use this method to get information about a member of a chat. Returns a 'ChatMember' object on success.
 getChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError GetChatMemberResponse)
 getChatMember token chat_id user_id manager = runExceptT $ getChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl
 
--- | Use this method to edit text messages sent by the bot or via the bot (for inline bots). On success, if edited message is sent by the bot, the edited `Message` is returned, otherwise True is returned.
+-- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
 editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
 editMessageText = run telegramBaseUrl editMessageText_
 
--- | Use this method to edit captions of messages sent by the bot or via the bot (for inline bots). On success, if edited message is sent by the bot, the edited `Message` is returned.
+-- | Use this method to edit captions of messages sent by the bot. On success, the edited 'Message' is returned.
 editMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError MessageResponse)
 editMessageCaption = run telegramBaseUrl editMessageCaption_
 
--- | Use this method to edit only the reply markup of messages sent by the bot or via the bot (for inline bots). On success, if edited message is sent by the bot, the edited `Message` is returned.
+-- | Use this method to edit only the reply markup of messages sent by the bot. On success, the edited 'Message' is returned.
 editMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError MessageResponse)
 editMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup_
+
+-- | Use this method to edit text messages sent via the bot (for inline bots).
+editInlineMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError (Response Bool))
+editInlineMessageText = run telegramBaseUrl editMessageText__
+
+-- | Use this method to edit captions of messages sent via the bot (for inline bots).
+editInlineMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError (Response Bool))
+editInlineMessageCaption = run telegramBaseUrl editMessageCaption__
+
+-- | Use this method to edit only the reply markup of messages sent via the bot (for inline bots).
+editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError (Response Bool))
+editInlineMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup__
 
 run :: BaseUrl -> (Token -> a -> Manager -> BaseUrl -> ExceptT ServantError IO b) -> Token -> a -> Manager -> IO (Either ServantError b)
 run b e t r m = runExceptT $ e t r m b
