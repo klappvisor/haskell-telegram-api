@@ -9,6 +9,7 @@ module Web.Telegram.API.Bot.Data
     , ChatMember                    (..)
     , Chat                          (..)
     , Message                       (..)
+    , MessageEntity                 (..)
     , PhotoSize                     (..)
     , Audio                         (..)
     , Document                      (..)
