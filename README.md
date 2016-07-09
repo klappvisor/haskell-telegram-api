@@ -129,7 +129,7 @@ The help option is available for the tests and for hspec:
 
 ```
 stack test --test-arguments "-h"
-stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -v BOT_NAME -- -h"
+stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -b BOT_NAME -- -h"
 ```
 
 Note: Inline Spec is disabled for now...
