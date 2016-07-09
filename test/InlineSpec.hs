@@ -2,17 +2,11 @@
 
 module InlineSpec (spec) where
 
-import           Control.Monad
 import           Web.Telegram.API.Bot
 import           Test.Hspec
 import           Data.Text (Text)
-import qualified Data.Text as T
 import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
-import           Servant.Client
-import           Servant.API
-import           Network.HTTP.Types.Status
-import           System.Environment
 
 spec :: Token -> Text -> Spec
 spec token chatId = do
@@ -21,33 +15,33 @@ spec token chatId = do
   -- Create the tls connection manager
   describe "/answerInlineQuery" $ do
     it "should answer with article" $ do
-      Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_article] Nothing Nothing Nothing Nothing Nothing) manager
+      Right Response { result = res } <-
+        answerInlineQuery token (answerInlineQueryRequest inline_query_id [inline_article]) manager
       res `shouldBe` True
     it "should answer with photo" $ do
-      Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_photo] Nothing Nothing Nothing Nothing Nothing) manager
+      Right Response { result = res } <-
+        answerInlineQuery token (answerInlineQueryRequest inline_query_id [inline_photo]) manager
       res `shouldBe` True
     it "should answer with gif" $ do
-      Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_gif] Nothing Nothing Nothing Nothing Nothing) manager
+      Right Response { result = res } <-
+        answerInlineQuery token (answerInlineQueryRequest inline_query_id [inline_gif]) manager
       res `shouldBe` True
     it "should answer with mpeg gif" $ do
-      Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_mpeg] Nothing Nothing Nothing Nothing Nothing) manager
+      Right Response { result = res } <-
+        answerInlineQuery token (answerInlineQueryRequest inline_query_id [inline_mpeg]) manager
       res `shouldBe` True
     it "should answer with video" $ do
-      Right InlineQueryResponse { query_result = res } <-
-        answerInlineQuery token (AnswerInlineQueryRequest inline_query_id [inline_video] Nothing Nothing Nothing Nothing Nothing) manager
+      Right Response { result = res } <-
+        answerInlineQuery token (answerInlineQueryRequest inline_query_id [inline_video]) manager
       res `shouldBe` True
 
-  describe "/answerInlineQuery" $ do
+  describe "/answerInlineQuery" $
     it "should get updates and answer" $ do
-      Right UpdatesResponse { update_result = updates} <-
+      Right Response { result = updates} <-
         getUpdates token Nothing Nothing Nothing manager
       Update { inline_query = Just (InlineQuery { query_id = id } ) } <- pure (last updates)
       e <-
-        answerInlineQuery token (AnswerInlineQueryRequest id [inline_video] Nothing Nothing Nothing Nothing Nothing) manager
+        answerInlineQuery token (answerInlineQueryRequest id [inline_video]) manager
       putStrLn (show e)
 
 message_content = InputTextMessageContent "test message content" Nothing Nothing
