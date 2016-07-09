@@ -13,6 +13,7 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 data-files:          test-data/christmas-cat.jpg
+                   , test-data/cert.pem
                    , test-data/haskell-logo.webp
                    , test-data/lego-video.mp4
                    , test-data/Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg

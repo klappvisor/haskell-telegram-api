@@ -3,6 +3,7 @@
 Features:
 
 * **[Breaking]** Changed `Response` data record to be generic
+* Added certificate upload to set web-hook method for self-signed certificates
 
 Bugfixes:
 

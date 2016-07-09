@@ -9,6 +9,7 @@ module Web.Telegram.API.Bot.Requests
     , ForwardMessageRequest          (..)
     , FileUpload                     (..)
     , FileUploadContent              (..)
+    , SetWebhookRequest              (..)
     , SendPhotoRequest               (..)
     , SendAudioRequest               (..)
     , SendDocumentRequest            (..)
@@ -28,6 +29,7 @@ module Web.Telegram.API.Bot.Requests
     , EditMessageReplyMarkupRequest  (..)
      -- * Functions
     , localFileUpload
+    , setWebhookRequest
     , sendMessageRequest
     , forwardMessageRequest
     , sendPhotoRequest
@@ -89,8 +91,7 @@ data FileUpload = FileUpload
   }
 
 localFileUpload :: FilePath -> FileUpload
-localFileUpload path =
-  FileUpload
+localFileUpload path = FileUpload
   { fileUpload_type = Nothing
   , fileUpload_content = FileUploadFile path
   }
@@ -106,6 +107,22 @@ fileUploadToPart inputName fileUpload =
 
 utf8Part :: Text -> Text -> Part
 utf8Part inputName = partBS inputName . T.encodeUtf8
+
+-- | This object represents request for 'setWebhookWithCertificate'
+data SetWebhookRequest = SetWebhookRequest
+  {
+    webhook_url         :: Text -- ^ HTTPS url to send updates to. Use `setWebhook` function and an empty string to remove webhook integration
+  , webhook_certificate :: FileUpload -- ^ Upload your public key certificate so that the root certificate in use can be checked.
+  }
+
+instance ToMultipartFormData SetWebhookRequest where
+  toMultipartFormData req =
+    [ utf8Part         "url"         $ webhook_url req
+    , fileUploadToPart "certificate" $ webhook_certificate req
+    ]
+
+setWebhookRequest :: Text -> FileUpload -> SetWebhookRequest
+setWebhookRequest = SetWebhookRequest
 
 -- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
