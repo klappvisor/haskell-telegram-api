@@ -6,22 +6,22 @@
 module Web.Telegram.API.Bot.Responses
     ( -- * Types
       Response                        (..)
-    , GetMeResponse                   (..)
-    , MessageResponse                 (..)
-    , ChatActionResponse              (..)
-    , UpdatesResponse                 (..)
-    , FileResponse                    (..)
-    , UserProfilePhotosResponse       (..)
-    , SetWebhookResponse              (..)
-    , InlineQueryResponse             (..)
-    , CallbackQueryResponse           (..)
-    , KickChatMemberResponse          (..)
-    , LeaveChatResponse               (..)
-    , UnbanChatMemberResponse         (..)
-    , GetChatResponse                 (..)
-    , GetChatAdministratorsResponse   (..)
-    , GetChatMembersCountResponse     (..)
-    , GetChatMemberResponse           (..)
+    , GetMeResponse
+    , MessageResponse
+    , ChatActionResponse
+    , UpdatesResponse
+    , FileResponse
+    , UserProfilePhotosResponse
+    , SetWebhookResponse
+    , InlineQueryResponse
+    , CallbackQueryResponse
+    , KickChatMemberResponse
+    , LeaveChatResponse
+    , UnbanChatMemberResponse
+    , GetChatResponse
+    , GetChatAdministratorsResponse
+    , GetChatMembersCountResponse
+    , GetChatMemberResponse
     ) where
 
 import           Data.Aeson

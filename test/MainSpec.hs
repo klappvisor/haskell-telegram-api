@@ -257,6 +257,14 @@ spec token chatId botName = do
      total_count photos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook" $ do
+    it "should set webhook with certificate" $ do
+      let cert = localFileUpload $ testFile "cert.pem"
+          req = SetWebhookRequest "https://example.com/secret_token" cert
+      res <- setWebhookWithCertificate token req manager
+      success res
+      let Right Response { result = val } = res
+      val `shouldBe` True
+
     it "should set webhook" $ do
       Right Response { result = res } <-
         setWebhook token (Just "https://example.com/secret_token") manager

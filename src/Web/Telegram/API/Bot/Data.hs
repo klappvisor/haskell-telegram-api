@@ -58,7 +58,7 @@ module Web.Telegram.API.Bot.Data
     ) where
 
 import           Data.Aeson
-import           Data.Maybe
+import           Data.Maybe()
 import           Data.Aeson.Types
 import           Data.Text (Text)
 import qualified Data.Char as Char

@@ -28,6 +28,7 @@ module Web.Telegram.API.Bot.API
   , getFile
   , getUserProfilePhotos
   , setWebhook
+  , setWebhookWithCertificate
   , answerInlineQuery
   , answerCallbackQuery
   , kickChatMember
@@ -144,6 +145,9 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "setWebhook"
          :> QueryParam "url" Text
          :> Get '[JSON] SetWebhookResponse
+    :<|> TelegramToken :> "setWebhook"
+         :> MultipartFormDataReqBody SetWebhookRequest
+         :> Post '[JSON] SetWebhookResponse
     :<|> TelegramToken :> "answerInlineQuery"
          :> ReqBody '[JSON] AnswerInlineQueryRequest
          :> Post '[JSON] InlineQueryResponse
@@ -220,6 +224,7 @@ getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Ma
 getFile_                   :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UserProfilePhotosResponse
 setWebhook_                :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
+setWebhookWithCert_        :: Token -> SetWebhookRequest -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
 answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO InlineQueryResponse
 answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO CallbackQueryResponse
 kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO KickChatMemberResponse
@@ -258,6 +263,7 @@ getMe_
   :<|> getFile_
   :<|> getUserProfilePhotos_
   :<|> setWebhook_
+  :<|> setWebhookWithCert_
   :<|> answerInlineQuery_
   :<|> answerCallbackQuery_
   :<|> kickChatMember_
@@ -378,6 +384,12 @@ setWebhook :: Token
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url manager = runExceptT $ setWebhook_ token url manager telegramBaseUrl
+
+-- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
+--
+--       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
+setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
+setWebhookWithCertificate = run telegramBaseUrl setWebhookWithCert_
 
 -- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
