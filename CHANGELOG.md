@@ -1,3 +1,9 @@
+## 0.4.3.1
+
+Bugfixes:
+
+* Exposed `MessageEntity`
+
 ## 0.4.3.0
 
 Features:
