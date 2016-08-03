@@ -19,6 +19,7 @@ module Web.Telegram.API.Bot.Requests
     , SendVenueRequest               (..)
     , SendContactRequest             (..)
     , SendChatActionRequest          (..)
+    , SetWebhookWithCertRequest      (..)
     , ChatAction                     (..)
     , AnswerInlineQueryRequest       (..)
     , AnswerCallbackQueryRequest     (..)
@@ -615,3 +616,9 @@ editMessageReplyMarkupRequest chatId messageId keyboard = EditMessageReplyMarkup
 
 editInlineMessageReplyMarkupRequest :: Text -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
 editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyMarkupRequest Nothing Nothing (Just inlineMessageId) keyboard
+
+data SetWebhookWithCertRequest = SetWebhookWithCertRequest FileUpload
+
+instance ToMultipartFormData SetWebhookWithCertRequest where
+  toMultipartFormData (SetWebhookWithCertRequest file) =
+    [ fileUploadToPart "certificate" file ]

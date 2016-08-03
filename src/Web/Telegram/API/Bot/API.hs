@@ -28,6 +28,7 @@ module Web.Telegram.API.Bot.API
   , getFile
   , getUserProfilePhotos
   , setWebhook
+  , setWebhookWithCert
   , answerInlineQuery
   , answerCallbackQuery
   , kickChatMember
@@ -141,6 +142,10 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "setWebhook"
          :> QueryParam "url" Text
          :> Get '[JSON] SetWebhookResponse
+    :<|> TelegramToken :> "setWebHook"
+         :> QueryParam "url" Text
+         :> MultipartFormDataReqBody SetWebhookWithCertRequest
+         :> Post '[JSON] SetWebhookResponse
     :<|> TelegramToken :> "answerInlineQuery"
          :> ReqBody '[JSON] AnswerInlineQueryRequest
          :> Post '[JSON] InlineQueryResponse
@@ -209,6 +214,7 @@ getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Ma
 getFile_                   :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UserProfilePhotosResponse
 setWebhook_                :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
+setWebhookWithCert_        :: Token -> Maybe Text -> SetWebhookWithCertRequest -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
 answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO InlineQueryResponse
 answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO CallbackQueryResponse
 kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO KickChatMemberResponse
@@ -244,6 +250,7 @@ getMe_
   :<|> getFile_
   :<|> getUserProfilePhotos_
   :<|> setWebhook_
+  :<|> setWebhookWithCert_
   :<|> answerInlineQuery_
   :<|> answerCallbackQuery_
   :<|> kickChatMember_
@@ -361,6 +368,13 @@ setWebhook :: Token
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url manager = runExceptT $ setWebhook_ token url manager telegramBaseUrl
+
+setWebhookWithCert :: Token
+    -> Maybe Text
+    -> SetWebhookWithCertRequest
+    -> Manager
+    -> IO (Either ServantError SetWebhookResponse)
+setWebhookWithCert token url file manager = runExceptT $ setWebhookWithCert_ token url file manager telegramBaseUrl
 
 -- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
