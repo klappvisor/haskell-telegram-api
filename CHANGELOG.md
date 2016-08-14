@@ -1,3 +1,14 @@
+## 0.5.0.0 [Breaking]
+
+Features:
+
+* **[Breaking]** Changed `Response` data record to be generic
+* Added certificate upload to set web-hook method for self-signed certificates
+
+Bugfixes:
+
+* Removed `O2` tag from cabal file
+
 ## 0.4.3.1
 
 Bugfixes:

@@ -13,9 +13,7 @@ Both `getUpdates` request or webhook can be used to receive updates for your bot
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
 
-**Almost full support of [Bot-2.0 API][bot-2.0]**
-
-See TODO section for details.
+**Support of [Bot-2.0 API][bot-2.0]**
 
 ## Usage
 
@@ -135,16 +133,6 @@ stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -b BOT_NAME -
 Note: Inline Spec is disabled for now...
 
 If everything is fine after running the tests you will receive a few new messages from your bot.
-
-## TODO
-
-* ~~`sendPhoto` - upload photo~~ done
-* ~~`sendAudio` - upload audio~~ done
-* ~~`sendDocument` - upload documents~~ done
-* ~~`sendSticker` - upload stickers~~ done
-* ~~`sendVideo` - upload video~~ done
-* ~~`sendVoice` - upload voice~~ done
-* `setWebhook` - upload certificate
 
 [telegram-bot-api]: https://core.telegram.org/bots/api
 [servant]: https://haskell-servant.github.io/

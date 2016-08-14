@@ -58,7 +58,7 @@ module Web.Telegram.API.Bot.Data
     ) where
 
 import           Data.Aeson
-import           Data.Maybe
+import           Data.Maybe()
 import           Data.Aeson.Types
 import           Data.Text (Text)
 import qualified Data.Char as Char
@@ -307,23 +307,7 @@ data InputMessageContent =
   } deriving (Show, Generic)
 
 instance ToJSON InputMessageContent where
-  toJSON (InputTextMessageContent txt mode preview) = object $
-    ("message_text" .= txt) : catMaybes [
-    ("parse_mode" .=) <$> mode,
-    ("disable_web_page_preview" .=) <$> preview]
-  toJSON (InputLocationMessageContent lat lon) = object [
-    "latitude" .= lat,
-    "longitude" .= lon ]
-  toJSON (InputVenueMessageContent lat lon title addr fsq_id) = object $ [
-    "latitude" .= lat,
-    "longitude" .= lon,
-    "title" .= title,
-    "address" .= addr ] ++ maybeToList
-    (("foursquare_id" .=) <$> fsq_id)
-  toJSON (InputContactMessageContent phone fName lName) = object $ [
-    "phone_number" .= phone,
-    "first_name" .= fName] ++ maybeToList
-    (("last_name" .=) <$> lName)
+  toJSON = toJsonDrop 4
 
 instance FromJSON InputMessageContent where
   parseJSON = parseJsonDrop 4
