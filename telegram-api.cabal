@@ -38,8 +38,8 @@ library
                      , either
                      , http-api-data
                      , http-client
-                     , servant == 0.7.*
-                     , servant-client == 0.7.*
+                     , servant >= 0.7 && <0.9
+                     , servant-client >= 0.7 && <0.9
                      , text
                      , transformers
                      , http-media
@@ -66,8 +66,8 @@ test-suite telegram-api-test
                      , http-types
                      , hspec
                      , optparse-applicative
-                     , servant == 0.7.*
-                     , servant-client == 0.7.*
+                     , servant >= 0.7 && <0.9
+                     , servant-client >= 0.7 && <0.9
                      , telegram-api
                      , http-types
                      , filepath
