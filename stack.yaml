@@ -2,7 +2,7 @@
 
 # Specifies the GHC version and set of packages available (e.g., lts-3.5, nightly-2015-09-21, ghc-7.10.2)
 #resolver: nightly-2016-05-12
-resolver: lts-6.2
+resolver: lts-6.16
 
 # Local packages, usually specified by relative directory name
 packages:
@@ -12,11 +12,13 @@ packages:
 extra-deps:
  - servant-0.8.1
  - servant-client-0.8.1
- - hjpath-3.0.1
- - hjson-1.3.2
+ - aeson-1.0.0.0
+ - semigroups-0.18.2
 
 # Override default flag values for local packages and extra-deps
-flags: {}
+flags:
+  semigroups:
+    bytestring-builder: false
 
 # Extra package databases containing global packages
 extra-package-dbs: []

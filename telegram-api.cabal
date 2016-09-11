@@ -1,5 +1,5 @@
 name:                telegram-api
-version:             0.5.0.0
+version:             0.5.0.1
 synopsis:            Telegram Bot API bindings
 description:         High-level bindings to the Telegram Bot API
 homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
@@ -34,7 +34,7 @@ library
   other-modules:       Web.Telegram.API.Bot.JsonExt
                      , Servant.Client.MultipartFormData
   build-depends:       base >= 4.7 && < 5
-                     , aeson
+                     , aeson == 1.0.*
                      , either
                      , http-api-data
                      , http-client
@@ -58,7 +58,7 @@ test-suite telegram-api-test
                      , InlineSpec
                      , JsonSpec
   build-depends:       base
-                     , aeson
+                     , aeson == 1.0.*
                      , hjpath
                      , ansi-wl-pprint
                      , http-client
