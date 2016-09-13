@@ -37,7 +37,7 @@ library
                      , aeson == 1.0.*
                      , either
                      , http-api-data
-                     , http-client
+                     , http-client >= 0.4 && < 0.5
                      , servant >= 0.7 && <0.9
                      , servant-client >= 0.7 && <0.9
                      , text
@@ -61,7 +61,7 @@ test-suite telegram-api-test
                      , aeson == 1.0.*
                      , hjpath
                      , ansi-wl-pprint
-                     , http-client
+                     , http-client >= 0.4 && < 0.5
                      , http-client-tls
                      , http-types
                      , hspec
