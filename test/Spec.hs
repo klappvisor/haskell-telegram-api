@@ -3,6 +3,7 @@
 
 module Main (main) where
 
+import           Data.Monoid                  ((<>))
 import           Data.Maybe                   (fromMaybe)
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
