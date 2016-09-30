@@ -27,7 +27,6 @@ module Web.Telegram.API.Bot.Responses
 import           Data.Aeson
 import           GHC.Generics
 import           Web.Telegram.API.Bot.Data
-import           Web.Telegram.API.Bot.JsonExt
 
 data Response a = Response
   {

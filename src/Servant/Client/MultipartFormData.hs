@@ -14,8 +14,9 @@ module Servant.Client.MultipartFormData
 
 import           Control.Exception
 import           Control.Monad
+import           Control.Monad.Reader.Class
 import           Control.Monad.IO.Class
-import           Control.Monad.Trans.Except
+import           Control.Monad.Error.Class
 import           Data.ByteString.Lazy       hiding (pack, filter, map, null, elem)
 import           Data.Proxy
 import           Data.String.Conversions
@@ -43,12 +44,12 @@ data MultipartFormDataReqBody a
 instance (ToMultipartFormData b, MimeUnrender ct a, cts' ~ (ct ': cts)
   ) => HasClient (MultipartFormDataReqBody b :> Post cts' a) where
   type Client (MultipartFormDataReqBody b :> Post cts' a)
-    = b -> Manager -> BaseUrl -> ClientM a
-  clientWithRoute Proxy req reqData manager baseurl =
+    = b -> ClientM a
+  clientWithRoute Proxy req reqData =
     let reqToRequest' req' baseurl' = do
           requestWithoutBody <- reqToRequest req' baseurl'
           formDataBody (toMultipartFormData reqData) requestWithoutBody
-    in snd <$> performRequestCT' reqToRequest' (Proxy :: Proxy ct) H.methodPost req manager baseurl
+    in snd <$> performRequestCT' reqToRequest' (Proxy :: Proxy ct) H.methodPost req
 
 -- copied `performRequest` from servant-0.7.1, then modified so it takes a variant of `reqToRequest`
 -- as an argument.
@@ -66,7 +67,7 @@ performRequest' reqToRequest' reqMethod req manager reqHost = do
   eResponse <- liftIO $ catchConnectionError $ Client.httpLbs request manager
   case eResponse of
     Left err ->
-      throwE . ConnectionError $ SomeException err
+      throwError . ConnectionError $ SomeException err
 
     Right response -> do
       let status = Client.responseStatus response
@@ -76,23 +77,24 @@ performRequest' reqToRequest' reqMethod req manager reqHost = do
       ct <- case lookup "Content-Type" $ Client.responseHeaders response of
                  Nothing -> pure $ "application"//"octet-stream"
                  Just t -> case parseAccept t of
-                   Nothing -> throwE $ InvalidContentTypeHeader (cs t) body
+                   Nothing -> throwError $ InvalidContentTypeHeader (cs t) body
                    Just t' -> pure t'
       unless (status_code >= 200 && status_code < 300) $
-        throwE $ FailureResponse status ct body
+        throwError $ FailureResponse status ct body
       return (status_code, body, ct, hdrs, response)
 
 -- copied `performRequestCT` from servant-0.7.1, then modified so it takes a variant of `reqToRequest`
 -- as an argument.
 performRequestCT' :: MimeUnrender ct result =>
   (Req -> BaseUrl -> IO Request) ->
-  Proxy ct -> Method -> Req -> Manager -> BaseUrl
+  Proxy ct -> Method -> Req
     -> ClientM ([HTTP.Header], result)
-performRequestCT' reqToRequest' ct reqMethod req manager reqHost = do
+performRequestCT' reqToRequest' ct reqMethod req = do
   let acceptCT = contentType ct
+  ClientEnv manager reqHost <- ask
   (_status, respBody, respCT, hdrs, _response) <-
     performRequest' reqToRequest' reqMethod (req { reqAccept = [acceptCT] }) manager reqHost
-  unless (matches respCT acceptCT) $ throwE $ UnsupportedContentType respCT respBody
+  unless (matches respCT acceptCT) $ throwError $ UnsupportedContentType respCT respBody
   case mimeUnrender ct respBody of
-    Left err -> throwE $ DecodeFailure err respCT respBody
+    Left err -> throwError $ DecodeFailure err respCT respBody
     Right val -> return (hdrs, val)
