@@ -66,8 +66,8 @@ test-suite telegram-api-test
                      , http-types
                      , hspec
                      , optparse-applicative
-                     , servant >= 0.7 && <0.9
-                     , servant-client >= 0.7 && <0.9
+                     , servant >= 0.9 && <0.10
+                     , servant-client >= 0.9 && <0.10
                      , telegram-api
                      , http-types
                      , filepath
