@@ -51,7 +51,6 @@ module Web.Telegram.API.Bot.API
   , Token             (..)
   ) where
 
-import           Control.Monad.Trans.Except (ExceptT, runExceptT)
 import           Data.Proxy
 import           Data.Text (Text)
 import           Network.HTTP.Client (Manager)
@@ -201,45 +200,45 @@ type TelegramBotAPI =
 api :: Proxy TelegramBotAPI
 api = Proxy
 
-getMe_                     :: Token -> Manager -> BaseUrl -> ExceptT ServantError IO GetMeResponse
-sendMessage_               :: Token -> SendMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-forwardMessage_            :: Token -> ForwardMessageRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendPhoto_                 :: Token -> SendPhotoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-uploadAudio_               :: Token -> SendAudioRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendAudio_                 :: Token -> SendAudioRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-uploadDocument_            :: Token -> SendDocumentRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendDocument_              :: Token -> SendDocumentRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-uploadSticker_             :: Token -> SendStickerRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendSticker_               :: Token -> SendStickerRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-uploadVideo_               :: Token -> SendVideoRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVideo_                 :: Token -> SendVideoRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-uploadVoice_               :: Token -> SendVoiceRequest FileUpload -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVoice_                 :: Token -> SendVoiceRequest Text -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendLocation_              :: Token -> SendLocationRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendVenue_                 :: Token -> SendVenueRequest-> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendContact_               :: Token -> SendContactRequest -> Manager -> BaseUrl -> ExceptT ServantError IO MessageResponse
-sendChatAction_            :: Token -> SendChatActionRequest -> Manager -> BaseUrl -> ExceptT ServantError IO ChatActionResponse
-getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UpdatesResponse
-getFile_                   :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO FileResponse
-getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UserProfilePhotosResponse
-setWebhook_                :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
-setWebhookWithCert_        :: Token -> SetWebhookRequest -> Manager -> BaseUrl -> ExceptT ServantError IO SetWebhookResponse
-answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO InlineQueryResponse
-answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> Manager -> BaseUrl -> ExceptT ServantError IO CallbackQueryResponse
-kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO KickChatMemberResponse
-leaveChat_                 :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO LeaveChatResponse
-unbanChatMember_           :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO UnbanChatMemberResponse
-getChat_                   :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO GetChatResponse
-getChatAdministrators_     :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO GetChatAdministratorsResponse
-getChatMembersCount_       :: Token -> Maybe Text -> Manager -> BaseUrl -> ExceptT ServantError IO GetChatMembersCountResponse
-getChatMember_             :: Token -> Maybe Text -> Maybe Int -> Manager -> BaseUrl -> ExceptT ServantError IO GetChatMemberResponse
-editMessageText_           :: Token -> EditMessageTextRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
-editMessageCaption_        :: Token -> EditMessageCaptionRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
-editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO MessageResponse
-editMessageText__          :: Token -> EditMessageTextRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO (Response Bool)
-editMessageCaption__       :: Token -> EditMessageCaptionRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO (Response Bool)
-editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> Manager -> BaseUrl ->  ExceptT ServantError IO (Response Bool)
+getMe_                     :: Token -> ClientM GetMeResponse
+sendMessage_               :: Token -> SendMessageRequest -> ClientM MessageResponse
+forwardMessage_            :: Token -> ForwardMessageRequest -> ClientM MessageResponse
+uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> ClientM MessageResponse
+sendPhoto_                 :: Token -> SendPhotoRequest Text -> ClientM MessageResponse
+uploadAudio_               :: Token -> SendAudioRequest FileUpload -> ClientM MessageResponse
+sendAudio_                 :: Token -> SendAudioRequest Text -> ClientM MessageResponse
+uploadDocument_            :: Token -> SendDocumentRequest FileUpload -> ClientM MessageResponse
+sendDocument_              :: Token -> SendDocumentRequest Text -> ClientM MessageResponse
+uploadSticker_             :: Token -> SendStickerRequest FileUpload -> ClientM MessageResponse
+sendSticker_               :: Token -> SendStickerRequest Text -> ClientM MessageResponse
+uploadVideo_               :: Token -> SendVideoRequest FileUpload -> ClientM MessageResponse
+sendVideo_                 :: Token -> SendVideoRequest Text -> ClientM MessageResponse
+uploadVoice_               :: Token -> SendVoiceRequest FileUpload -> ClientM MessageResponse
+sendVoice_                 :: Token -> SendVoiceRequest Text -> ClientM MessageResponse
+sendLocation_              :: Token -> SendLocationRequest -> ClientM MessageResponse
+sendVenue_                 :: Token -> SendVenueRequest-> ClientM MessageResponse
+sendContact_               :: Token -> SendContactRequest -> ClientM MessageResponse
+sendChatAction_            :: Token -> SendChatActionRequest -> ClientM ChatActionResponse
+getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UpdatesResponse
+getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
+getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
+setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
+setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
+answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
+answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
+kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> ClientM KickChatMemberResponse
+leaveChat_                 :: Token -> Maybe Text -> ClientM LeaveChatResponse
+unbanChatMember_           :: Token -> Maybe Text -> Maybe Int -> ClientM UnbanChatMemberResponse
+getChat_                   :: Token -> Maybe Text -> ClientM GetChatResponse
+getChatAdministrators_     :: Token -> Maybe Text -> ClientM GetChatAdministratorsResponse
+getChatMembersCount_       :: Token -> Maybe Text -> ClientM GetChatMembersCountResponse
+getChatMember_             :: Token -> Maybe Text -> Maybe Int -> ClientM GetChatMemberResponse
+editMessageText_           :: Token -> EditMessageTextRequest -> ClientM MessageResponse
+editMessageCaption_        :: Token -> EditMessageCaptionRequest -> ClientM MessageResponse
+editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> ClientM MessageResponse
+editMessageText__          :: Token -> EditMessageTextRequest -> ClientM (Response Bool)
+editMessageCaption__       :: Token -> EditMessageCaptionRequest -> ClientM (Response Bool)
+editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> ClientM (Response Bool)
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -284,7 +283,7 @@ getMe_
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
 getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
-getMe token manager = runExceptT $ getMe_ token manager telegramBaseUrl
+getMe token manager = runClientM (getMe_ token) (ClientEnv manager telegramBaseUrl)
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
 sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
@@ -366,15 +365,15 @@ sendChatAction = run telegramBaseUrl sendChatAction_
 
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned.
 getUpdates :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UpdatesResponse)
-getUpdates token offset limit timeout manager = runExceptT $ getUpdates_ token offset limit timeout manager telegramBaseUrl
+getUpdates token offset limit timeout manager = runClientM (getUpdates_ token offset limit timeout) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
 getFile :: Token -> Text -> Manager -> IO (Either ServantError FileResponse)
-getFile token file_id manager = runExceptT $ getFile_ token (Just file_id) manager telegramBaseUrl
+getFile token file_id manager = runClientM (getFile_ token (Just file_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
 getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
-getUserProfilePhotos token user_id offset limit manager = runExceptT $ getUserProfilePhotos_ token (Just user_id) offset limit manager telegramBaseUrl
+getUserProfilePhotos token user_id offset limit manager = runClientM (getUserProfilePhotos_ token (Just user_id) offset limit) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -383,7 +382,7 @@ setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
-setWebhook token url manager = runExceptT $ setWebhook_ token url manager telegramBaseUrl
+setWebhook token url manager = runClientM (setWebhook_ token url) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -401,31 +400,31 @@ answerCallbackQuery = run telegramBaseUrl answerCallbackQuery_
 
 -- | Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must be an administrator in the group for this to work.
 kickChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError KickChatMemberResponse)
-kickChatMember token chat_id user_id manager = runExceptT $ kickChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl
+kickChatMember token chat_id user_id manager = runClientM (kickChatMember_ token (Just chat_id) (Just user_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
 leaveChat :: Token -> Text -> Manager -> IO (Either ServantError LeaveChatResponse)
-leaveChat token chat_id manager = runExceptT $ leaveChat_ token (Just chat_id) manager telegramBaseUrl
+leaveChat token chat_id manager = runClientM (leaveChat_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically, but will be able to join via link, etc. The bot must be an administrator in the group for this to work.
 unbanChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError UnbanChatMemberResponse)
-unbanChatMember token chat_id user_id manager = runExceptT $ unbanChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl
+unbanChatMember token chat_id user_id manager = runClientM (unbanChatMember_ token (Just chat_id) (Just user_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.)
 getChat :: Token -> Text -> Manager -> IO (Either ServantError GetChatResponse)
-getChat token chat_id manager = runExceptT $ getChat_ token (Just chat_id) manager telegramBaseUrl
+getChat token chat_id manager = runClientM (getChat_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to get a list of administrators in a chat. On success, returns an Array of 'ChatMember' objects that contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
 getChatAdministrators :: Token -> Text -> Manager -> IO (Either ServantError GetChatAdministratorsResponse)
-getChatAdministrators token chat_id manager = runExceptT $ getChatAdministrators_ token (Just chat_id) manager telegramBaseUrl
+getChatAdministrators token chat_id manager = runClientM (getChatAdministrators_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to get the number of members in a chat. Returns 'Int' on success.
 getChatMembersCount :: Token -> Text -> Manager -> IO (Either ServantError GetChatMembersCountResponse)
-getChatMembersCount token chat_id manager = runExceptT $ getChatMembersCount_ token (Just chat_id) manager telegramBaseUrl
+getChatMembersCount token chat_id manager = runClientM (getChatMembersCount_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to get information about a member of a chat. Returns a 'ChatMember' object on success.
 getChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError GetChatMemberResponse)
-getChatMember token chat_id user_id manager = runExceptT $ getChatMember_ token (Just chat_id) (Just user_id) manager telegramBaseUrl
+getChatMember token chat_id user_id manager = runClientM (getChatMember_ token (Just chat_id) (Just user_id)) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
 editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
@@ -451,5 +450,5 @@ editInlineMessageCaption = run telegramBaseUrl editMessageCaption__
 editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError (Response Bool))
 editInlineMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup__
 
-run :: BaseUrl -> (Token -> a -> Manager -> BaseUrl -> ExceptT ServantError IO b) -> Token -> a -> Manager -> IO (Either ServantError b)
-run b e t r m = runExceptT $ e t r m b
+run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ServantError b)
+run b e t r m = runClientM (e t r) (ClientEnv m b)

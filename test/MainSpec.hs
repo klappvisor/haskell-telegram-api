@@ -17,6 +17,7 @@ import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Servant.Client
 import           Network.HTTP.Types.Status
 import           System.FilePath
+import           Control.Concurrent
 
 import           Paths_telegram_api
 
@@ -266,6 +267,7 @@ spec token chatId botName = do
       val `shouldBe` True
 
     it "should set webhook" $ do
+      threadDelay $ 2 * 1000 * 1000
       Right Response { result = res } <-
         setWebhook token (Just "https://example.com/secret_token") manager
       res `shouldBe` True
