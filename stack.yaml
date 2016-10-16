@@ -13,15 +13,12 @@ extra-deps:
  - servant-0.9
  - servant-client-0.9
  - aeson-1.0.0.0
- - semigroups-0.18.2
  - http-api-data-0.3.1
  - hjpath-3.0.1
  - hjson-1.3.2
 
 # Override default flag values for local packages and extra-deps
-flags:
-  semigroups:
-    bytestring-builder: false
+flags: {}
 
 # Extra package databases containing global packages
 extra-package-dbs: []
