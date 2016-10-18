@@ -51,20 +51,20 @@ instance (ToMultipartFormData b, MimeUnrender ct a, cts' ~ (ct ': cts)
           formDataBody (toMultipartFormData reqData) requestWithoutBody
     in snd <$> performRequestCT' reqToRequest' (Proxy :: Proxy ct) H.methodPost req
 
--- copied `performRequest` from servant-0.7.1, then modified so it takes a variant of `reqToRequest`
--- as an argument.
-performRequest' :: (Req -> BaseUrl -> IO Request)
-               -> Method -> Req -> Manager -> BaseUrl
-               -> ClientM ( Int, ByteString, MediaType
-                          , [HTTP.Header], Response ByteString)
-performRequest' reqToRequest' reqMethod req manager reqHost = do
+-- copied `performRequest` from servant-client-0.9.0.1, then modified so it
+-- takes a variant of `reqToRequest` as an argument.
+performRequest' :: (Req -> BaseUrl -> IO Request) -- ^ our new argument
+                -> Method -> Req
+                -> ClientM ( Int, ByteString, MediaType
+                           , [HTTP.Header], Response ByteString)
+performRequest' reqToRequest' reqMethod req = do
+  m <- asks manager
+  reqHost <- asks baseUrl
   partialRequest <- liftIO $ reqToRequest' req reqHost
 
-  let request = partialRequest { Client.method = reqMethod
-                               , checkStatus = \ _status _headers _cookies -> Nothing
-                               }
+  let request = partialRequest { Client.method = reqMethod }
 
-  eResponse <- liftIO $ catchConnectionError $ Client.httpLbs request manager
+  eResponse <- liftIO $ catchConnectionError $ Client.httpLbs request m
   case eResponse of
     Left err ->
       throwError . ConnectionError $ SomeException err
@@ -83,18 +83,18 @@ performRequest' reqToRequest' reqMethod req manager reqHost = do
         throwError $ FailureResponse status ct body
       return (status_code, body, ct, hdrs, response)
 
--- copied `performRequestCT` from servant-0.7.1, then modified so it takes a variant of `reqToRequest`
--- as an argument.
+-- copied `performRequest` from servant-client-0.9.0.1, then modified so it
+-- takes a variant of `reqToRequest` as an argument an uses our modified
+-- function `performRequest'` with this variant.
 performRequestCT' :: MimeUnrender ct result =>
-  (Req -> BaseUrl -> IO Request) ->
-  Proxy ct -> Method -> Req
+    (Req -> BaseUrl -> IO Request) -- ^ our new argument
+    -> Proxy ct -> Method -> Req
     -> ClientM ([HTTP.Header], result)
 performRequestCT' reqToRequest' ct reqMethod req = do
   let acceptCT = contentType ct
-  ClientEnv manager reqHost <- ask
   (_status, respBody, respCT, hdrs, _response) <-
-    performRequest' reqToRequest' reqMethod (req { reqAccept = [acceptCT] }) manager reqHost
-  unless (matches respCT acceptCT) $ throwError $ UnsupportedContentType respCT respBody
+    performRequest' reqToRequest' reqMethod (req { reqAccept = [acceptCT] })
+  unless (matches respCT (acceptCT)) $ throwError $ UnsupportedContentType respCT respBody
   case mimeUnrender ct respBody of
     Left err -> throwError $ DecodeFailure err respCT respBody
     Right val -> return (hdrs, val)
