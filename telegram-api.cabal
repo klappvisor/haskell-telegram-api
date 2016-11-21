@@ -36,7 +36,7 @@ library
   build-depends:       base >= 4.7 && < 5
                      , aeson == 1.0.*
                      , http-api-data
-                     , http-client >= 0.4 && < 0.5
+                     , http-client >= 0.5 && < 0.6
                      , servant >= 0.9 && <0.10
                      , servant-client >= 0.9 && <0.10
                      , mtl >= 2.2 && < 2.3
@@ -61,7 +61,7 @@ test-suite telegram-api-test
                      , aeson == 1.0.*
                      , hjpath
                      , ansi-wl-pprint
-                     , http-client >= 0.4 && < 0.5
+                     , http-client >= 0.5 && < 0.6
                      , http-client-tls
                      , http-types
                      , hspec
