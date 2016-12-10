@@ -13,6 +13,8 @@ module Web.Telegram.API.Bot.Data
     , PhotoSize                     (..)
     , Audio                         (..)
     , Document                      (..)
+    , Game                          (..)
+    , Animation                     (..)
     , Sticker                       (..)
     , Video                         (..)
     , Voice                         (..)
@@ -27,6 +29,7 @@ module Web.Telegram.API.Bot.Data
     , InlineQueryResult             (..)
     , InlineKeyboardMarkup          (..)
     , InlineKeyboardButton          (..)
+    , CallbackGame                  (..)
     , CallbackQuery                 (..)
     , ChatType                      (..)
     , ParseMode                     (..)
@@ -50,6 +53,7 @@ module Web.Telegram.API.Bot.Data
     , inlineQueryResultCachedDocument
     , inlineQueryResultCachedGif
     , inlineQueryResultCachedMpeg4Gif
+    , inlineQueryResultGame
     , inlineQueryResultCachedPhoto
     , inlineQueryResultCachedSticker
     , inlineQueryResultCachedVideo
@@ -191,6 +195,39 @@ instance ToJSON Document where
 
 instance FromJSON Document where
   parseJSON = parseJsonDrop 4
+
+-- | This object represents a game. Use BotFather to create and edit games, their short names will act as unique identifiers.
+data Game = Game
+  {
+    game_title :: Text
+  , game_description :: Text
+  , game_photo :: [PhotoSize]
+  , game_text :: Maybe Text
+  , game_text_entities :: Maybe [MessageEntity]
+  , game_animation :: Maybe Animation
+  } deriving (Show, Generic)
+
+instance ToJSON Game where
+  toJSON = toJsonDrop 5
+
+instance FromJSON Game where
+  parseJSON = parseJsonDrop 5
+
+-- | This object represents an animation file to be displayed in the message containing a game.
+data Animation = Animation
+  {
+    anim_file_id :: Text
+  , anim_thumb :: Maybe PhotoSize
+  , anim_file_name :: Maybe Text
+  , anim_mime_type :: Maybe Text
+  , anim_file_size :: Maybe Int
+  } deriving (Show, Generic)
+
+instance ToJSON Animation where
+  toJSON = toJsonDrop 5
+
+instance FromJSON Animation where
+  parseJSON = parseJsonDrop 5
 
 -- | This object represents a sticker.
 data Sticker = Sticker
@@ -460,6 +497,13 @@ data InlineQueryResult =
   , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
   , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
   }
+  -- | Represents a Game.
+  | InlineQueryResultGame
+  {
+    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_game_short_name :: Text -- ^ Short name of the game
+  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  }
   -- | Represents a link to a photo stored on the Telegram servers. By default, this photo will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   | InlineQueryResultCachedPhoto
   {
@@ -594,6 +638,9 @@ inlineQueryResultVenue id lat lon title address = InlineQueryResultVenue id lat 
 inlineQueryResultContact :: Text -> Text -> Text -> InlineQueryResult
 inlineQueryResultContact id phoneNumber firstName = InlineQueryResultContact id phoneNumber firstName Nothing Nothing Nothing Nothing Nothing Nothing
 
+inlineQueryResultGame :: Text -> Text -> InlineQueryResult
+inlineQueryResultGame id gameShortName = InlineQueryResultGame id gameShortName Nothing
+
 inlineQueryResultCachedPhoto :: Text -> Text -> InlineQueryResult
 inlineQueryResultCachedPhoto id fileId = InlineQueryResultCachedPhoto id fileId Nothing Nothing Nothing Nothing Nothing
 
@@ -629,6 +676,7 @@ data InlineKeyboardButton = InlineKeyboardButton
   , ikb_url :: Maybe Text
   , ikb_callback_data :: Maybe Text
   , ikb_switch_inline_query :: Maybe Text
+  , ikb_callback_game :: Maybe CallbackGame
   } deriving (Show, Generic)
 
 instance ToJSON InlineKeyboardButton where
@@ -638,7 +686,17 @@ instance FromJSON InlineKeyboardButton where
   parseJSON = parseJsonDrop 4
 
 inlineKeyboardButton :: Text -> InlineKeyboardButton
-inlineKeyboardButton text = InlineKeyboardButton text Nothing Nothing Nothing
+inlineKeyboardButton text = InlineKeyboardButton text Nothing Nothing Nothing Nothing
+
+data CallbackGame = CallbackGame
+  {
+  } deriving (Show, Generic)
+
+instance ToJSON CallbackGame where
+  toJSON = toJsonDrop 3
+
+instance FromJSON CallbackGame where
+  parseJSON = parseJsonDrop 3
 
 data CallbackQuery = CallbackQuery
   {
@@ -646,7 +704,9 @@ data CallbackQuery = CallbackQuery
   , cq_from :: User
   , cq_message :: Maybe Message
   , cq_inline_message_id :: Maybe Text
+  , cq_chat_instance :: Text
   , cq_data :: Maybe Text
+  , cq_game_short_name :: Maybe Text
   } deriving (Show, Generic)
 
 instance ToJSON CallbackQuery where
@@ -721,6 +781,7 @@ data Message = Message
   , entities :: Maybe [MessageEntity]     -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
   , audio :: Maybe Audio                  -- ^ Message is an audio file, information about the file
   , document :: Maybe Document            -- ^ Message is a general file, information about the file
+  , game :: Maybe Game                    -- ^ Message is a game, information about the game
   , photo :: Maybe [PhotoSize]            -- ^ Message is a photo, available sizes of the photo
   , sticker :: Maybe Sticker              -- ^ Message is a sticker, information about the sticker
   , video :: Maybe Video                  -- ^ Message is a video, information about the video
