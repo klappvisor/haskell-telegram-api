@@ -540,7 +540,8 @@ data AnswerCallbackQueryRequest = AnswerCallbackQueryRequest
     cq_callback_query_id :: Text -- ^ Unique identifier for the query to be answered
   , cq_text :: Maybe Text -- ^ Text of the notification. If not specified, nothing will be shown to the user
   , cq_show_alert :: Maybe Bool -- ^ If true, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to false.
-  , cq_url :: Maybe Text -- ^ URL that will be opened by the user's client. If you have created a Game and accepted the conditions via Botfather, specify the URL that opens your game – note that this will only work if the query comes from a callback_game button.
+  , cq_url :: Maybe Text -- ^ URL that will be opened by the user's client. If you have created a `Game` and accepted the conditions via `@Botfather`, specify the URL that opens your game – note that this will only work if the query comes from a `callback_game` button. Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
+  , cq_cache_time :: Maybe Int -- ^ The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0.
   } deriving (Show, Generic)
 
 instance ToJSON AnswerCallbackQueryRequest where
@@ -550,7 +551,7 @@ instance FromJSON AnswerCallbackQueryRequest where
   parseJSON = parseJsonDrop 3
 
 answerCallbackQueryRequest :: Text -> AnswerCallbackQueryRequest
-answerCallbackQueryRequest queryId = AnswerCallbackQueryRequest queryId Nothing Nothing Nothing
+answerCallbackQueryRequest queryId = AnswerCallbackQueryRequest queryId Nothing Nothing Nothing Nothing
 
 data ReplyKeyboard =
   -- | This object represents a custom keyboard with reply options
