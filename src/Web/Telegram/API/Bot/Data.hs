@@ -199,12 +199,12 @@ instance FromJSON Document where
 -- | This object represents a game. Use BotFather to create and edit games, their short names will act as unique identifiers.
 data Game = Game
   {
-    game_title :: Text
-  , game_description :: Text
-  , game_photo :: [PhotoSize]
-  , game_text :: Maybe Text
-  , game_text_entities :: Maybe [MessageEntity]
-  , game_animation :: Maybe Animation
+    game_title :: Text -- ^ Title of the game
+  , game_description :: Text -- ^ Description of the game
+  , game_photo :: [PhotoSize] -- ^ Photo that will be displayed in the game message in chats.
+  , game_text :: Maybe Text -- ^ Brief description of the game or high scores included in the game message. Can be automatically edited to include current high scores for the game when the bot calls setGameScore, or manually edited using editMessageText. 0-4096 characters.
+  , game_text_entities :: Maybe [MessageEntity] -- ^ Special entities that appear in text, such as usernames, URLs, bot commands, etc.
+  , game_animation :: Maybe Animation -- ^ Animation that will be displayed in the game message in chats. Upload via BotFather
   } deriving (Show, Generic)
 
 instance ToJSON Game where
@@ -216,11 +216,11 @@ instance FromJSON Game where
 -- | This object represents an animation file to be displayed in the message containing a game.
 data Animation = Animation
   {
-    anim_file_id :: Text
-  , anim_thumb :: Maybe PhotoSize
-  , anim_file_name :: Maybe Text
-  , anim_mime_type :: Maybe Text
-  , anim_file_size :: Maybe Int
+    anim_file_id :: Text -- ^ Unique file identifier
+  , anim_thumb :: Maybe PhotoSize -- ^ Animation thumbnail as defined by sender
+  , anim_file_name :: Maybe Text -- ^ Original animation filename as defined by sender
+  , anim_mime_type :: Maybe Text -- ^ MIME type of the file as defined by sender
+  , anim_file_size :: Maybe Int -- ^ File size
   } deriving (Show, Generic)
 
 instance ToJSON Animation where
