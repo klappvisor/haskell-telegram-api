@@ -35,6 +35,7 @@ module Web.Telegram.API.Bot.Data
     , ParseMode                     (..)
     , InputMessageContent           (..)
     , KeyboardButton                (..)
+    , WebhookInfo                   (..)
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
@@ -858,3 +859,18 @@ instance FromJSON KeyboardButton where
 
 keyboardButton :: Text -> KeyboardButton
 keyboardButton buttonText = KeyboardButton buttonText Nothing Nothing
+
+data WebhookInfo = WebhookInfo
+  {
+    whi_url :: Text -- ^ Webhook URL, may be empty if webhook is not set up
+  , whi_has_custom_certificate :: Bool -- ^ True, if a custom certificate was provided for webhook certificate checks
+  , whi_pending_update_count :: Int -- ^ Number of updates awaiting delivery
+  , whi_last_error_date :: Maybe Int -- ^ Unix time for the most recent error that happened when trying to deliver an update via webhook
+  , whi_last_error_message :: Maybe Text -- ^ Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
+  } deriving (Show, Generic)
+
+instance ToJSON WebhookInfo where
+  toJSON = toJsonDrop 4
+
+instance FromJSON WebhookInfo where
+  parseJSON = parseJsonDrop 4
