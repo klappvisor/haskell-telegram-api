@@ -24,6 +24,7 @@ module Web.Telegram.API.Bot.API
   , sendVenue
   , sendContact
   , sendChatAction
+  , sendGame
   , getUpdates
   , getFile
   , getUserProfilePhotos
@@ -128,6 +129,9 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "sendChatAction"
          :> ReqBody '[JSON] SendChatActionRequest
          :> Post '[JSON] ChatActionResponse
+    :<|> TelegramToken :> "sendGame"
+         :> ReqBody '[JSON] SendGameRequest
+         :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "getUpdates"
          :> QueryParam "offset" Int
          :> QueryParam "limit" Int
@@ -219,6 +223,7 @@ sendLocation_              :: Token -> SendLocationRequest -> ClientM MessageRes
 sendVenue_                 :: Token -> SendVenueRequest-> ClientM MessageResponse
 sendContact_               :: Token -> SendContactRequest -> ClientM MessageResponse
 sendChatAction_            :: Token -> SendChatActionRequest -> ClientM ChatActionResponse
+sendGame_                  :: Token -> SendGameRequest -> ClientM MessageResponse
 getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UpdatesResponse
 getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
@@ -258,6 +263,7 @@ getMe_
   :<|> sendVenue_
   :<|> sendContact_
   :<|> sendChatAction_
+  :<|> sendGame_
   :<|> getUpdates_
   :<|> getFile_
   :<|> getUserProfilePhotos_
@@ -362,6 +368,10 @@ sendContact = run telegramBaseUrl sendContact_
 --   Telegram clients clear its typing status).
 sendChatAction :: Token -> SendChatActionRequest -> Manager -> IO (Either ServantError ChatActionResponse)
 sendChatAction = run telegramBaseUrl sendChatAction_
+
+-- | Use this method to send a game. On success, the sent 'Message' is returned.
+sendGame :: Token -> SendGameRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendGame = run telegramBaseUrl sendGame_
 
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned.
 getUpdates
