@@ -109,6 +109,7 @@ data Chat = Chat
   , chat_username :: Maybe Text   -- ^ Username, for private chats and channels if available
   , chat_first_name :: Maybe Text -- ^ First name of the other party in a private chat
   , chat_last_name :: Maybe Text  -- ^ Last name of the other party in a private chat
+  , chat_all_members_are_administrators :: Maybe Bool -- ^ True if a group has ‘All Members Are Admins’ enabled.
   } deriving (Show, Generic)
 
 instance ToJSON Chat where
@@ -426,6 +427,7 @@ data InlineQueryResult =
     iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_audio_url :: Text -- ^ A valid URL for the audio file
   , iq_res_title :: Maybe Text -- ^ Title
+  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
   , iq_res_performer :: Maybe Text -- ^ Performer
   , iq_res_audio_duration :: Maybe Int -- ^ Audio duration in seconds
   , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
@@ -437,6 +439,7 @@ data InlineQueryResult =
     iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_voice_url :: Text -- ^ A valid URL for the voice recording
   , iq_res_title :: Maybe Text -- ^ Recording title
+  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
   , iq_res_voice_duration :: Maybe Int -- ^ Recording duration in seconds
   , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the voice recording
@@ -571,6 +574,7 @@ data InlineQueryResult =
     iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_voice_file_id :: Text -- ^ A valid file identifier for the voice message
   , iq_res_title :: Maybe Text -- ^ Voice message title
+  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
   , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the voice message
   }
@@ -579,6 +583,7 @@ data InlineQueryResult =
   {
     iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_audio_file_id :: Text -- ^ A valid file identifier for the audio file
+  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
   , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the audio
   } deriving (Show, Generic)
@@ -621,10 +626,10 @@ inlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryRes
 inlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 inlineQueryResultAudio :: Text -> Text -> Text -> InlineQueryResult
-inlineQueryResultAudio id audioUrl title = InlineQueryResultAudio id audioUrl (Just title) Nothing Nothing Nothing Nothing
+inlineQueryResultAudio id audioUrl title = InlineQueryResultAudio id audioUrl (Just title) Nothing Nothing Nothing Nothing Nothing
 
 inlineQueryResultVoice :: Text -> Text -> Text -> InlineQueryResult
-inlineQueryResultVoice id voiceUrl title = InlineQueryResultVoice id voiceUrl (Just title) Nothing Nothing Nothing
+inlineQueryResultVoice id voiceUrl title = InlineQueryResultVoice id voiceUrl (Just title) Nothing Nothing Nothing Nothing
 
 inlineQueryResultDocument :: Text -> Text -> Text -> Text -> InlineQueryResult
 inlineQueryResultDocument id title docUrl mimeType = InlineQueryResultDocument id (Just title) Nothing docUrl mimeType Nothing Nothing Nothing Nothing Nothing Nothing
@@ -660,10 +665,10 @@ inlineQueryResultCachedVideo :: Text -> Text -> Text -> InlineQueryResult
 inlineQueryResultCachedVideo id fileId title = InlineQueryResultCachedVideo id fileId (Just title) Nothing Nothing Nothing Nothing
 
 inlineQueryResultCachedVoice :: Text -> Text -> Text -> InlineQueryResult
-inlineQueryResultCachedVoice id fileId title = InlineQueryResultCachedVoice id fileId (Just title) Nothing Nothing
+inlineQueryResultCachedVoice id fileId title = InlineQueryResultCachedVoice id fileId (Just title) Nothing Nothing Nothing
 
 inlineQueryResultCachedAudio :: Text -> Text -> InlineQueryResult
-inlineQueryResultCachedAudio id fileId = InlineQueryResultCachedAudio id fileId Nothing Nothing
+inlineQueryResultCachedAudio id fileId = InlineQueryResultCachedAudio id fileId Nothing Nothing Nothing
 
 data InlineKeyboardMarkup = InlineKeyboardMarkup
   {
@@ -677,6 +682,7 @@ data InlineKeyboardButton = InlineKeyboardButton
   , ikb_callback_data :: Maybe Text
   , ikb_switch_inline_query :: Maybe Text
   , ikb_callback_game :: Maybe CallbackGame
+  , ikb_switch_inline_query_current_chat :: Maybe Text -- ^ If set, pressing the button will insert the bot‘s username and the specified inline query in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.
   } deriving (Show, Generic)
 
 instance ToJSON InlineKeyboardButton where
@@ -686,7 +692,7 @@ instance FromJSON InlineKeyboardButton where
   parseJSON = parseJsonDrop 4
 
 inlineKeyboardButton :: Text -> InlineKeyboardButton
-inlineKeyboardButton text = InlineKeyboardButton text Nothing Nothing Nothing Nothing
+inlineKeyboardButton text = InlineKeyboardButton text Nothing Nothing Nothing Nothing Nothing
 
 data CallbackGame = CallbackGame
   {

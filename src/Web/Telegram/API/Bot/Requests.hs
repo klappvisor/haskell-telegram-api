@@ -204,6 +204,7 @@ data SendAudioRequest payload = SendAudioRequest
   {
     _audio_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _audio_audio                :: payload -- ^ Audio to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
+  , _audio_caption              :: Maybe Text -- ^ Audio caption, 0-200 characters
   , _audio_duration             :: Maybe Int -- ^ Duration of the audio in seconds
   , _audio_performer            :: Maybe Text -- ^ Performer
   , _audio_title                :: Maybe Text -- ^ Track name
@@ -232,10 +233,10 @@ instance ToMultipartFormData (SendAudioRequest FileUpload) where
     [ fileUploadToPart "audio" (_audio_audio req) ]
 
 sendAudioRequest :: Text -> Text -> SendAudioRequest Text
-sendAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing
+sendAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 uploadAudioRequest :: Text -> FileUpload -> SendAudioRequest FileUpload
-uploadAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing
+uploadAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendSticker'
 data SendStickerRequest payload = SendStickerRequest
@@ -344,6 +345,7 @@ data SendVoiceRequest payload = SendVoiceRequest
   {
     _voice_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _voice_voice                    :: payload -- ^ Audio file to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
+  , _voice_caption                  :: Maybe Text -- ^ Voice message caption, 0-200 characters
   , _voice_duration                 :: Maybe Int -- ^ Duration of sent audio in seconds
   , _voice_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , _voice_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
@@ -368,10 +370,10 @@ instance ToMultipartFormData (SendVoiceRequest FileUpload) where
     [ fileUploadToPart "voice" (_voice_voice req) ]
 
 sendVoiceRequest :: Text -> Text -> SendVoiceRequest Text
-sendVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing
+sendVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing Nothing
 
 uploadVoiceRequest :: Text -> FileUpload -> SendVoiceRequest FileUpload
-uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing
+uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
