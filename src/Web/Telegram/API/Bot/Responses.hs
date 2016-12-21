@@ -30,7 +30,14 @@ import           Web.Telegram.API.Bot.Data
 
 data Response a = Response
   {
-    result :: a
+    result :: a,
+    parameters :: Maybe ResponseParameters
+  } deriving (Show, Generic, FromJSON)
+
+data ResponseParameters = ResponseParameters
+  {
+    migrate_to_chat_id :: Maybe Int -- ^ The group has been migrated to a supergroup with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier.
+  , retry_after :: Maybe Int -- ^ In case of exceeding flood control, the number of seconds left to wait before the request can be repeated
   } deriving (Show, Generic, FromJSON)
 
 -- | This object represents 'getMe' response
