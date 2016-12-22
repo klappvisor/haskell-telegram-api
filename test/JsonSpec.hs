@@ -5,7 +5,7 @@ module JsonSpec (spec) where
 import           Web.Telegram.API.Bot
 import           Test.Hspec
 import qualified Data.Text as T
-import           Data.Aeson.Encode
+import           Data.Aeson
 import           Text.JSON.JPath
 import           Data.ByteString.Lazy.UTF8
 

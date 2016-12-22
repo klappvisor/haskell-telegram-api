@@ -31,7 +31,8 @@ import qualified Network.HTTP.Types.Header  as HTTP
 import           Servant.API
 import           Servant.Common.BaseUrl
 import           Servant.Client
-import           Servant.Common.Req
+import           Servant.Common.Req         (Req, catchConnectionError,
+                                             reqAccept, reqToRequest)
 -- | A type that can be converted to a multipart/form-data value.
 class ToMultipartFormData a where
   -- | Convert a Haskell value to a multipart/form-data-friendly intermediate type.
