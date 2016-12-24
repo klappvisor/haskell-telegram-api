@@ -61,6 +61,8 @@ module Web.Telegram.API.Bot.Data
 
     ) where
 
+import           Prelude hiding (id)
+
 import           Data.Aeson
 import           Data.Maybe()
 import           Data.Aeson.Types
@@ -692,7 +694,8 @@ instance FromJSON InlineKeyboardButton where
   parseJSON = parseJsonDrop 4
 
 inlineKeyboardButton :: Text -> InlineKeyboardButton
-inlineKeyboardButton text = InlineKeyboardButton text Nothing Nothing Nothing Nothing Nothing
+inlineKeyboardButton buttonText =
+  InlineKeyboardButton buttonText Nothing Nothing Nothing Nothing Nothing
 
 data CallbackGame = CallbackGame
   {
@@ -854,4 +857,4 @@ instance FromJSON KeyboardButton where
   parseJSON = parseJsonDrop 3
 
 keyboardButton :: Text -> KeyboardButton
-keyboardButton text = KeyboardButton text Nothing Nothing
+keyboardButton buttonText = KeyboardButton buttonText Nothing Nothing

@@ -145,9 +145,17 @@ spec token chatId botName = do
       let fileUpload = localFileUpload (testFile "concerto-for-2-trumpets-in-c-major.mp3")
           audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
           audioPerformer = "Michel Rondeau"
-          audio = (uploadAudioRequest chatId fileUpload) { _audio_performer = Just audioPerformer, _audio_title = Just audioTitle }
-      Right Response { result = Message { audio = Just Audio { audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer } } } <-
-        uploadAudio token audio manager
+          audio = (uploadAudioRequest chatId fileUpload) {
+            _audio_performer = Just audioPerformer,
+            _audio_title = Just audioTitle
+          }
+      Right Response {
+        result = Message {
+          audio = Just Audio {
+            audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer
+          }
+        }
+      } <- uploadAudio token audio manager
       title `shouldBe` audioTitle
       performer `shouldBe` audioPerformer
       let audio = sendAudioRequest chatId file_id
@@ -163,11 +171,11 @@ spec token chatId botName = do
       sticker_file_id sticker `shouldBe` "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
       let fileUpload = localFileUpload (testFile "haskell-logo.webp")
-          stickerReq = uploadStickerRequest chatId fileUpload 
+          stickerReq = uploadStickerRequest chatId fileUpload
       Right Response { result = Message { sticker = Just sticker } } <-
         uploadSticker token stickerReq manager
       sticker_height sticker `shouldBe` 128
-  
+
   describe "/sendVoice" $
     it "should upload voice" $ do
       -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
