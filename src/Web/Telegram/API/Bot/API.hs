@@ -232,7 +232,7 @@ getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
 setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
 setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
-getWebhookInfo_        :: Token -> ClientM GetWebhookInfoResponse
+getWebhookInfo_            :: Token -> ClientM GetWebhookInfoResponse
 answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
 answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
 kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> ClientM KickChatMemberResponse
