@@ -75,8 +75,11 @@ import           GHC.Generics
 import           Network.HTTP.Client.MultipartFormData
 import           Network.Mime
 import           Servant.Client.MultipartFormData (ToMultipartFormData (..))
+import           Web.Telegram.API.Bot.Data (InlineKeyboardButton,
+                                            InlineKeyboardMarkup,
+                                            InlineQueryResult, KeyboardButton,
+                                            ParseMode)
 import           Web.Telegram.API.Bot.JsonExt
-import           Web.Telegram.API.Bot.Data
 
 
 -- | This object represents data (image, video, ...) to upload.
