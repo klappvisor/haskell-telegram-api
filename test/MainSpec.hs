@@ -265,7 +265,7 @@ spec token chatId botName = do
        getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager
      total_count photos `shouldSatisfy` (>= 0)
 
-  describe "/setWebhook" $ do
+  describe "/setWebhook and /getWebhookInfo" $ do
     it "should set webhook with certificate" $ do
       let cert = localFileUpload $ testFile "cert.pem"
           req = SetWebhookRequest "https://example.com/secret_token" cert
@@ -280,12 +280,15 @@ spec token chatId botName = do
         setWebhook token (Just "https://example.com/secret_token") manager
       res `shouldBe` True
 
+    it "should get webhook info" $ do
+      Right Response { result = WebhookInfo { whi_url = url } } <- getWebhookInfo token manager
+      url `shouldBe` "https://example.com/secret_token"
+
     it "should remove webhook" $ do
       Right Response { result = res } <-
         setWebhook token Nothing manager
       res `shouldBe` True
 
-  describe "/editTextMessage" $ do
     it "should edit message" $ do
       let originalMessage = sendMessageRequest chatId "veritas"
       Right Response { result = Message { message_id = msg_id, text = Just txt } } <-
