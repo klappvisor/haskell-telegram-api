@@ -23,6 +23,7 @@ module Web.Telegram.API.Bot.Responses
     , GetChatAdministratorsResponse
     , GetChatMembersCountResponse
     , GetChatMemberResponse
+    , GetWebhookInfoResponse
     ) where
 
 import           Data.Aeson
@@ -87,3 +88,5 @@ type GetChatAdministratorsResponse = Response [ChatMember]
 type GetChatMembersCountResponse = Response Int
 
 type GetChatMemberResponse = Response ChatMember
+
+type GetWebhookInfoResponse = Response WebhookInfo

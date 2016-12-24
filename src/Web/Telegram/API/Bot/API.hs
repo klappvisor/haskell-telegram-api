@@ -30,6 +30,7 @@ module Web.Telegram.API.Bot.API
   , getUserProfilePhotos
   , setWebhook
   , setWebhookWithCertificate
+  , getWebhookInfo
   , answerInlineQuery
   , answerCallbackQuery
   , kickChatMember
@@ -151,6 +152,8 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "setWebhook"
          :> MultipartFormDataReqBody SetWebhookRequest
          :> Post '[JSON] SetWebhookResponse
+    :<|> TelegramToken :> "getWebhookInfo"
+         :> Get '[JSON] GetWebhookInfoResponse
     :<|> TelegramToken :> "answerInlineQuery"
          :> ReqBody '[JSON] AnswerInlineQueryRequest
          :> Post '[JSON] InlineQueryResponse
@@ -229,6 +232,7 @@ getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
 setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
 setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
+getWebhookInfo_            :: Token -> ClientM GetWebhookInfoResponse
 answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
 answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
 kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> ClientM KickChatMemberResponse
@@ -269,6 +273,7 @@ getMe_
   :<|> getUserProfilePhotos_
   :<|> setWebhook_
   :<|> setWebhookWithCert_
+  :<|> getWebhookInfo_
   :<|> answerInlineQuery_
   :<|> answerCallbackQuery_
   :<|> kickChatMember_
@@ -405,6 +410,10 @@ setWebhook token url manager = runClientM (setWebhook_ token url) $ ClientEnv ma
 --       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
 setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
 setWebhookWithCertificate = run telegramBaseUrl setWebhookWithCert_
+
+-- | Contains information about the current status of a webhook.
+getWebhookInfo :: Token -> Manager -> IO (Either ServantError GetWebhookInfoResponse)
+getWebhookInfo token manager = runClientM (getWebhookInfo_ token) $ ClientEnv manager telegramBaseUrl
 
 -- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
