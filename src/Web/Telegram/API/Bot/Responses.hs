@@ -6,6 +6,7 @@
 module Web.Telegram.API.Bot.Responses
     ( -- * Types
       Response                        (..)
+    , ResponseParameters              (..)
     , GetMeResponse
     , MessageResponse
     , ChatActionResponse
@@ -27,18 +28,22 @@ module Web.Telegram.API.Bot.Responses
 import           Data.Aeson
 import           GHC.Generics
 import           Web.Telegram.API.Bot.Data
+import           Web.Telegram.API.Bot.JsonExt
 
 data Response a = Response
   {
-    result :: a,
-    parameters :: Maybe ResponseParameters
+    result :: a
+  , parameters :: Maybe ResponseParameters
   } deriving (Show, Generic, FromJSON)
 
 data ResponseParameters = ResponseParameters
   {
-    migrate_to_chat_id :: Maybe Int -- ^ The group has been migrated to a supergroup with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier.
-  , retry_after :: Maybe Int -- ^ In case of exceeding flood control, the number of seconds left to wait before the request can be repeated
-  } deriving (Show, Generic, FromJSON)
+    res_migrate_to_chat_id :: Maybe Int -- ^ The group has been migrated to a supergroup with the specified identifier. This number may be greater than 32 bits and some programming languages may have difficulty/silent defects in interpreting it. But it is smaller than 52 bits, so a signed 64 bit integer or double-precision float type are safe for storing this identifier.
+  , res_retry_after :: Maybe Int -- ^ In case of exceeding flood control, the number of seconds left to wait before the request can be repeated
+  } deriving (Show, Generic)
+
+instance FromJSON ResponseParameters where
+  parseJSON = parseJsonDrop 4
 
 -- | This object represents 'getMe' response
 type GetMeResponse = Response User
