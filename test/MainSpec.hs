@@ -289,6 +289,15 @@ spec token chatId botName = do
         setWebhook token Nothing manager
       res `shouldBe` True
 
+    it "should remove webhood with deleteWebhook" $ do
+      threadDelay $ 2 * 1000 * 1000
+      _ <- setWebhook token (Just "https://example.com/secret_token") manager
+      res <- deleteWebhook token manager
+      success res
+      let Right Response { result = val } = res
+      val `shouldBe` True
+
+  describe "/editTextMessage" $ do
     it "should edit message" $ do
       let originalMessage = sendMessageRequest chatId "veritas"
       Right Response { result = Message { message_id = msg_id, text = Just txt } } <-

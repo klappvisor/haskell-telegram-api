@@ -30,6 +30,7 @@ module Web.Telegram.API.Bot.API
   , getUserProfilePhotos
   , setWebhook
   , setWebhookWithCertificate
+  , deleteWebhook
   , getWebhookInfo
   , answerInlineQuery
   , answerCallbackQuery
@@ -152,6 +153,8 @@ type TelegramBotAPI =
     :<|> TelegramToken :> "setWebhook"
          :> MultipartFormDataReqBody SetWebhookRequest
          :> Post '[JSON] SetWebhookResponse
+    :<|> TelegramToken :> "deleteWebhook"
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "getWebhookInfo"
          :> Get '[JSON] GetWebhookInfoResponse
     :<|> TelegramToken :> "answerInlineQuery"
@@ -232,6 +235,7 @@ getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
 setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
 setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
+deleteWebhook_             :: Token -> ClientM (Response Bool)
 getWebhookInfo_            :: Token -> ClientM GetWebhookInfoResponse
 answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
 answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
@@ -273,6 +277,7 @@ getMe_
   :<|> getUserProfilePhotos_
   :<|> setWebhook_
   :<|> setWebhookWithCert_
+  :<|> deleteWebhook_
   :<|> getWebhookInfo_
   :<|> answerInlineQuery_
   :<|> answerCallbackQuery_
@@ -410,6 +415,9 @@ setWebhook token url manager = runClientM (setWebhook_ token url) $ ClientEnv ma
 --       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
 setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
 setWebhookWithCertificate = run telegramBaseUrl setWebhookWithCert_
+
+deleteWebhook :: Token -> Manager -> IO (Either ServantError (Response Bool))
+deleteWebhook token manager = runClientM (deleteWebhook_ token) $ ClientEnv manager telegramBaseUrl
 
 -- | Contains information about the current status of a webhook.
 getWebhookInfo :: Token -> Manager -> IO (Either ServantError GetWebhookInfoResponse)
