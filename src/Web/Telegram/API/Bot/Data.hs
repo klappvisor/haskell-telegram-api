@@ -24,7 +24,6 @@ module Web.Telegram.API.Bot.Data
     , Update                        (..)
     , File                          (..)
     , UserProfilePhotos             (..)
-    , WebhookInfo                   (..)
     , InlineQuery                   (..)
     , ChosenInlineResult            (..)
     , InlineQueryResult             (..)
@@ -733,6 +732,8 @@ data Update = Update
     update_id            :: Int   -- ^ The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially. This ID becomes especially handy if you’re using 'setWebhooks', since it allows you to ignore repeated updates or to restore the correct update sequence, should they get out of order.
   , message              :: Maybe Message -- ^ New incoming message of any kind — text, photo, sticker, etc.
   , edited_message       :: Maybe Message -- ^ New version of a message that is known to the bot and was edited
+  , channel_post         :: Maybe Message -- ^ New incoming channel post of any kind — text, photo, sticker, etc.
+  , edited_channel_post  :: Maybe Message -- ^ New version of a channel post that is known to the bot and was edited
   , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
   , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
   , callback_query       :: Maybe CallbackQuery -- ^ This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
@@ -785,6 +786,7 @@ data Message = Message
   , chat :: Chat                          -- ^ Conversation the message belongs to
   , forward_from :: Maybe User            -- ^ For forwarded messages, sender of the original message
   , forward_from_chat :: Maybe Chat       -- ^ For messages forwarded from a channel, information about the original channel
+  , forward_from_message_id :: Maybe Int  -- ^ For forwarded channel posts, identifier of the original message in the channel
   , forward_date :: Maybe Int             -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message :: Maybe Message     -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
   , edit_date :: Maybe Int                -- ^ Date the message was last edited in Unix time
