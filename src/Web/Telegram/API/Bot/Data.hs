@@ -24,6 +24,7 @@ module Web.Telegram.API.Bot.Data
     , Update                        (..)
     , File                          (..)
     , UserProfilePhotos             (..)
+    , WebhookInfo                   (..)
     , InlineQuery                   (..)
     , ChosenInlineResult            (..)
     , InlineQueryResult             (..)
