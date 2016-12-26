@@ -5,7 +5,10 @@
 
 module Web.Telegram.API.Bot.API
   ( -- * Functions
-    getMe
+    runClient
+  , runClientEx
+    -- * API Methods
+  , getMe
   , sendMessage
   , forwardMessage
   , uploadPhoto
@@ -53,8 +56,10 @@ module Web.Telegram.API.Bot.API
   , Token             (..)
   ) where
 
+import           Data.Monoid ((<>))
 import           Data.Proxy
 import           Data.Text (Text)
+import qualified Data.Text as Text
 import           Network.HTTP.Client (Manager)
 import           Servant.API
 import           Servant.Client
@@ -69,137 +74,134 @@ newtype Token = Token Text
 telegramBaseUrl :: BaseUrl
 telegramBaseUrl = BaseUrl Https "api.telegram.org" 443 ""
 
--- | Type for token
-type TelegramToken = Capture ":token" Token
-
 -- | Telegram Bot API
 type TelegramBotAPI =
-         TelegramToken :> "getMe"
+         "getMe"
          :> Get '[JSON] GetMeResponse
-    :<|> TelegramToken :> "sendMessage"
+    :<|> "sendMessage"
          :> ReqBody '[JSON] SendMessageRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "forwardMessage"
+    :<|> "forwardMessage"
          :> ReqBody '[JSON] ForwardMessageRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendPhoto"
+    :<|> "sendPhoto"
          :> MultipartFormDataReqBody (SendPhotoRequest FileUpload)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendPhoto"
+    :<|> "sendPhoto"
          :> ReqBody '[JSON] (SendPhotoRequest Text)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendAudio"
+    :<|> "sendAudio"
          :> MultipartFormDataReqBody (SendAudioRequest FileUpload)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendAudio"
+    :<|> "sendAudio"
          :> ReqBody '[JSON] (SendAudioRequest Text)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendDocument"
+    :<|> "sendDocument"
          :> MultipartFormDataReqBody (SendDocumentRequest FileUpload)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendDocument"
+    :<|> "sendDocument"
          :> ReqBody '[JSON] (SendDocumentRequest Text)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendSticker"
+    :<|> "sendSticker"
          :> MultipartFormDataReqBody (SendStickerRequest FileUpload)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendSticker"
+    :<|> "sendSticker"
          :> ReqBody '[JSON] (SendStickerRequest Text)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendVideo"
+    :<|> "sendVideo"
          :> MultipartFormDataReqBody (SendVideoRequest FileUpload)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendVideo"
+    :<|> "sendVideo"
          :> ReqBody '[JSON] (SendVideoRequest Text)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendVoice"
+    :<|> "sendVoice"
          :> MultipartFormDataReqBody (SendVoiceRequest FileUpload)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendVoice"
+    :<|> "sendVoice"
          :> ReqBody '[JSON] (SendVoiceRequest Text)
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendLocation"
+    :<|> "sendLocation"
          :> ReqBody '[JSON] SendLocationRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendVenue"
+    :<|> "sendVenue"
          :> ReqBody '[JSON] SendVenueRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendContact"
+    :<|> "sendContact"
          :> ReqBody '[JSON] SendContactRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "sendChatAction"
+    :<|> "sendChatAction"
          :> ReqBody '[JSON] SendChatActionRequest
          :> Post '[JSON] ChatActionResponse
-    :<|> TelegramToken :> "sendGame"
+    :<|> "sendGame"
          :> ReqBody '[JSON] SendGameRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "getUpdates"
+    :<|> "getUpdates"
          :> QueryParam "offset" Int
          :> QueryParam "limit" Int
          :> QueryParam "timeout" Int
          :> Get '[JSON] UpdatesResponse
-    :<|> TelegramToken :> "getFile"
+    :<|> "getFile"
          :> QueryParam "file_id" Text
          :> Get '[JSON] FileResponse
-    :<|> TelegramToken :> "getUserProfilePhotos"
+    :<|> "getUserProfilePhotos"
          :> QueryParam "user_id" Int
          :> QueryParam "offset" Int
          :> QueryParam "limit" Int
          :> Get '[JSON] UserProfilePhotosResponse
-    :<|> TelegramToken :> "setWebhook"
+    :<|> "setWebhook"
          :> QueryParam "url" Text
          :> Get '[JSON] SetWebhookResponse
-    :<|> TelegramToken :> "setWebhook"
+    :<|> "setWebhook"
          :> MultipartFormDataReqBody SetWebhookRequest
          :> Post '[JSON] SetWebhookResponse
-    :<|> TelegramToken :> "getWebhookInfo"
+    :<|> "getWebhookInfo"
          :> Get '[JSON] GetWebhookInfoResponse
-    :<|> TelegramToken :> "answerInlineQuery"
+    :<|> "answerInlineQuery"
          :> ReqBody '[JSON] AnswerInlineQueryRequest
          :> Post '[JSON] InlineQueryResponse
-    :<|> TelegramToken :> "answerCallbackQuery"
+    :<|> "answerCallbackQuery"
          :> ReqBody '[JSON] AnswerCallbackQueryRequest
          :> Post '[JSON] CallbackQueryResponse
-    :<|> TelegramToken :> "kickChatMember"
+    :<|> "kickChatMember"
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
          :> Post '[JSON] KickChatMemberResponse
-    :<|> TelegramToken :> "leaveChat"
+    :<|> "leaveChat"
          :> QueryParam "chat_id" Text
          :> Post '[JSON] LeaveChatResponse
-    :<|> TelegramToken :> "unbanChatMember"
+    :<|> "unbanChatMember"
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
          :> Post '[JSON] UnbanChatMemberResponse
-    :<|> TelegramToken :> "getChat"
+    :<|> "getChat"
          :> QueryParam "chat_id" Text
          :> Post '[JSON] GetChatResponse
-    :<|> TelegramToken :> "getChatAdministrators"
+    :<|> "getChatAdministrators"
          :> QueryParam "chat_id" Text
          :> Post '[JSON] GetChatAdministratorsResponse
-    :<|> TelegramToken :> "getChatMembersCount"
+    :<|> "getChatMembersCount"
          :> QueryParam "chat_id" Text
          :> Post '[JSON] GetChatMembersCountResponse
-    :<|> TelegramToken :> "getChatMember"
+    :<|> "getChatMember"
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
          :> Post '[JSON] GetChatMemberResponse
-    :<|> TelegramToken :> "editMessageText"
+    :<|> "editMessageText"
          :> ReqBody '[JSON] EditMessageTextRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "editMessageCaption"
+    :<|> "editMessageCaption"
          :> ReqBody '[JSON] EditMessageCaptionRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "editMessageReplyMarkup"
+    :<|> "editMessageReplyMarkup"
          :> ReqBody '[JSON] EditMessageReplyMarkupRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "editMessageText"
+    :<|> "editMessageText"
          :> ReqBody '[JSON] EditMessageTextRequest
          :> Post '[JSON] (Response Bool)
-    :<|> TelegramToken :> "editMessageCaption"
+    :<|> "editMessageCaption"
          :> ReqBody '[JSON] EditMessageCaptionRequest
          :> Post '[JSON] (Response Bool)
-    :<|> TelegramToken :> "editMessageReplyMarkup"
+    :<|> "editMessageReplyMarkup"
          :> ReqBody '[JSON] EditMessageReplyMarkupRequest
          :> Post '[JSON] (Response Bool)
 
@@ -207,47 +209,47 @@ type TelegramBotAPI =
 api :: Proxy TelegramBotAPI
 api = Proxy
 
-getMe_                     :: Token -> ClientM GetMeResponse
-sendMessage_               :: Token -> SendMessageRequest -> ClientM MessageResponse
-forwardMessage_            :: Token -> ForwardMessageRequest -> ClientM MessageResponse
-uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> ClientM MessageResponse
-sendPhoto_                 :: Token -> SendPhotoRequest Text -> ClientM MessageResponse
-uploadAudio_               :: Token -> SendAudioRequest FileUpload -> ClientM MessageResponse
-sendAudio_                 :: Token -> SendAudioRequest Text -> ClientM MessageResponse
-uploadDocument_            :: Token -> SendDocumentRequest FileUpload -> ClientM MessageResponse
-sendDocument_              :: Token -> SendDocumentRequest Text -> ClientM MessageResponse
-uploadSticker_             :: Token -> SendStickerRequest FileUpload -> ClientM MessageResponse
-sendSticker_               :: Token -> SendStickerRequest Text -> ClientM MessageResponse
-uploadVideo_               :: Token -> SendVideoRequest FileUpload -> ClientM MessageResponse
-sendVideo_                 :: Token -> SendVideoRequest Text -> ClientM MessageResponse
-uploadVoice_               :: Token -> SendVoiceRequest FileUpload -> ClientM MessageResponse
-sendVoice_                 :: Token -> SendVoiceRequest Text -> ClientM MessageResponse
-sendLocation_              :: Token -> SendLocationRequest -> ClientM MessageResponse
-sendVenue_                 :: Token -> SendVenueRequest-> ClientM MessageResponse
-sendContact_               :: Token -> SendContactRequest -> ClientM MessageResponse
-sendChatAction_            :: Token -> SendChatActionRequest -> ClientM ChatActionResponse
-sendGame_                  :: Token -> SendGameRequest -> ClientM MessageResponse
-getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UpdatesResponse
-getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
-getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
-setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
-setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
-getWebhookInfo_            :: Token -> ClientM GetWebhookInfoResponse
-answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
-answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
-kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> ClientM KickChatMemberResponse
-leaveChat_                 :: Token -> Maybe Text -> ClientM LeaveChatResponse
-unbanChatMember_           :: Token -> Maybe Text -> Maybe Int -> ClientM UnbanChatMemberResponse
-getChat_                   :: Token -> Maybe Text -> ClientM GetChatResponse
-getChatAdministrators_     :: Token -> Maybe Text -> ClientM GetChatAdministratorsResponse
-getChatMembersCount_       :: Token -> Maybe Text -> ClientM GetChatMembersCountResponse
-getChatMember_             :: Token -> Maybe Text -> Maybe Int -> ClientM GetChatMemberResponse
-editMessageText_           :: Token -> EditMessageTextRequest -> ClientM MessageResponse
-editMessageCaption_        :: Token -> EditMessageCaptionRequest -> ClientM MessageResponse
-editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> ClientM MessageResponse
-editMessageText__          :: Token -> EditMessageTextRequest -> ClientM (Response Bool)
-editMessageCaption__       :: Token -> EditMessageCaptionRequest -> ClientM (Response Bool)
-editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> ClientM (Response Bool)
+getMe_                     :: ClientM GetMeResponse
+sendMessage_               :: SendMessageRequest -> ClientM MessageResponse
+forwardMessage_            :: ForwardMessageRequest -> ClientM MessageResponse
+uploadPhoto_               :: SendPhotoRequest FileUpload -> ClientM MessageResponse
+sendPhoto_                 :: SendPhotoRequest Text -> ClientM MessageResponse
+uploadAudio_               :: SendAudioRequest FileUpload -> ClientM MessageResponse
+sendAudio_                 :: SendAudioRequest Text -> ClientM MessageResponse
+uploadDocument_            :: SendDocumentRequest FileUpload -> ClientM MessageResponse
+sendDocument_              :: SendDocumentRequest Text -> ClientM MessageResponse
+uploadSticker_             :: SendStickerRequest FileUpload -> ClientM MessageResponse
+sendSticker_               :: SendStickerRequest Text -> ClientM MessageResponse
+uploadVideo_               :: SendVideoRequest FileUpload -> ClientM MessageResponse
+sendVideo_                 :: SendVideoRequest Text -> ClientM MessageResponse
+uploadVoice_               :: SendVoiceRequest FileUpload -> ClientM MessageResponse
+sendVoice_                 :: SendVoiceRequest Text -> ClientM MessageResponse
+sendLocation_              :: SendLocationRequest -> ClientM MessageResponse
+sendVenue_                 :: SendVenueRequest-> ClientM MessageResponse
+sendContact_               :: SendContactRequest -> ClientM MessageResponse
+sendChatAction_            :: SendChatActionRequest -> ClientM ChatActionResponse
+sendGame_                  :: SendGameRequest -> ClientM MessageResponse
+getUpdates_                :: Maybe Int -> Maybe Int -> Maybe Int -> ClientM UpdatesResponse
+getFile_                   :: Maybe Text -> ClientM FileResponse
+getUserProfilePhotos_      :: Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
+setWebhook_                :: Maybe Text -> ClientM SetWebhookResponse
+setWebhookWithCert_        :: SetWebhookRequest -> ClientM SetWebhookResponse
+getWebhookInfo_            :: ClientM GetWebhookInfoResponse
+answerInlineQuery_         :: AnswerInlineQueryRequest -> ClientM InlineQueryResponse
+answerCallbackQuery_       :: AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
+kickChatMember_            :: Maybe Text -> Maybe Int -> ClientM KickChatMemberResponse
+leaveChat_                 :: Maybe Text -> ClientM LeaveChatResponse
+unbanChatMember_           :: Maybe Text -> Maybe Int -> ClientM UnbanChatMemberResponse
+getChat_                   :: Maybe Text -> ClientM GetChatResponse
+getChatAdministrators_     :: Maybe Text -> ClientM GetChatAdministratorsResponse
+getChatMembersCount_       :: Maybe Text -> ClientM GetChatMembersCountResponse
+getChatMember_             :: Maybe Text -> Maybe Int -> ClientM GetChatMemberResponse
+editMessageText_           :: EditMessageTextRequest -> ClientM MessageResponse
+editMessageCaption_        :: EditMessageCaptionRequest -> ClientM MessageResponse
+editMessageReplyMarkup_    :: EditMessageReplyMarkupRequest -> ClientM MessageResponse
+editMessageText__          :: EditMessageTextRequest -> ClientM (Response Bool)
+editMessageCaption__       :: EditMessageCaptionRequest -> ClientM (Response Bool)
+editMessageReplyMarkup__   :: EditMessageReplyMarkupRequest -> ClientM (Response Bool)
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -294,7 +296,7 @@ getMe_
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
 getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
-getMe token manager = runClientM (getMe_ token) (ClientEnv manager telegramBaseUrl)
+getMe token = runClient' token getMe_
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
 sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
@@ -386,15 +388,15 @@ getUpdates
     -> Maybe Int -- ^ timeout
     -> Manager
     -> IO (Either ServantError UpdatesResponse)
-getUpdates token offset limit timeout manager = runClientM (getUpdates_ token offset limit timeout) $ ClientEnv manager telegramBaseUrl
+getUpdates token offset limit timeout = runClient' token $ getUpdates_ offset limit timeout
 
 -- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
 getFile :: Token -> Text -> Manager -> IO (Either ServantError FileResponse)
-getFile token file_id manager = runClientM (getFile_ token (Just file_id)) $ ClientEnv manager telegramBaseUrl
+getFile token file_id = runClient' token $ getFile_ (Just file_id)
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
 getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
-getUserProfilePhotos token user_id offset limit manager = runClientM (getUserProfilePhotos_ token (Just user_id) offset limit) $ ClientEnv manager telegramBaseUrl
+getUserProfilePhotos token user_id offset limit = runClient' token $ getUserProfilePhotos_ (Just user_id) offset limit
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -403,7 +405,7 @@ setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
-setWebhook token url manager = runClientM (setWebhook_ token url) $ ClientEnv manager telegramBaseUrl
+setWebhook token url = runClient' token $ setWebhook_ url
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -413,7 +415,7 @@ setWebhookWithCertificate = run telegramBaseUrl setWebhookWithCert_
 
 -- | Contains information about the current status of a webhook.
 getWebhookInfo :: Token -> Manager -> IO (Either ServantError GetWebhookInfoResponse)
-getWebhookInfo token manager = runClientM (getWebhookInfo_ token) $ ClientEnv manager telegramBaseUrl
+getWebhookInfo token = runClient' token getWebhookInfo_
 
 -- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
@@ -425,31 +427,31 @@ answerCallbackQuery = run telegramBaseUrl answerCallbackQuery_
 
 -- | Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must be an administrator in the group for this to work.
 kickChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError KickChatMemberResponse)
-kickChatMember token chat_id user_id manager = runClientM (kickChatMember_ token (Just chat_id) (Just user_id)) $ ClientEnv manager telegramBaseUrl
+kickChatMember token chat_id user_id = runClient' token $ kickChatMember_ (Just chat_id) (Just user_id)
 
 -- | Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
 leaveChat :: Token -> Text -> Manager -> IO (Either ServantError LeaveChatResponse)
-leaveChat token chat_id manager = runClientM (leaveChat_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
+leaveChat token chat_id = runClient' token $ leaveChat_ (Just chat_id)
 
 -- | Use this method to unban a previously kicked user in a supergroup. The user will not return to the group automatically, but will be able to join via link, etc. The bot must be an administrator in the group for this to work.
 unbanChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError UnbanChatMemberResponse)
-unbanChatMember token chat_id user_id manager = runClientM (unbanChatMember_ token (Just chat_id) (Just user_id)) $ ClientEnv manager telegramBaseUrl
+unbanChatMember token chat_id user_id = runClient' token $ unbanChatMember_ (Just chat_id) (Just user_id)
 
 -- | Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.)
 getChat :: Token -> Text -> Manager -> IO (Either ServantError GetChatResponse)
-getChat token chat_id manager = runClientM (getChat_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
+getChat token chat_id = runClient' token $ getChat_ (Just chat_id)
 
 -- | Use this method to get a list of administrators in a chat. On success, returns an Array of 'ChatMember' objects that contains information about all chat administrators except other bots. If the chat is a group or a supergroup and no administrators were appointed, only the creator will be returned.
 getChatAdministrators :: Token -> Text -> Manager -> IO (Either ServantError GetChatAdministratorsResponse)
-getChatAdministrators token chat_id manager = runClientM (getChatAdministrators_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
+getChatAdministrators token chat_id = runClient' token $ getChatAdministrators_ (Just chat_id)
 
 -- | Use this method to get the number of members in a chat. Returns 'Int' on success.
 getChatMembersCount :: Token -> Text -> Manager -> IO (Either ServantError GetChatMembersCountResponse)
-getChatMembersCount token chat_id manager = runClientM (getChatMembersCount_ token (Just chat_id)) $ ClientEnv manager telegramBaseUrl
+getChatMembersCount token chat_id = runClient' token $ getChatMembersCount_ (Just chat_id)
 
 -- | Use this method to get information about a member of a chat. Returns a 'ChatMember' object on success.
 getChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError GetChatMemberResponse)
-getChatMember token chat_id user_id manager = runClientM (getChatMember_ token (Just chat_id) (Just user_id)) $ ClientEnv manager telegramBaseUrl
+getChatMember token chat_id user_id = runClient' token $ getChatMember_ (Just chat_id) (Just user_id)
 
 -- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
 editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
@@ -475,5 +477,32 @@ editInlineMessageCaption = run telegramBaseUrl editMessageCaption__
 editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError (Response Bool))
 editInlineMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup__
 
-run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ServantError b)
-run b e t r m = runClientM (e t r) (ClientEnv m b)
+run :: BaseUrl
+    -> (request -> ClientM response)
+    -> Token
+    -> request
+    -> Manager
+    -> IO (Either ServantError response)
+run baseUrl endpoint token request manager = runClientEx baseUrl token manager (endpoint request)
+
+runClientEx :: BaseUrl
+            -> Token
+            -> Manager
+            -> ClientM response
+            -> IO (Either ServantError response)
+runClientEx baseUrl token manager clientProc =
+  let Token tok = token
+      url = baseUrl {baseUrlPath = baseUrlPath baseUrl <> "/bot" <> Text.unpack tok}
+  in runClientM clientProc (ClientEnv manager url)
+
+runClient' :: Token
+           -> ClientM response
+           -> Manager
+           -> IO (Either ServantError response)
+runClient' token clientProc manager = runClientEx telegramBaseUrl token manager clientProc
+
+runClient :: Token
+          -> Manager
+          -> ClientM response
+          -> IO (Either ServantError response)
+runClient = runClientEx telegramBaseUrl
