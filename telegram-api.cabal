@@ -1,5 +1,5 @@
 name:                telegram-api
-version:             0.5.1.2
+version:             0.6.0.0
 synopsis:            Telegram Bot API bindings
 description:         High-level bindings to the Telegram Bot API
 homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
@@ -28,10 +28,14 @@ library
   hs-source-dirs:      src
   exposed-modules:     Web.Telegram.API.Bot
                      , Web.Telegram.API.Bot.API
+                     , Web.Telegram.API.Bot.API.Messages
+                     , Web.Telegram.API.Bot.API.Settings
+                     , Web.Telegram.API.Bot.API.Chats
                      , Web.Telegram.API.Bot.Data
                      , Web.Telegram.API.Bot.Responses
                      , Web.Telegram.API.Bot.Requests
   other-modules:       Web.Telegram.API.Bot.JsonExt
+                     , Web.Telegram.API.Bot.API.Core
                      , Servant.Client.MultipartFormData
   build-depends:       base >= 4.7 && < 5
                      , aeson == 1.0.*
