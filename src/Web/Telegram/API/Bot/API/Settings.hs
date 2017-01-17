@@ -5,11 +5,17 @@
 module Web.Telegram.API.Bot.API.Settings
   ( -- * Functions
     getMe
+  , getMeM
   , getUpdates
+  , getUpdatesM
   , setWebhook
+  , setWebhookM
   , setWebhookWithCertificate
+  , setWebhookWithCertificateM
   , deleteWebhook
+  , deleteWebhookM
   , getWebhookInfo
+  , getWebhookInfoM
     -- * API
   , TelegramBotSettingsAPI
   , settingsApi
@@ -65,7 +71,10 @@ getMe_
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
 getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
-getMe token manager = runClientM (getMe_ token) (ClientEnv manager telegramBaseUrl)
+getMe = runClient getMeM
+
+getMeM :: TelegramClient GetMeResponse
+getMeM = asking getMe_
 
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned.
 getUpdates
@@ -75,7 +84,14 @@ getUpdates
     -> Maybe Int -- ^ timeout
     -> Manager
     -> IO (Either ServantError UpdatesResponse)
-getUpdates token offset limit timeout manager = runClientM (getUpdates_ token offset limit timeout) $ ClientEnv manager telegramBaseUrl
+getUpdates token offset limit timeout = runClient (getUpdatesM offset limit timeout) token
+
+getUpdatesM ::
+       Maybe Int -- ^ offset
+    -> Maybe Int -- ^ limit
+    -> Maybe Int
+    -> TelegramClient UpdatesResponse
+getUpdatesM offset limit timeout = asking $ \t -> getUpdates_ t offset limit timeout
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -84,17 +100,29 @@ setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
-setWebhook token url manager = runClientM (setWebhook_ token url) $ ClientEnv manager telegramBaseUrl
+setWebhook token url = runClient (setWebhookM url) token
+
+setWebhookM :: Maybe Text -> TelegramClient SetWebhookResponse
+setWebhookM url = asking $ flip setWebhook_ url
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
 --       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
 setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
-setWebhookWithCertificate = run telegramBaseUrl setWebhookWithCert_
+setWebhookWithCertificate token request = runClient (setWebhookWithCertificateM request) token
+
+setWebhookWithCertificateM :: SetWebhookRequest -> TelegramClient SetWebhookResponse
+setWebhookWithCertificateM request = asking $ flip setWebhookWithCert_ request
 
 deleteWebhook :: Token -> Manager -> IO (Either ServantError (Response Bool))
-deleteWebhook token manager = runClientM (deleteWebhook_ token) $ ClientEnv manager telegramBaseUrl
+deleteWebhook = runClient deleteWebhookM
+
+deleteWebhookM :: TelegramClient (Response Bool)
+deleteWebhookM = asking deleteWebhook_
 
 -- | Contains information about the current status of a webhook.
 getWebhookInfo :: Token -> Manager -> IO (Either ServantError GetWebhookInfoResponse)
-getWebhookInfo token manager = runClientM (getWebhookInfo_ token) $ ClientEnv manager telegramBaseUrl
+getWebhookInfo = runClient getWebhookInfoM
+
+getWebhookInfoM :: TelegramClient GetWebhookInfoResponse
+getWebhookInfoM = asking getWebhookInfo_

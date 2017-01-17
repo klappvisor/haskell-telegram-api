@@ -61,6 +61,7 @@ test-suite telegram-api-test
   other-modules:       MainSpec
                      , InlineSpec
                      , JsonSpec
+                     , SettingsSpec
   build-depends:       base
                      , aeson == 1.0.*
                      , hjpath

@@ -9,6 +9,7 @@ import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified MainSpec
 import qualified JsonSpec
+import qualified SettingsSpec
 import           Options.Applicative
 import           System.Environment           (withArgs)
 import           Test.Hspec
@@ -64,7 +65,7 @@ main = do
 runSpec' :: Bool -> Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
 runSpec' integration token chatId botName = do
     describe "Unit tests" $ do
-      describe "Json tests" $ JsonSpec.spec
+      describe "Json tests" JsonSpec.spec
     if integration then runIntegrationSpec token chatId botName
     else describe "Integration tests" $ it "skipping..." $
         pendingWith "Use --integration switch to run integration tests"
@@ -73,12 +74,13 @@ runSpec' integration token chatId botName = do
 runIntegrationSpec :: Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
 runIntegrationSpec (Just token) (Just chatId) (Just botName) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
+        describe "Settings API spec" $ SettingsSpec.spec token botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ = describe "Integration tests" $ do
         fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
 
 description ::  Maybe PP.Doc
 description = Just $
-           (PP.text  "Run the haskell-telegram-api tests")
+           (PP.text "Run the haskell-telegram-api tests")
     PP.<$> ((PP.text "Running with stack: ") PP.<> (PP.text "stack test --test-arguments=\"--integration -t asd128903uiasbfì1023u -c 1235122 -b MyTeleBot -- -m send\""))
     PP.<$> ((PP.red . PP.text $ "WARNING: ") PP.<> (PP.text "the HSPEC_ARGS are optional but if present MUST be at the end and seperated from the other options with a -- "))
