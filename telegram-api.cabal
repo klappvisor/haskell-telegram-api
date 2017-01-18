@@ -29,7 +29,7 @@ library
   exposed-modules:     Web.Telegram.API.Bot
                      , Web.Telegram.API.Bot.API
                      , Web.Telegram.API.Bot.API.Messages
-                     , Web.Telegram.API.Bot.API.Settings
+                     , Web.Telegram.API.Bot.API.Updates
                      , Web.Telegram.API.Bot.API.Chats
                      , Web.Telegram.API.Bot.Data
                      , Web.Telegram.API.Bot.Responses
@@ -61,7 +61,7 @@ test-suite telegram-api-test
   other-modules:       MainSpec
                      , InlineSpec
                      , JsonSpec
-                     , SettingsSpec
+                     , UpdatesSpec
   build-depends:       base
                      , aeson == 1.0.*
                      , hjpath

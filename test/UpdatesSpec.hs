@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module SettingsSpec (spec) where
+module UpdatesSpec (spec) where
 
 import           Control.Concurrent
 import           Control.Monad.IO.Class

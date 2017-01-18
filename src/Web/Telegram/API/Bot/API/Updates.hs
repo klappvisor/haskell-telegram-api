@@ -2,11 +2,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module Web.Telegram.API.Bot.API.Settings
+module Web.Telegram.API.Bot.API.Updates
   ( -- * Functions
-    getMe
-  , getMeM
-  , getUpdates
+    getUpdates
   , getUpdatesM
   , setWebhook
   , setWebhookM
@@ -17,7 +15,7 @@ module Web.Telegram.API.Bot.API.Settings
   , getWebhookInfo
   , getWebhookInfoM
     -- * API
-  , TelegramBotSettingsAPI
+  , TelegramBotUpdatesAPI
   , settingsApi
   ) where
 
@@ -32,10 +30,8 @@ import           Web.Telegram.API.Bot.Requests
 import           Web.Telegram.API.Bot.Responses
 
 -- | Telegram Bot API
-type TelegramBotSettingsAPI =
-         TelegramToken :> "getMe"
-         :> Get '[JSON] GetMeResponse
-    :<|> TelegramToken :> "getUpdates"
+type TelegramBotUpdatesAPI =
+         TelegramToken :> "getUpdates"
          :> QueryParam "offset" Int
          :> QueryParam "limit" Int
          :> QueryParam "timeout" Int
@@ -52,29 +48,19 @@ type TelegramBotSettingsAPI =
          :> Get '[JSON] GetWebhookInfoResponse
 
 -- | Proxy for Thelegram Bot API to configure your bot
-settingsApi :: Proxy TelegramBotSettingsAPI
+settingsApi :: Proxy TelegramBotUpdatesAPI
 settingsApi = Proxy
 
-getMe_                     :: Token -> ClientM GetMeResponse
 getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UpdatesResponse
 setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
 setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
 deleteWebhook_             :: Token -> ClientM (Response Bool)
 getWebhookInfo_            :: Token -> ClientM GetWebhookInfoResponse
-getMe_
-  :<|> getUpdates_
+getUpdates_
   :<|> setWebhook_
   :<|> setWebhookWithCert_
   :<|> deleteWebhook_
   :<|> getWebhookInfo_ = client settingsApi
-
--- | A simple method for testing your bot's auth token. Requires no parameters.
---   Returns basic information about the bot in form of a 'User' object.
-getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
-getMe = runClient getMeM
-
-getMeM :: TelegramClient GetMeResponse
-getMeM = asking getMe_
 
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned.
 getUpdates
@@ -86,6 +72,7 @@ getUpdates
     -> IO (Either ServantError UpdatesResponse)
 getUpdates token offset limit timeout = runClient (getUpdatesM offset limit timeout) token
 
+-- | See 'getUpdates'
 getUpdatesM ::
        Maybe Int -- ^ offset
     -> Maybe Int -- ^ limit
@@ -102,6 +89,7 @@ setWebhook :: Token
     -> IO (Either ServantError SetWebhookResponse)
 setWebhook token url = runClient (setWebhookM url) token
 
+-- | See 'setWebhook'
 setWebhookM :: Maybe Text -> TelegramClient SetWebhookResponse
 setWebhookM url = asking $ flip setWebhook_ url
 
@@ -111,12 +99,15 @@ setWebhookM url = asking $ flip setWebhook_ url
 setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
 setWebhookWithCertificate token request = runClient (setWebhookWithCertificateM request) token
 
+-- | See 'setWebhookWithCertificate'
 setWebhookWithCertificateM :: SetWebhookRequest -> TelegramClient SetWebhookResponse
 setWebhookWithCertificateM request = asking $ flip setWebhookWithCert_ request
 
+-- | Use this method to remove webhook integration if you decide to switch back to getUpdates. Returns True on success.
 deleteWebhook :: Token -> Manager -> IO (Either ServantError (Response Bool))
 deleteWebhook = runClient deleteWebhookM
 
+-- | See 'deleteWebhook'
 deleteWebhookM :: TelegramClient (Response Bool)
 deleteWebhookM = asking deleteWebhook_
 
@@ -124,5 +115,6 @@ deleteWebhookM = asking deleteWebhook_
 getWebhookInfo :: Token -> Manager -> IO (Either ServantError GetWebhookInfoResponse)
 getWebhookInfo = runClient getWebhookInfoM
 
+-- | See 'getWebhookInfo'
 getWebhookInfoM :: TelegramClient GetWebhookInfoResponse
 getWebhookInfoM = asking getWebhookInfo_

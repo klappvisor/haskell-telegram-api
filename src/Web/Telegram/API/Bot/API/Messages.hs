@@ -4,7 +4,9 @@
 
 module Web.Telegram.API.Bot.API.Messages
   ( -- * Functions
-    sendMessage
+    getMe
+  , getMeM
+  , sendMessage
   , forwardMessage
   , uploadPhoto
   , sendPhoto
@@ -52,7 +54,9 @@ import           Web.Telegram.API.Bot.Responses
 -- | Type for token
 -- | Telegram Bot API
 type TelegramBotMessagesAPI =
-         TelegramToken :> "sendMessage"
+         TelegramToken :> "getMe"
+         :> Get '[JSON] GetMeResponse
+    :<|> TelegramToken :> "sendMessage"
          :> ReqBody '[JSON] SendMessageRequest
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "forwardMessage"
@@ -147,6 +151,7 @@ type TelegramBotMessagesAPI =
 messagesApi :: Proxy TelegramBotMessagesAPI
 messagesApi = Proxy
 
+getMe_                     :: Token -> ClientM GetMeResponse
 sendMessage_               :: Token -> SendMessageRequest -> ClientM MessageResponse
 forwardMessage_            :: Token -> ForwardMessageRequest -> ClientM MessageResponse
 uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> ClientM MessageResponse
@@ -176,7 +181,8 @@ editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> ClientM 
 editMessageText__          :: Token -> EditMessageTextRequest -> ClientM (Response Bool)
 editMessageCaption__       :: Token -> EditMessageCaptionRequest -> ClientM (Response Bool)
 editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> ClientM (Response Bool)
-sendMessage_
+getMe_
+  :<|> sendMessage_
   :<|> forwardMessage_
   :<|> uploadPhoto_
   :<|> sendPhoto_
@@ -206,6 +212,15 @@ sendMessage_
   :<|> editMessageCaption__
   :<|> editMessageReplyMarkup__
      = client messagesApi
+
+-- | A simple method for testing your bot's auth token. Requires no parameters.
+--   Returns basic information about the bot in form of a 'User' object.
+getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
+getMe = runClient getMeM
+
+-- | See `getMe`
+getMeM :: TelegramClient GetMeResponse
+getMeM = asking getMe_
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
 sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)

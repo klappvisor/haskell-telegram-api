@@ -10,7 +10,7 @@ import qualified Data.Text                    as T
 import qualified JsonSpec
 import qualified MainSpec
 import           Options.Applicative
-import qualified SettingsSpec
+import qualified UpdatesSpec
 import           System.Environment           (withArgs)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
@@ -74,7 +74,7 @@ runSpec' integration token chatId botName = do
 runIntegrationSpec :: Maybe Token -> Maybe Text -> Maybe Text -> SpecWith ()
 runIntegrationSpec (Just token) (Just chatId) (Just botName) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
-        describe "Settings API spec" $ SettingsSpec.spec token botName
+        describe "Settings API spec" $ UpdatesSpec.spec token botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ = describe "Integration tests" $ do
         fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"

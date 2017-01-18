@@ -19,11 +19,11 @@ import           Servant.API
 import           Web.Telegram.API.Bot.API.Chats    as API
 import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.API.Messages as API
-import           Web.Telegram.API.Bot.API.Settings as API
+import           Web.Telegram.API.Bot.API.Updates  as API
 
 type TelegramBotAPI =
        TelegramBotMessagesAPI
-  :<|> TelegramBotSettingsAPI
+  :<|> TelegramBotUpdatesAPI
   :<|> TelegramBotChatsAPI
 
 -- | Proxy for Thelegram Bot API
