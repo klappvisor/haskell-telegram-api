@@ -1,6 +1,6 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Web.Telegram.API.Bot.API.Settings
   ( -- * Functions
@@ -22,14 +22,14 @@ module Web.Telegram.API.Bot.API.Settings
   ) where
 
 import           Data.Proxy
-import           Data.Text (Text)
-import           Network.HTTP.Client (Manager)
+import           Data.Text                        (Text)
+import           Network.HTTP.Client              (Manager)
 import           Servant.API
 import           Servant.Client
 import           Servant.Client.MultipartFormData
-import           Web.Telegram.API.Bot.Responses
-import           Web.Telegram.API.Bot.Requests
 import           Web.Telegram.API.Bot.API.Core
+import           Web.Telegram.API.Bot.Requests
+import           Web.Telegram.API.Bot.Responses
 
 -- | Telegram Bot API
 type TelegramBotSettingsAPI =

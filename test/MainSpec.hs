@@ -5,19 +5,19 @@
 
 module MainSpec (spec) where
 
-import           Control.Monad
-import           Data.Monoid
-import           Web.Telegram.API.Bot
-import           Test.Hspec
-import           Data.Either (isRight, isLeft)
-import           Data.Text (Text)
-import qualified Data.Text as T
-import           Network.HTTP.Client      (newManager)
-import           Network.HTTP.Client.TLS  (tlsManagerSettings)
-import           Servant.Client
-import           Network.HTTP.Types.Status
-import           System.FilePath
 import           Control.Concurrent
+import           Control.Monad
+import           Data.Either               (isLeft, isRight)
+import           Data.Monoid
+import           Data.Text                 (Text)
+import qualified Data.Text                 as T
+import           Network.HTTP.Client       (newManager)
+import           Network.HTTP.Client.TLS   (tlsManagerSettings)
+import           Network.HTTP.Types.Status
+import           Servant.Client
+import           System.FilePath
+import           Test.Hspec
+import           Web.Telegram.API.Bot
 
 import           Paths_telegram_api
 

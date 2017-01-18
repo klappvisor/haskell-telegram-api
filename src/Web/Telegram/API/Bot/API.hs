@@ -1,6 +1,6 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Web.Telegram.API.Bot.API
   ( -- * Functions
@@ -16,10 +16,10 @@ module Web.Telegram.API.Bot.API
 
 import           Data.Proxy
 import           Servant.API
+import           Web.Telegram.API.Bot.API.Chats    as API
 import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.API.Messages as API
 import           Web.Telegram.API.Bot.API.Settings as API
-import           Web.Telegram.API.Bot.API.Chats as API
 
 type TelegramBotAPI =
        TelegramBotMessagesAPI

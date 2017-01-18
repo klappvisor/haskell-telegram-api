@@ -5,11 +5,11 @@
 
 module SettingsSpec (spec) where
 
-import           Web.Telegram.API.Bot
+import           Data.Text               (Text)
+import           Network.HTTP.Client     (newManager)
+import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Test.Hspec
-import           Data.Text (Text)
-import           Network.HTTP.Client      (newManager)
-import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Web.Telegram.API.Bot
 
 spec :: Token -> Text -> Spec
 spec token botName = do

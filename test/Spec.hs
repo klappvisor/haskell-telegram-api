@@ -3,14 +3,14 @@
 
 module Main (main) where
 
-import           Data.Monoid                  ((<>))
 import           Data.Maybe                   (fromMaybe)
+import           Data.Monoid                  ((<>))
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
-import qualified MainSpec
 import qualified JsonSpec
-import qualified SettingsSpec
+import qualified MainSpec
 import           Options.Applicative
+import qualified SettingsSpec
 import           System.Environment           (withArgs)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP

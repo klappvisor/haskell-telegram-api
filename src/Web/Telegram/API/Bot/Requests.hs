@@ -1,6 +1,6 @@
 {-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- | This module contains data objects which represents requests to Telegram Bot API
 module Web.Telegram.API.Bot.Requests
@@ -65,20 +65,21 @@ module Web.Telegram.API.Bot.Requests
     ) where
 
 import           Data.Aeson
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString                       as BS
+import qualified Data.ByteString.Lazy                  as LBS
 import           Data.Maybe
-import           Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
+import           Data.Text                             (Text)
+import qualified Data.Text                             as T
+import qualified Data.Text.Encoding                    as T
 import           GHC.Generics
 import           Network.HTTP.Client.MultipartFormData
 import           Network.Mime
-import           Servant.Client.MultipartFormData (ToMultipartFormData (..))
-import           Web.Telegram.API.Bot.Data (InlineKeyboardButton,
-                                            InlineKeyboardMarkup,
-                                            InlineQueryResult, KeyboardButton,
-                                            ParseMode)
+import           Servant.Client.MultipartFormData      (ToMultipartFormData (..))
+import           Web.Telegram.API.Bot.Data             (InlineKeyboardButton,
+                                                        InlineKeyboardMarkup,
+                                                        InlineQueryResult,
+                                                        KeyboardButton,
+                                                        ParseMode)
 import           Web.Telegram.API.Bot.JsonExt
 
 
@@ -106,8 +107,8 @@ fileUploadToPart inputName fileUpload =
   let part =
         case fileUpload_content fileUpload of
           FileUploadFile path -> partFileSource inputName path
-          FileUploadBS bs -> partBS inputName bs
-          FileUploadLBS lbs -> partLBS inputName lbs
+          FileUploadBS bs     -> partBS inputName bs
+          FileUploadLBS lbs   -> partLBS inputName lbs
   in part { partContentType = fileUpload_type fileUpload }
 
 utf8Part :: Text -> Text -> Part
@@ -153,10 +154,10 @@ sendMessageRequest chatId text = SendMessageRequest chatId text Nothing Nothing 
 -- | This object represents request for 'forwardMessage'
 data ForwardMessageRequest = ForwardMessageRequest
   {
-    forward_chat_id :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , forward_from_chat_id :: Text -- ^ Unique identifier for the chat where the original message was sent (or channel username in the format @@channelusername@)
-  , forward_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , forward_message_id :: Int -- ^ Unique message identifier
+    forward_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , forward_from_chat_id         :: Text -- ^ Unique identifier for the chat where the original message was sent (or channel username in the format @@channelusername@)
+  , forward_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , forward_message_id           :: Int -- ^ Unique message identifier
   } deriving (Show, Generic)
 
 instance ToJSON ForwardMessageRequest where
@@ -244,11 +245,11 @@ uploadAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing 
 -- | This object represents request for 'sendSticker'
 data SendStickerRequest payload = SendStickerRequest
   {
-    sticker_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , sticker_sticker                  :: payload -- ^ Sticker to send. You can either pass a file_id as String to resend a sticker that is already on the Telegram servers, or upload a new sticker.
-  , sticker_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , sticker_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , sticker_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    sticker_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , sticker_sticker              :: payload -- ^ Sticker to send. You can either pass a file_id as String to resend a sticker that is already on the Telegram servers, or upload a new sticker.
+  , sticker_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , sticker_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , sticker_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendStickerRequest Text) where
@@ -276,12 +277,12 @@ uploadStickerRequest chatId sticker = SendStickerRequest chatId sticker Nothing 
 -- | This object represents request for 'sendDocument'
 data SendDocumentRequest payload = SendDocumentRequest
   {
-    document_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , document_document                 :: payload -- ^ File to send. You can either pass a file_id as String to resend a file that is already on the Telegram servers, or upload a new file.
-  , document_caption                  :: Maybe Text -- ^ Document caption (may also be used when resending documents by file_id), 0-200 characters
-  , document_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , document_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , document_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    document_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , document_document             :: payload -- ^ File to send. You can either pass a file_id as String to resend a file that is already on the Telegram servers, or upload a new file.
+  , document_caption              :: Maybe Text -- ^ Document caption (may also be used when resending documents by file_id), 0-200 characters
+  , document_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , document_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , document_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendDocumentRequest Text) where
@@ -310,13 +311,13 @@ uploadDocumentRequest chatId document = SendDocumentRequest chatId document Noth
 -- | This object represents request for 'sendVideo'
 data SendVideoRequest payload = SendVideoRequest
   {
-    _video_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _video_video                    :: payload -- ^ Video to send. You can either pass a file_id as String to resend a video that is already on the Telegram servers, or upload a new video.
-  , _video_duration                 :: Maybe Int -- ^ Duration of sent video in seconds
-  , _video_caption                  :: Maybe Text -- ^ Video caption, 0-200 characters.
-  , _video_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , _video_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _video_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    _video_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _video_video                :: payload -- ^ Video to send. You can either pass a file_id as String to resend a video that is already on the Telegram servers, or upload a new video.
+  , _video_duration             :: Maybe Int -- ^ Duration of sent video in seconds
+  , _video_caption              :: Maybe Text -- ^ Video caption, 0-200 characters.
+  , _video_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _video_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _video_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendVideoRequest Text) where
@@ -346,13 +347,13 @@ uploadVideoRequest chatId video = SendVideoRequest chatId video Nothing Nothing 
 -- | This object represents request for 'sendVoice'
 data SendVoiceRequest payload = SendVoiceRequest
   {
-    _voice_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _voice_voice                    :: payload -- ^ Audio file to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
-  , _voice_caption                  :: Maybe Text -- ^ Voice message caption, 0-200 characters
-  , _voice_duration                 :: Maybe Int -- ^ Duration of sent audio in seconds
-  , _voice_disable_notification     :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , _voice_reply_to_message_id      :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _voice_reply_markup             :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    _voice_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _voice_voice                :: payload -- ^ Audio file to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
+  , _voice_caption              :: Maybe Text -- ^ Voice message caption, 0-200 characters
+  , _voice_duration             :: Maybe Int -- ^ Duration of sent audio in seconds
+  , _voice_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _voice_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _voice_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendVoiceRequest Text) where
@@ -381,12 +382,12 @@ uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing 
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
   {
-    location_chat_id                :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , location_latitude               :: Float -- ^ Latitude of location
-  , location_longitude              :: Float -- ^ Longitude of location
-  , location_disable_notification   :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , location_reply_to_message_id    :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , location_reply_markup           :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    location_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , location_latitude             :: Float -- ^ Latitude of location
+  , location_longitude            :: Float -- ^ Longitude of location
+  , location_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , location_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , location_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendLocationRequest where
@@ -401,15 +402,15 @@ sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latit
 -- | This object represents request for 'sendVenue'
 data SendVenueRequest = SendVenueRequest
   {
-    _venue_chat_id               :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , _venue_latitude              :: Float -- ^ Latitude of the venue
-  , _venue_longitude             :: Float -- ^ Longitude of the venue
-  , _venue_title                 :: Text -- ^ Name of the venue
-  , _venue_address               :: Text -- ^ Address of the venue
-  , _venue_foursquare_id         :: Maybe Text -- ^ Foursquare identifier of the venue
-  , _venue_disable_notification  :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , _venue_reply_to_message_id   :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _venue_reply_markup          :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
+    _venue_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _venue_latitude             :: Float -- ^ Latitude of the venue
+  , _venue_longitude            :: Float -- ^ Longitude of the venue
+  , _venue_title                :: Text -- ^ Name of the venue
+  , _venue_address              :: Text -- ^ Address of the venue
+  , _venue_foursquare_id        :: Maybe Text -- ^ Foursquare identifier of the venue
+  , _venue_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _venue_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _venue_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON SendVenueRequest where
@@ -477,7 +478,7 @@ instance FromJSON ChatAction where
 data SendChatActionRequest = SendChatActionRequest
   {
     action_chat_id :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , action_action :: ChatAction -- ^ Type of action to broadcast.
+  , action_action  :: ChatAction -- ^ Type of action to broadcast.
   } deriving (Show, Generic)
 
 instance ToJSON SendChatActionRequest where
@@ -492,11 +493,11 @@ sendChatActionRequest = SendChatActionRequest
 -- | This object represents request for 'sendGame'
 data SendGameRequest = SendGameRequest
   {
-    game_chat_id :: Text -- ^ Unique identifier for the target chat
-  , game_game_short_name :: Text -- ^ Short name of the game, serves as the unique identifier for the game. Set up your games via Botfather.
+    game_chat_id              :: Text -- ^ Unique identifier for the target chat
+  , game_game_short_name      :: Text -- ^ Short name of the game, serves as the unique identifier for the game. Set up your games via Botfather.
   , game_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , game_reply_to_message_id :: Maybe Int -- ^  If the message is a reply, ID of the original message
-  , game_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one ‘Play game_title’ button will be shown. If not empty, the first button must launch the game.
+  , game_reply_to_message_id  :: Maybe Int -- ^  If the message is a reply, ID of the original message
+  , game_reply_markup         :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one ‘Play game_title’ button will be shown. If not empty, the first button must launch the game.
   } deriving (Show, Generic)
 
 instance ToJSON SendGameRequest where
@@ -538,10 +539,10 @@ answerInlineQueryRequest queryId results = AnswerInlineQueryRequest queryId resu
 data AnswerCallbackQueryRequest = AnswerCallbackQueryRequest
   {
     cq_callback_query_id :: Text -- ^ Unique identifier for the query to be answered
-  , cq_text :: Maybe Text -- ^ Text of the notification. If not specified, nothing will be shown to the user
-  , cq_show_alert :: Maybe Bool -- ^ If true, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to false.
-  , cq_url :: Maybe Text -- ^ URL that will be opened by the user's client. If you have created a `Game` and accepted the conditions via `@Botfather`, specify the URL that opens your game – note that this will only work if the query comes from a `callback_game` button. Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
-  , cq_cache_time :: Maybe Int -- ^ The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0.
+  , cq_text              :: Maybe Text -- ^ Text of the notification. If not specified, nothing will be shown to the user
+  , cq_show_alert        :: Maybe Bool -- ^ If true, an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to false.
+  , cq_url               :: Maybe Text -- ^ URL that will be opened by the user's client. If you have created a `Game` and accepted the conditions via `@Botfather`, specify the URL that opens your game – note that this will only work if the query comes from a `callback_game` button. Otherwise, you may use links like telegram.me/your_bot?start=XXXX that open your bot with a parameter.
+  , cq_cache_time        :: Maybe Int -- ^ The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0.
   } deriving (Show, Generic)
 
 instance ToJSON AnswerCallbackQueryRequest where
@@ -561,27 +562,27 @@ data ReplyKeyboard =
   }
   | ReplyKeyboardMarkup
   {
-    reply_keyboard             :: [[KeyboardButton]] -- ^ Array of button rows, each represented by an Array of 'KeyboardButton' objects
-  , reply_resize_keyboard      :: Maybe Bool -- ^ Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
-  , reply_one_time_keyboard    :: Maybe Bool -- ^ Requests clients to hide the keyboard as soon as it's been used. Defaults to false.
-  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select the new language. Other users in the group don’t see the keyboard.
+    reply_keyboard          :: [[KeyboardButton]] -- ^ Array of button rows, each represented by an Array of 'KeyboardButton' objects
+  , reply_resize_keyboard   :: Maybe Bool -- ^ Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
+  , reply_one_time_keyboard :: Maybe Bool -- ^ Requests clients to hide the keyboard as soon as it's been used. Defaults to false.
+  , reply_selective         :: Maybe Bool -- ^ Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user requests to change the bot‘s language, bot replies to the request with a keyboard to select the new language. Other users in the group don’t see the keyboard.
   }
   -- | Upon receiving a message with this object, Telegram clients will hide the current custom keyboard and display the default letter-keyboard. By default, custom keyboards are displayed until a new keyboard is sent by a bot. An exception is made for one-time keyboards that are hidden immediately after the user presses a button
   | ReplyKeyboardHide
   {
-    reply_hide_keyboard        :: Bool -- ^ Requests clients to hide the custom keyboard
-  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to hide keyboard for specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
+    reply_hide_keyboard :: Bool -- ^ Requests clients to hide the custom keyboard
+  , reply_selective     :: Maybe Bool -- ^ Use this parameter if you want to hide keyboard for specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
   }
   | ReplyKeyboardRemove
   {
-    reply_remove_keyboard      :: Bool -- ^ Requests clients to remove the custom keyboard (user will not be able to summon this keyboard; if you want to hide the keyboard from sight but keep it accessible, use one_time_keyboard in 'ReplyKeyboardMarkup')
-  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to hide keyboard for specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
+    reply_remove_keyboard :: Bool -- ^ Requests clients to remove the custom keyboard (user will not be able to summon this keyboard; if you want to hide the keyboard from sight but keep it accessible, use one_time_keyboard in 'ReplyKeyboardMarkup')
+  , reply_selective       :: Maybe Bool -- ^ Use this parameter if you want to hide keyboard for specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.    Example: A user votes in a poll, bot returns confirmation message in reply to the vote and hides keyboard for that user, while still showing the keyboard with poll options to users who haven't voted yet.
   }
   -- | Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot‘s message and tapped ’Reply'). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode.
   | ForceReply
   {
-    reply_force_reply          :: Bool -- ^ Shows reply interface to the user, as if they manually selected the bot‘s message and tapped ’Reply'
-  , reply_selective            :: Maybe Bool -- ^ Use this parameter if you want to force reply from specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
+    reply_force_reply :: Bool -- ^ Shows reply interface to the user, as if they manually selected the bot‘s message and tapped ’Reply'
+  , reply_selective   :: Maybe Bool -- ^ Use this parameter if you want to force reply from specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply (has reply_to_message_id), sender of the original message.
   } deriving (Show, Generic)
 
 instance ToJSON ReplyKeyboard where
@@ -604,13 +605,13 @@ forceReply = ForceReply True Nothing
 
 data EditMessageTextRequest = EditMessageTextRequest
   {
-    emt_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , emt_message_id :: Maybe Int -- ^ if `inline_message_id` is not specified. Unique identifier of the sent message
-  , emt_inline_message_id :: Maybe Text -- ^ Required if chat_id and message_id are not specified. Identifier of the inline message
-  , emt_text :: Text -- ^ New text of the message
-  , emt_parse_mode :: Maybe ParseMode -- ^ Send `Markdown` or `HTML`, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
+    emt_chat_id                  :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , emt_message_id               :: Maybe Int -- ^ if `inline_message_id` is not specified. Unique identifier of the sent message
+  , emt_inline_message_id        :: Maybe Text -- ^ Required if chat_id and message_id are not specified. Identifier of the inline message
+  , emt_text                     :: Text -- ^ New text of the message
+  , emt_parse_mode               :: Maybe ParseMode -- ^ Send `Markdown` or `HTML`, if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
   , emt_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in this message
-  , emt_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
+  , emt_reply_markup             :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
   } deriving (Show, Generic)
 
 instance ToJSON EditMessageTextRequest where
@@ -627,11 +628,11 @@ editInlineMessageTextRequest inlineMessageId text = EditMessageTextRequest Nothi
 
 data EditMessageCaptionRequest = EditMessageCaptionRequest
   {
-    emc_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , emc_message_id :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
+    emc_chat_id           :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , emc_message_id        :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
   , emc_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
-  , emc_caption :: Maybe Text -- ^ New caption of the message
-  , emc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
+  , emc_caption           :: Maybe Text -- ^ New caption of the message
+  , emc_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
   } deriving (Show, Generic)
 
 instance ToJSON EditMessageCaptionRequest where
@@ -648,10 +649,10 @@ editInlineMessageCaptionRequest inlineMessageId caption = EditMessageCaptionRequ
 
 data EditMessageReplyMarkupRequest = EditMessageReplyMarkupRequest
   {
-    emrm_chat_id :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
-  , emrm_message_id :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
+    emrm_chat_id           :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+  , emrm_message_id        :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
   , emrm_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
-  , emrm_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
+  , emrm_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
   } deriving (Show, Generic)
 
 instance ToJSON EditMessageReplyMarkupRequest where

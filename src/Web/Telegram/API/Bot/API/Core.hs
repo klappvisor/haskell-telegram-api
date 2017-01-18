@@ -15,11 +15,11 @@ module Web.Telegram.API.Bot.API.Core
   , telegramBaseUrl
   ) where
 
-import Control.Monad.Trans.Reader
-import Control.Monad.Trans.Class
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Reader
 
-import           Data.Text (Text)
-import           Network.HTTP.Client (Manager)
+import           Data.Text                  (Text)
+import           Network.HTTP.Client        (Manager)
 import           Servant.API
 import           Servant.Client
 
