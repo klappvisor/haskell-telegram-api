@@ -29,12 +29,6 @@ module Web.Telegram.API.Bot.API.Messages
   , getUserProfilePhotos
   , answerInlineQuery
   , answerCallbackQuery
-  , editMessageText
-  , editMessageCaption
-  , editMessageReplyMarkup
-  , editInlineMessageText
-  , editInlineMessageCaption
-  , editInlineMessageReplyMarkup
     -- * API
   , TelegramBotMessagesAPI
   , messagesApi
@@ -51,7 +45,6 @@ import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.Requests
 import           Web.Telegram.API.Bot.Responses
 
--- | Type for token
 -- | Telegram Bot API
 type TelegramBotMessagesAPI =
          TelegramToken :> "getMe"
@@ -127,24 +120,6 @@ type TelegramBotMessagesAPI =
     :<|> TelegramToken :> "answerCallbackQuery"
          :> ReqBody '[JSON] AnswerCallbackQueryRequest
          :> Post '[JSON] CallbackQueryResponse
-    :<|> TelegramToken :> "editMessageText"
-         :> ReqBody '[JSON] EditMessageTextRequest
-         :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "editMessageCaption"
-         :> ReqBody '[JSON] EditMessageCaptionRequest
-         :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "editMessageReplyMarkup"
-         :> ReqBody '[JSON] EditMessageReplyMarkupRequest
-         :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "editMessageText"
-         :> ReqBody '[JSON] EditMessageTextRequest
-         :> Post '[JSON] (Response Bool)
-    :<|> TelegramToken :> "editMessageCaption"
-         :> ReqBody '[JSON] EditMessageCaptionRequest
-         :> Post '[JSON] (Response Bool)
-    :<|> TelegramToken :> "editMessageReplyMarkup"
-         :> ReqBody '[JSON] EditMessageReplyMarkupRequest
-         :> Post '[JSON] (Response Bool)
 
 
 -- | Proxy for Thelegram Bot API
@@ -175,12 +150,6 @@ getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
 getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
 answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
 answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
-editMessageText_           :: Token -> EditMessageTextRequest -> ClientM MessageResponse
-editMessageCaption_        :: Token -> EditMessageCaptionRequest -> ClientM MessageResponse
-editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> ClientM MessageResponse
-editMessageText__          :: Token -> EditMessageTextRequest -> ClientM (Response Bool)
-editMessageCaption__       :: Token -> EditMessageCaptionRequest -> ClientM (Response Bool)
-editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> ClientM (Response Bool)
 getMe_
   :<|> sendMessage_
   :<|> forwardMessage_
@@ -205,12 +174,6 @@ getMe_
   :<|> getUserProfilePhotos_
   :<|> answerInlineQuery_
   :<|> answerCallbackQuery_
-  :<|> editMessageText_
-  :<|> editMessageCaption_
-  :<|> editMessageReplyMarkup_
-  :<|> editMessageText__
-  :<|> editMessageCaption__
-  :<|> editMessageReplyMarkup__
      = client messagesApi
 
 -- | A simple method for testing your bot's auth token. Requires no parameters.
@@ -411,50 +374,3 @@ answerCallbackQuery = runM answerCallbackQueryM
 -- | See 'answerCallbackQuery'
 answerCallbackQueryM :: AnswerCallbackQueryRequest -> TelegramClient CallbackQueryResponse
 answerCallbackQueryM = run_ answerCallbackQuery_
-
--- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
-editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
-editMessageText = runM editMessageTextM
-
--- | See 'editMessageText'
-editMessageTextM :: EditMessageTextRequest -> TelegramClient MessageResponse
-editMessageTextM = run_ editMessageText_
-
--- | Use this method to edit captions of messages sent by the bot. On success, the edited 'Message' is returned.
-editMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError MessageResponse)
-editMessageCaption = runM editMessageCaptionM
-
--- | See 'editMessageCaption'
-editMessageCaptionM :: EditMessageCaptionRequest -> TelegramClient MessageResponse
-editMessageCaptionM = run_ editMessageCaption_
-
--- | Use this method to edit only the reply markup of messages sent by the bot. On success, the edited 'Message' is returned.
-editMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError MessageResponse)
-editMessageReplyMarkup = runM editMessageReplyMarkupM
-
-editMessageReplyMarkupM :: EditMessageReplyMarkupRequest -> TelegramClient MessageResponse
-editMessageReplyMarkupM = run_ editMessageReplyMarkup_
-
--- | Use this method to edit text messages sent via the bot (for inline bots).
-editInlineMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError (Response Bool))
-editInlineMessageText = runM editInlineMessageTextM
-
--- | See 'editInlineMessageText'
-editInlineMessageTextM :: EditMessageTextRequest -> TelegramClient (Response Bool)
-editInlineMessageTextM = run_ editMessageText__
-
--- | Use this method to edit captions of messages sent via the bot (for inline bots).
-editInlineMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError (Response Bool))
-editInlineMessageCaption = runM editInlineMessageCaptionM
-
--- | See 'editInlineMessageCaption'
-editInlineMessageCaptionM :: EditMessageCaptionRequest -> TelegramClient (Response Bool)
-editInlineMessageCaptionM = run_ editMessageCaption__
-
--- | Use this method to edit only the reply markup of messages sent via the bot (for inline bots).
-editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError (Response Bool))
-editInlineMessageReplyMarkup = runM editInlineMessageReplyMarkupM
-
--- | See 'editInlineMessageReplyMarkup'
-editInlineMessageReplyMarkupM :: EditMessageReplyMarkupRequest -> TelegramClient (Response Bool)
-editInlineMessageReplyMarkupM = run_ editMessageReplyMarkup__

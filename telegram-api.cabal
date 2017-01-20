@@ -29,6 +29,7 @@ library
   exposed-modules:     Web.Telegram.API.Bot
                      , Web.Telegram.API.Bot.API
                      , Web.Telegram.API.Bot.API.Messages
+                     , Web.Telegram.API.Bot.API.Edit
                      , Web.Telegram.API.Bot.API.Updates
                      , Web.Telegram.API.Bot.API.Chats
                      , Web.Telegram.API.Bot.Data
