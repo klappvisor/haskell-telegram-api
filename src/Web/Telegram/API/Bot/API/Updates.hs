@@ -76,7 +76,7 @@ getUpdates token offset limit timeout = runClient (getUpdatesM offset limit time
 getUpdatesM ::
        Maybe Int -- ^ offset
     -> Maybe Int -- ^ limit
-    -> Maybe Int
+    -> Maybe Int -- ^ timeout
     -> TelegramClient UpdatesResponse
 getUpdatesM offset limit timeout = asking $ \t -> getUpdates_ t offset limit timeout
 
@@ -87,21 +87,22 @@ setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
-setWebhook token url = runClient (setWebhookM url) token
+setWebhook = runM setWebhookM
 
 -- | See 'setWebhook'
-setWebhookM :: Maybe Text -> TelegramClient SetWebhookResponse
-setWebhookM url = asking $ flip setWebhook_ url
+setWebhookM :: Maybe Text -- ^ webhook url
+            -> TelegramClient SetWebhookResponse
+setWebhookM = run_ setWebhook_
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
 --       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
 setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
-setWebhookWithCertificate token request = runClient (setWebhookWithCertificateM request) token
+setWebhookWithCertificate = runM setWebhookWithCertificateM
 
 -- | See 'setWebhookWithCertificate'
 setWebhookWithCertificateM :: SetWebhookRequest -> TelegramClient SetWebhookResponse
-setWebhookWithCertificateM request = asking $ flip setWebhookWithCert_ request
+setWebhookWithCertificateM = run_ setWebhookWithCert_
 
 -- | Use this method to remove webhook integration if you decide to switch back to getUpdates. Returns True on success.
 deleteWebhook :: Token -> Manager -> IO (Either ServantError (Response Bool))

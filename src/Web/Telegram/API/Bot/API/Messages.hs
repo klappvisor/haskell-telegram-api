@@ -224,122 +224,237 @@ getMeM = asking getMe_
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
 sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
-sendMessage = run telegramBaseUrl sendMessage_
+sendMessage = runM sendMessageM
+
+-- | See 'sendMessage'
+sendMessageM :: SendMessageRequest -> TelegramClient MessageResponse
+sendMessageM = run_ sendMessage_
 
 -- | Use this method to forward messages of any kind. On success, the sent 'Message' is returned.
 forwardMessage :: Token -> ForwardMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
-forwardMessage = run telegramBaseUrl forwardMessage_
+forwardMessage = runM forwardMessageM
+
+-- | See 'forwardMessage'
+forwardMessageM :: ForwardMessageRequest -> TelegramClient MessageResponse
+forwardMessageM = run_ forwardMessage_
 
 -- | Use this method to upload and send photos. On success, the sent 'Message' is returned.
 uploadPhoto :: Token -> SendPhotoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-uploadPhoto = run telegramBaseUrl uploadPhoto_
+uploadPhoto = runM uploadPhotoM
+
+-- | See 'uploadPhoto'
+uploadPhotoM :: SendPhotoRequest FileUpload -> TelegramClient MessageResponse
+uploadPhotoM = run_ uploadPhoto_
 
 -- | Use this method to send photos that have already been uploaded. On success, the sent 'Message' is returned.
 sendPhoto :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendPhoto = run telegramBaseUrl sendPhoto_
+sendPhoto = runM sendPhotoM
+
+-- | See 'sendPhoto'
+sendPhotoM :: SendPhotoRequest Text -> TelegramClient MessageResponse
+sendPhotoM = run_ sendPhoto_
 
 -- | Use this method to upload and send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
 --       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
 uploadAudio :: Token -> SendAudioRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-uploadAudio = run telegramBaseUrl uploadAudio_
+uploadAudio = runM uploadAudioM
+
+-- | See 'uploadAudio'
+uploadAudioM :: SendAudioRequest FileUpload -> TelegramClient MessageResponse
+uploadAudioM = run_ uploadAudio_
 
 -- | Use this method to send audio files that are already on the Telegram servers, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
 --       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
 sendAudio :: Token -> SendAudioRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendAudio = run telegramBaseUrl sendAudio_
+sendAudio = runM sendAudioM
+
+-- | See 'sendAudio'
+sendAudioM :: SendAudioRequest Text -> TelegramClient MessageResponse
+sendAudioM = run_ sendAudio_
 
 -- | Use this method to upload and send general files. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
 uploadDocument :: Token -> SendDocumentRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-uploadDocument = run telegramBaseUrl uploadDocument_
+uploadDocument = runM uploadDocumentM
+
+-- | See 'uploadDocument'
+uploadDocumentM :: SendDocumentRequest FileUpload -> TelegramClient MessageResponse
+uploadDocumentM = run_ uploadDocument_
 
 -- | Use this method to send general files that have already been uploaded. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
 sendDocument :: Token -> SendDocumentRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendDocument = run telegramBaseUrl sendDocument_
+sendDocument = runM sendDocumentM
+
+-- | See 'sendDocument'
+sendDocumentM :: SendDocumentRequest Text -> TelegramClient MessageResponse
+sendDocumentM = run_ sendDocument_
 
 -- | Use this method to upload and send .webp stickers. On success, the sent 'Message' is returned.
 uploadSticker :: Token -> SendStickerRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-uploadSticker = run telegramBaseUrl uploadSticker_
+uploadSticker = runM uploadStickerM
+
+-- | See 'uploadSticker'
+uploadStickerM :: SendStickerRequest FileUpload -> TelegramClient MessageResponse
+uploadStickerM = run_ uploadSticker_
 
 -- | Use this method to send .webp stickers that are already on the Telegram servers. On success, the sent 'Message' is returned.
 sendSticker :: Token -> SendStickerRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendSticker = run telegramBaseUrl sendSticker_
+sendSticker = runM sendStickerM
+
+-- | See 'sendSticker'
+sendStickerM :: SendStickerRequest Text -> TelegramClient MessageResponse
+sendStickerM = run_ sendSticker_
 
 -- | Use this method to upload and send video files. Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
 uploadVideo :: Token -> SendVideoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-uploadVideo = run telegramBaseUrl uploadVideo_
+uploadVideo = runM uploadVideoM
+
+-- | See 'uploadVideo'
+uploadVideoM :: SendVideoRequest FileUpload -> TelegramClient MessageResponse
+uploadVideoM = run_ uploadVideo_
 
 -- | Use this method to send video files that are already on the Telegram servers. Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
 sendVideo :: Token -> SendVideoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendVideo = run telegramBaseUrl sendVideo_
+sendVideo = runM sendVideoM
+
+-- | See 'sendVideo'
+sendVideoM :: SendVideoRequest Text -> TelegramClient MessageResponse
+sendVideoM = run_ sendVideo_
 
 -- | Use this method to upload and send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 uploadVoice :: Token -> SendVoiceRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
-uploadVoice = run telegramBaseUrl uploadVoice_
+uploadVoice = runM uploadVoiceM
+
+-- | See 'uploadVoice'
+uploadVoiceM :: SendVoiceRequest FileUpload -> TelegramClient MessageResponse
+uploadVoiceM = run_ uploadVoice_
 
 -- | Use this method to send audio files that are already on the telegram server, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 sendVoice :: Token -> SendVoiceRequest Text -> Manager -> IO (Either ServantError MessageResponse)
-sendVoice = run telegramBaseUrl sendVoice_
+sendVoice = runM sendVoiceM
+
+-- | See 'sendVoice'
+sendVoiceM :: SendVoiceRequest Text -> TelegramClient MessageResponse
+sendVoiceM = run_ sendVoice_
 
 -- | Use this method to send point on the map. On success, the sent 'Message' is returned.
 sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ServantError MessageResponse)
-sendLocation = run telegramBaseUrl sendLocation_
+sendLocation = runM sendLocationM
+
+-- | See 'sendLocation'
+sendLocationM :: SendLocationRequest -> TelegramClient MessageResponse
+sendLocationM = run_ sendLocation_
 
 -- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
 sendVenue :: Token -> SendVenueRequest -> Manager -> IO (Either ServantError MessageResponse)
-sendVenue = run telegramBaseUrl sendVenue_
+sendVenue = runM sendVenueM
+
+-- | See 'sendVenue'
+sendVenueM :: SendVenueRequest -> TelegramClient MessageResponse
+sendVenueM = run_ sendVenue_
 
 -- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
 sendContact :: Token -> SendContactRequest -> Manager -> IO (Either ServantError MessageResponse)
-sendContact = run telegramBaseUrl sendContact_
+sendContact = runM sendContactM
+
+-- | See 'sendContact'
+sendContactM :: SendContactRequest -> TelegramClient MessageResponse
+sendContactM = run_ sendContact_
 
 -- | Use this method when you need to tell the user that something is happening on the bot's side.
 --   The status is set for 5 seconds or less (when a message arrives from your bot,
 --   Telegram clients clear its typing status).
 sendChatAction :: Token -> SendChatActionRequest -> Manager -> IO (Either ServantError ChatActionResponse)
-sendChatAction = run telegramBaseUrl sendChatAction_
+sendChatAction = runM sendChatActionM
+
+-- | See 'sendChatAction'
+sendChatActionM :: SendChatActionRequest -> TelegramClient ChatActionResponse
+sendChatActionM = run_ sendChatAction_
 
 -- | Use this method to send a game. On success, the sent 'Message' is returned.
 sendGame :: Token -> SendGameRequest -> Manager -> IO (Either ServantError MessageResponse)
-sendGame = run telegramBaseUrl sendGame_
+sendGame = runM sendGameM
+
+-- | See 'sendGame'
+sendGameM :: SendGameRequest -> TelegramClient MessageResponse
+sendGameM = run_ sendGame_
 
 -- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
 getFile :: Token -> Text -> Manager -> IO (Either ServantError FileResponse)
-getFile token file_id manager = runClientM (getFile_ token (Just file_id)) $ ClientEnv manager telegramBaseUrl
+getFile token fileId = runClient (getFileM fileId) token
+
+-- | See 'getFile'
+getFileM :: Text -> TelegramClient FileResponse
+getFileM fileId = run_ getFile_ (Just fileId)
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
 getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
-getUserProfilePhotos token user_id offset limit manager = runClientM (getUserProfilePhotos_ token (Just user_id) offset limit) $ ClientEnv manager telegramBaseUrl
+getUserProfilePhotos token userId offset limit = runClient (getUserProfilePhotosM userId offset limit) token
+
+-- | See 'getUserProfilePhotos'
+getUserProfilePhotosM :: Int -> Maybe Int -> Maybe Int -> TelegramClient UserProfilePhotosResponse
+getUserProfilePhotosM userId offset limit = asking $ \t -> getUserProfilePhotos_ t (Just userId) offset limit
 
 -- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
 answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
-answerInlineQuery = run telegramBaseUrl answerInlineQuery_
+answerInlineQuery = runM answerInlineQueryM
+
+-- | See 'answerInlineQuery'
+answerInlineQueryM :: AnswerInlineQueryRequest -> TelegramClient InlineQueryResponse
+answerInlineQueryM = run_ answerInlineQuery_
 
 -- | Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
 answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> IO (Either ServantError CallbackQueryResponse)
-answerCallbackQuery = run telegramBaseUrl answerCallbackQuery_
+answerCallbackQuery = runM answerCallbackQueryM
+
+-- | See 'answerCallbackQuery'
+answerCallbackQueryM :: AnswerCallbackQueryRequest -> TelegramClient CallbackQueryResponse
+answerCallbackQueryM = run_ answerCallbackQuery_
 
 -- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
 editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
-editMessageText = run telegramBaseUrl editMessageText_
+editMessageText = runM editMessageTextM
+
+-- | See 'editMessageText'
+editMessageTextM :: EditMessageTextRequest -> TelegramClient MessageResponse
+editMessageTextM = run_ editMessageText_
 
 -- | Use this method to edit captions of messages sent by the bot. On success, the edited 'Message' is returned.
 editMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError MessageResponse)
-editMessageCaption = run telegramBaseUrl editMessageCaption_
+editMessageCaption = runM editMessageCaptionM
+
+-- | See 'editMessageCaption'
+editMessageCaptionM :: EditMessageCaptionRequest -> TelegramClient MessageResponse
+editMessageCaptionM = run_ editMessageCaption_
 
 -- | Use this method to edit only the reply markup of messages sent by the bot. On success, the edited 'Message' is returned.
 editMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError MessageResponse)
-editMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup_
+editMessageReplyMarkup = runM editMessageReplyMarkupM
+
+editMessageReplyMarkupM :: EditMessageReplyMarkupRequest -> TelegramClient MessageResponse
+editMessageReplyMarkupM = run_ editMessageReplyMarkup_
 
 -- | Use this method to edit text messages sent via the bot (for inline bots).
 editInlineMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError (Response Bool))
-editInlineMessageText = run telegramBaseUrl editMessageText__
+editInlineMessageText = runM editInlineMessageTextM
+
+-- | See 'editInlineMessageText'
+editInlineMessageTextM :: EditMessageTextRequest -> TelegramClient (Response Bool)
+editInlineMessageTextM = run_ editMessageText__
 
 -- | Use this method to edit captions of messages sent via the bot (for inline bots).
 editInlineMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError (Response Bool))
-editInlineMessageCaption = run telegramBaseUrl editMessageCaption__
+editInlineMessageCaption = runM editInlineMessageCaptionM
+
+-- | See 'editInlineMessageCaption'
+editInlineMessageCaptionM :: EditMessageCaptionRequest -> TelegramClient (Response Bool)
+editInlineMessageCaptionM = run_ editMessageCaption__
 
 -- | Use this method to edit only the reply markup of messages sent via the bot (for inline bots).
 editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError (Response Bool))
-editInlineMessageReplyMarkup = run telegramBaseUrl editMessageReplyMarkup__
+editInlineMessageReplyMarkup = runM editInlineMessageReplyMarkupM
+
+-- | See 'editInlineMessageReplyMarkup'
+editInlineMessageReplyMarkupM :: EditMessageReplyMarkupRequest -> TelegramClient (Response Bool)
+editInlineMessageReplyMarkupM = run_ editMessageReplyMarkup__

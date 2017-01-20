@@ -9,6 +9,8 @@ module Web.Telegram.API.Bot.API.Core
   , TelegramToken
   , TelegramClient
   , run
+  , run_
+  , runM
   , asking
   , runClient
   , runClient'
@@ -46,3 +48,9 @@ asking op = ask >>= \t -> lift $ op t
 
 run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ServantError b)
 run b e t r m = runClientM (e t r) (ClientEnv m b)
+
+run_ :: Monad m => (a -> b -> m c) -> b -> ReaderT a m c
+run_ act request = asking $ flip act request
+
+runM :: (r -> TelegramClient a) -> Token -> r -> Manager -> IO (Either ServantError a)
+runM tcm token request = runClient (tcm request) token
