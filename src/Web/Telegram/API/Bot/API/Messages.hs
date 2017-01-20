@@ -4,31 +4,44 @@
 
 module Web.Telegram.API.Bot.API.Messages
   ( -- * Functions
-    getMe
-  , getMeM
-  , sendMessage
+    sendMessage
+  , sendMessageM
   , forwardMessage
+  , forwardMessageM
   , uploadPhoto
+  , uploadPhotoM
   , sendPhoto
+  , sendPhotoM
   , uploadAudio
+  , uploadAudioM
   , sendAudio
+  , sendAudioM
   , uploadDocument
+  , uploadDocumentM
   , sendDocument
+  , sendDocumentM
   , uploadSticker
+  , uploadStickerM
   , sendSticker
+  , sendStickerM
   , uploadVideo
+  , uploadVideoM
   , sendVideo
+  , sendVideoM
   , uploadVoice
+  , uploadVoiceM
   , sendVoice
+  , sendVoiceM
   , sendLocation
+  , sendLocationM
   , sendVenue
+  , sendVenueM
   , sendContact
+  , sendContactM
   , sendChatAction
+  , sendChatActionM
   , sendGame
-  , getFile
-  , getUserProfilePhotos
-  , answerInlineQuery
-  , answerCallbackQuery
+  , sendGameM
     -- * API
   , TelegramBotMessagesAPI
   , messagesApi
@@ -47,9 +60,7 @@ import           Web.Telegram.API.Bot.Responses
 
 -- | Telegram Bot API
 type TelegramBotMessagesAPI =
-         TelegramToken :> "getMe"
-         :> Get '[JSON] GetMeResponse
-    :<|> TelegramToken :> "sendMessage"
+         TelegramToken :> "sendMessage"
          :> ReqBody '[JSON] SendMessageRequest
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "forwardMessage"
@@ -106,27 +117,11 @@ type TelegramBotMessagesAPI =
     :<|> TelegramToken :> "sendGame"
          :> ReqBody '[JSON] SendGameRequest
          :> Post '[JSON] MessageResponse
-    :<|> TelegramToken :> "getFile"
-         :> QueryParam "file_id" Text
-         :> Get '[JSON] FileResponse
-    :<|> TelegramToken :> "getUserProfilePhotos"
-         :> QueryParam "user_id" Int
-         :> QueryParam "offset" Int
-         :> QueryParam "limit" Int
-         :> Get '[JSON] UserProfilePhotosResponse
-    :<|> TelegramToken :> "answerInlineQuery"
-         :> ReqBody '[JSON] AnswerInlineQueryRequest
-         :> Post '[JSON] InlineQueryResponse
-    :<|> TelegramToken :> "answerCallbackQuery"
-         :> ReqBody '[JSON] AnswerCallbackQueryRequest
-         :> Post '[JSON] CallbackQueryResponse
-
 
 -- | Proxy for Thelegram Bot API
 messagesApi :: Proxy TelegramBotMessagesAPI
 messagesApi = Proxy
 
-getMe_                     :: Token -> ClientM GetMeResponse
 sendMessage_               :: Token -> SendMessageRequest -> ClientM MessageResponse
 forwardMessage_            :: Token -> ForwardMessageRequest -> ClientM MessageResponse
 uploadPhoto_               :: Token -> SendPhotoRequest FileUpload -> ClientM MessageResponse
@@ -146,12 +141,7 @@ sendVenue_                 :: Token -> SendVenueRequest-> ClientM MessageRespons
 sendContact_               :: Token -> SendContactRequest -> ClientM MessageResponse
 sendChatAction_            :: Token -> SendChatActionRequest -> ClientM ChatActionResponse
 sendGame_                  :: Token -> SendGameRequest -> ClientM MessageResponse
-getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
-getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
-answerInlineQuery_         :: Token -> AnswerInlineQueryRequest -> ClientM InlineQueryResponse
-answerCallbackQuery_       :: Token -> AnswerCallbackQueryRequest -> ClientM CallbackQueryResponse
-getMe_
-  :<|> sendMessage_
+sendMessage_
   :<|> forwardMessage_
   :<|> uploadPhoto_
   :<|> sendPhoto_
@@ -170,20 +160,7 @@ getMe_
   :<|> sendContact_
   :<|> sendChatAction_
   :<|> sendGame_
-  :<|> getFile_
-  :<|> getUserProfilePhotos_
-  :<|> answerInlineQuery_
-  :<|> answerCallbackQuery_
      = client messagesApi
-
--- | A simple method for testing your bot's auth token. Requires no parameters.
---   Returns basic information about the bot in form of a 'User' object.
-getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
-getMe = runClient getMeM
-
--- | See `getMe`
-getMeM :: TelegramClient GetMeResponse
-getMeM = asking getMe_
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
 sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
@@ -342,35 +319,3 @@ sendGame = runM sendGameM
 -- | See 'sendGame'
 sendGameM :: SendGameRequest -> TelegramClient MessageResponse
 sendGameM = run_ sendGame_
-
--- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
-getFile :: Token -> Text -> Manager -> IO (Either ServantError FileResponse)
-getFile token fileId = runClient (getFileM fileId) token
-
--- | See 'getFile'
-getFileM :: Text -> TelegramClient FileResponse
-getFileM fileId = run_ getFile_ (Just fileId)
-
--- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
-getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
-getUserProfilePhotos token userId offset limit = runClient (getUserProfilePhotosM userId offset limit) token
-
--- | See 'getUserProfilePhotos'
-getUserProfilePhotosM :: Int -> Maybe Int -> Maybe Int -> TelegramClient UserProfilePhotosResponse
-getUserProfilePhotosM userId offset limit = asking $ \t -> getUserProfilePhotos_ t (Just userId) offset limit
-
--- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
-answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
-answerInlineQuery = runM answerInlineQueryM
-
--- | See 'answerInlineQuery'
-answerInlineQueryM :: AnswerInlineQueryRequest -> TelegramClient InlineQueryResponse
-answerInlineQueryM = run_ answerInlineQuery_
-
--- | Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
-answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> IO (Either ServantError CallbackQueryResponse)
-answerCallbackQuery = runM answerCallbackQueryM
-
--- | See 'answerCallbackQuery'
-answerCallbackQueryM :: AnswerCallbackQueryRequest -> TelegramClient CallbackQueryResponse
-answerCallbackQueryM = run_ answerCallbackQuery_
