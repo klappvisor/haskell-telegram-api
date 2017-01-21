@@ -1,3 +1,15 @@
+## 0.5.2.0
+
+Features:
+
+* Added webhook methods such as getWebhookInfo, deleteWebhook, etc.
+* Changes to update api
+* Added sendGame  
+
+## 0.5.1.1
+
+Updated to use servant-0.9 and aeson-1.0
+
 ## 0.5.0.0 [Breaking]
 
 Features:
