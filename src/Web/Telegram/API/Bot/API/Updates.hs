@@ -16,7 +16,7 @@ module Web.Telegram.API.Bot.API.Updates
   , getWebhookInfoM
     -- * API
   , TelegramBotUpdatesAPI
-  , settingsApi
+  , updatesApi
   ) where
 
 import           Data.Proxy
@@ -32,10 +32,7 @@ import           Web.Telegram.API.Bot.Responses
 -- | Telegram Bot API
 type TelegramBotUpdatesAPI =
          TelegramToken :> "getUpdates"
-         :> QueryParam "offset" Int
-         :> QueryParam "limit" Int
-         :> QueryParam "timeout" Int
-         :> QueryParam "allowed_updates" [Text]
+         :> ReqBody '[JSON] GetUpdatesRequest
          :> Get '[JSON] UpdatesResponse
     :<|> TelegramToken :> "setWebhook"
          :> QueryParam "url" Text
@@ -49,10 +46,10 @@ type TelegramBotUpdatesAPI =
          :> Get '[JSON] GetWebhookInfoResponse
 
 -- | Proxy for Thelegram Bot API to configure your bot
-settingsApi :: Proxy TelegramBotUpdatesAPI
-settingsApi = Proxy
+updatesApi :: Proxy TelegramBotUpdatesAPI
+updatesApi = Proxy
 
-getUpdates_                :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> Maybe [Text] -> ClientM UpdatesResponse
+getUpdates_                :: Token -> GetUpdatesRequest -> ClientM UpdatesResponse
 setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
 setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
 deleteWebhook_             :: Token -> ClientM (Response Bool)
@@ -61,7 +58,7 @@ getUpdates_
   :<|> setWebhook_
   :<|> setWebhookWithCert_
   :<|> deleteWebhook_
-  :<|> getWebhookInfo_ = client settingsApi
+  :<|> getWebhookInfo_ = client updatesApi
 
 -- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned. Use `getUpdateM` for more features
 getUpdates
@@ -80,11 +77,7 @@ getUpdatesM = getUpdatesM' getUpdatesRequest
 
 -- | See 'getUpdates'
 getUpdatesM' :: GetUpdatesRequest -> TelegramClient UpdatesResponse
-getUpdatesM' request = asking $ \t -> getUpdates_ t offset limit timeout allowedUpdates
-    where offset = updates_offset request
-          limit = updates_limit request
-          timeout = updates_timeout request
-          allowedUpdates = updates_allowed_updates request
+getUpdatesM' = run_ getUpdates_
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
