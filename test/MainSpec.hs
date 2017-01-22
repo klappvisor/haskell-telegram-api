@@ -268,7 +268,7 @@ spec token chatId botName = do
   describe "/setWebhook and /getWebhookInfo" $ do
     it "should set webhook with certificate" $ do
       let cert = localFileUpload $ testFile "cert.pem"
-          req = SetWebhookRequest "https://example.com/secret_token" cert
+          req = setWebhookRequest "https://example.com/secret_token" cert
       res <- setWebhookWithCertificate token req manager
       success res
       let Right Response { result = val } = res

@@ -20,7 +20,8 @@ module Web.Telegram.API.Bot.API.Updates
   ) where
 
 import           Data.Proxy
-import           Data.Text                        (Text)
+import           Data.Maybe
+import           Data.Text                        (Text, empty)
 import           Network.HTTP.Client              (Manager)
 import           Servant.API
 import           Servant.Client
@@ -35,7 +36,7 @@ type TelegramBotUpdatesAPI =
          :> ReqBody '[JSON] GetUpdatesRequest
          :> Get '[JSON] UpdatesResponse
     :<|> TelegramToken :> "setWebhook"
-         :> QueryParam "url" Text
+         :> ReqBody '[JSON] SetWebhookRequest
          :> Get '[JSON] SetWebhookResponse
     :<|> TelegramToken :> "setWebhook"
          :> MultipartFormDataReqBody SetWebhookRequest
@@ -50,7 +51,7 @@ updatesApi :: Proxy TelegramBotUpdatesAPI
 updatesApi = Proxy
 
 getUpdates_                :: Token -> GetUpdatesRequest -> ClientM UpdatesResponse
-setWebhook_                :: Token -> Maybe Text -> ClientM SetWebhookResponse
+setWebhook_                :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
 setWebhookWithCert_        :: Token -> SetWebhookRequest -> ClientM SetWebhookResponse
 deleteWebhook_             :: Token -> ClientM (Response Bool)
 getWebhookInfo_            :: Token -> ClientM GetWebhookInfoResponse
@@ -86,11 +87,11 @@ setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
     -> IO (Either ServantError SetWebhookResponse)
-setWebhook = runM setWebhookM
+setWebhook token url = runClient (setWebhookM request) token
+    where request = setWebhookRequest' $ fromMaybe empty url
 
 -- | See 'setWebhook'
-setWebhookM :: Maybe Text -- ^ webhook url
-            -> TelegramClient SetWebhookResponse
+setWebhookM :: SetWebhookRequest -> TelegramClient SetWebhookResponse
 setWebhookM = run_ setWebhook_
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.

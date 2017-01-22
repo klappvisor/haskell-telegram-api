@@ -27,15 +27,18 @@ spec token botName = do
       whi_url whi `shouldBe` ""
   describe "webhook operations" $
     it "able to get and set webhook" $ do
+      let url = "https://example.com/bot"
       res <- runClient ( do
           info <- getWebhookInfoM
           liftIO $ (whi_url . result) info `shouldBe` ""
           liftIO $ threadDelay $ 2 * 1000 * 1000 -- to avoid Too many request error
-          set <- setWebhookM $ Just "https://example.com/bot"
+          set <- setWebhookM $ setWebhookRequest' url
           liftIO $ result set `shouldBe` True
+          info <- getWebhookInfoM
+          liftIO $ (whi_url . result) info `shouldBe` url
           liftIO $ threadDelay $ 2 * 1000 * 1000 -- to avoid Too many request error
           del <- deleteWebhookM
           liftIO $ result del `shouldBe` True
-          getWebhookInfoM) token manager
+          getWebhookInfoM ) token manager
       let Right Response { result = whi } = res
       whi_url whi `shouldBe` ""

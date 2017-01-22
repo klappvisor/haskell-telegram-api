@@ -32,6 +32,7 @@ module Web.Telegram.API.Bot.Requests
      -- * Functions
     , localFileUpload
     , setWebhookRequest
+    , setWebhookRequest'
     , getUpdatesRequest
     , sendMessageRequest
     , forwardMessageRequest
@@ -121,16 +122,35 @@ data SetWebhookRequest = SetWebhookRequest
   {
     webhook_url         :: Text -- ^ HTTPS url to send updates to. Use `setWebhook` function and an empty string to remove webhook integration
   , webhook_certificate :: FileUpload -- ^ Upload your public key certificate so that the root certificate in use can be checked.
+  , webhook_max_connections :: Maybe Int
+-- TODO: implement , webhook_allowed_updates :: Maybe [Text]
   }
+  | SetWebhookWithoutCertRequest
+  {
+    webhook_url  :: Text
+  , webhook_max_connections :: Maybe Int
+  , webhook_allowed_updates :: Maybe [Text]
+  } deriving (Generic)
+
+instance ToJSON SetWebhookRequest where
+  toJSON SetWebhookRequest{} = undefined
+  toJSON (SetWebhookWithoutCertRequest url maxConnections allowedUpdates) = object $
+    ("url" .= url) : catMaybes [
+    ("max_connections" .=) <$> maxConnections,
+    ("allowed_updates" .=) <$> allowedUpdates]
 
 instance ToMultipartFormData SetWebhookRequest where
   toMultipartFormData req =
     [ utf8Part         "url"         $ webhook_url req
-    , fileUploadToPart "certificate" $ webhook_certificate req
-    ]
+    , fileUploadToPart "certificate" $ webhook_certificate req ] ++
+    catMaybes
+    [ utf8Part         "max_connections" . T.pack . show <$> webhook_max_connections req ]
 
 setWebhookRequest :: Text -> FileUpload -> SetWebhookRequest
-setWebhookRequest = SetWebhookRequest
+setWebhookRequest url certificate = SetWebhookRequest url certificate Nothing
+
+setWebhookRequest' :: Text -> SetWebhookRequest
+setWebhookRequest' url = SetWebhookWithoutCertRequest url Nothing Nothing
 
 data GetUpdatesRequest = GetUpdatesRequest
   {
