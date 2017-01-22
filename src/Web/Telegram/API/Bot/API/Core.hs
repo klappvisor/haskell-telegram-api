@@ -37,9 +37,11 @@ type TelegramClient a = ReaderT Token ClientM a
 telegramBaseUrl :: BaseUrl
 telegramBaseUrl = BaseUrl Https "api.telegram.org" 443 ""
 
+-- | Allows to run 'TelegramClient' against arbitrary url
 runClient' :: TelegramClient a -> Token -> ClientEnv -> IO (Either ServantError a)
 runClient' tcm token = runClientM (runReaderT tcm token)
 
+-- | Runs 'TelegramClient'
 runClient :: TelegramClient a -> Token -> Manager -> IO (Either ServantError a)
 runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl)
 

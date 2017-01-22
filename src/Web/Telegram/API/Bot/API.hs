@@ -12,6 +12,7 @@ module Web.Telegram.API.Bot.API
   , api
     -- * Types
   , Token             (..)
+  , TelegramClient
   ) where
 
 import           Data.Proxy
