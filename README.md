@@ -34,7 +34,7 @@ main = do
     Left e -> do
       putStrLn "Request failed"
       print e
-    Right GetMeResponse { user_result = u } -> do
+    Right Response { result = u } -> do
       putStrLn "Request succeded"
       print $ user_first_name u
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
@@ -58,7 +58,7 @@ main = do
     Left e -> do
       putStrLn "Request failed"
       print e
-    Right MessageResponse { message_result = m } -> do
+    Right Response { result = m } -> do
       putStrLn "Request succeded"
       print $ message_id m
       print $ text m
