@@ -144,7 +144,9 @@ instance ToMultipartFormData SetWebhookRequest where
     [ utf8Part         "url"         $ webhook_url req
     , fileUploadToPart "certificate" $ webhook_certificate req ] ++
     catMaybes
-    [ utf8Part         "max_connections" . T.pack . show <$> webhook_max_connections req ]
+    [ utf8Part         "max_connections" . T.pack . show <$> webhook_max_connections req
+    -- TODO: , ??? "allowed_updates" ??? <$> webhook_allowed_updates req
+    ]
 
 setWebhookRequest :: Text -> FileUpload -> SetWebhookRequest
 setWebhookRequest url certificate = SetWebhookRequest url certificate Nothing

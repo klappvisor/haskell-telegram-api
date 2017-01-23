@@ -244,6 +244,7 @@ spec token chatId botName = do
 
   describe "/getUpdates" $
     it "should get all messages" $ do
+      _ <- deleteWebhook token manager
       Right Response { result = updates} <-
         getUpdates token Nothing Nothing Nothing manager
       length updates `shouldSatisfy` (>= 0)
