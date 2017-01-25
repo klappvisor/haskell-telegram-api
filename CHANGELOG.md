@@ -1,3 +1,9 @@
+## 0.6.0.0
+
+* Added `TelegramClient`, see example of usage in README.md
+* Changes from December update of Telegram Bot API
+* `TelegramBotAPI` splitted in separate sub-types  
+
 ## 0.5.2.0
 
 Features:

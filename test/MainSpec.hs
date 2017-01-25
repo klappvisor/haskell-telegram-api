@@ -5,19 +5,19 @@
 
 module MainSpec (spec) where
 
-import           Control.Monad
-import           Data.Monoid
-import           Web.Telegram.API.Bot
-import           Test.Hspec
-import           Data.Either (isRight, isLeft)
-import           Data.Text (Text)
-import qualified Data.Text as T
-import           Network.HTTP.Client      (newManager)
-import           Network.HTTP.Client.TLS  (tlsManagerSettings)
-import           Servant.Client
-import           Network.HTTP.Types.Status
-import           System.FilePath
 import           Control.Concurrent
+import           Control.Monad
+import           Data.Either               (isLeft, isRight)
+import           Data.Monoid
+import           Data.Text                 (Text)
+import qualified Data.Text                 as T
+import           Network.HTTP.Client       (newManager)
+import           Network.HTTP.Client.TLS   (tlsManagerSettings)
+import           Network.HTTP.Types.Status
+import           Servant.Client
+import           System.FilePath
+import           Test.Hspec
+import           Web.Telegram.API.Bot
 
 import           Paths_telegram_api
 
@@ -244,6 +244,7 @@ spec token chatId botName = do
 
   describe "/getUpdates" $
     it "should get all messages" $ do
+      _ <- deleteWebhook token manager
       Right Response { result = updates} <-
         getUpdates token Nothing Nothing Nothing manager
       length updates `shouldSatisfy` (>= 0)
@@ -268,7 +269,7 @@ spec token chatId botName = do
   describe "/setWebhook and /getWebhookInfo" $ do
     it "should set webhook with certificate" $ do
       let cert = localFileUpload $ testFile "cert.pem"
-          req = SetWebhookRequest "https://example.com/secret_token" cert
+          req = setWebhookRequest "https://example.com/secret_token" cert
       res <- setWebhookWithCertificate token req manager
       success res
       let Right Response { result = val } = res

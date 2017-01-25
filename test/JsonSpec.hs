@@ -2,12 +2,12 @@
 
 module JsonSpec (spec) where
 
-import           Web.Telegram.API.Bot
-import           Test.Hspec
-import qualified Data.Text as T
 import           Data.Aeson
-import           Text.JSON.JPath
 import           Data.ByteString.Lazy.UTF8
+import qualified Data.Text                 as T
+import           Test.Hspec
+import           Text.JSON.JPath
+import           Web.Telegram.API.Bot
 
 spec :: Spec
 spec = do
