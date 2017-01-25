@@ -9,13 +9,40 @@
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 
 High-level bindings to the [Telegram Bot API][telegram-bot-api] based on [servant][servant] library.
-Both `getUpdates` request or webhook can be used to receive updates for your bot. 
+Both `getUpdates` request or webhook can be used to receive updates for your bot.
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
 
 **Support of [Bot-2.0 API][bot-2.0]**
 
 ## Usage
+
+There are two ways of using Telegram Bot API. First and original way is to run IO directly for every Telegram servers request, another one is based on `TelegramClient` which is just `ReaderT`.
+
+### Use `TelegramClient`
+
+```haskell
+{-# LANGUAGE OverloadedStrings #-}
+
+import           Network.HTTP.Client      (newManager)
+import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Web.Telegram.API.Bot
+import           Control.Monad            (when)
+
+main :: IO ()
+main = do
+  let token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+  manager <- newManager tlsManagerSettings
+  result <- runClient ( do
+    info <- getWebhookInfoM
+    let request = setWebhookRequest' "https://example.com/hook"
+    isSet <- setWebhookM request
+    getMeM) token manager
+  print result
+  print "done!"
+```
+
+### Runing IO directly
 
 `getMe` example
 
@@ -63,7 +90,7 @@ main = do
       print $ message_id m
       print $ text m
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
-        chatId = "<chat_id> or <@channelusername>" 
+        chatId = "<chat_id> or <@channelusername>"
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
 ```
 
