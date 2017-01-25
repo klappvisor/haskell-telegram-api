@@ -870,6 +870,8 @@ data WebhookInfo = WebhookInfo
   , whi_pending_update_count :: Int -- ^ Number of updates awaiting delivery
   , whi_last_error_date :: Maybe Int -- ^ Unix time for the most recent error that happened when trying to deliver an update via webhook
   , whi_last_error_message :: Maybe Text -- ^ Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
+  , whi_max_connections :: Maybe Int -- ^ Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
+  , whi_allowed_updates :: Maybe [Text] -- ^ A list of update types the bot is subscribed to. Defaults to all update types
   } deriving (Show, Generic)
 
 instance ToJSON WebhookInfo where
