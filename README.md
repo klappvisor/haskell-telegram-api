@@ -27,7 +27,6 @@ There are two ways of using Telegram Bot API. First and original way is to run I
 import           Network.HTTP.Client      (newManager)
 import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Web.Telegram.API.Bot
-import           Control.Monad            (when)
 
 main :: IO ()
 main = do
