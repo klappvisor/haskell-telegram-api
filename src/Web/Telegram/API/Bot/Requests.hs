@@ -5,7 +5,8 @@
 -- | This module contains data objects which represents requests to Telegram Bot API
 module Web.Telegram.API.Bot.Requests
     ( -- * Types
-      SendMessageRequest             (..)
+      ChatId                         (..)
+    , SendMessageRequest             (..)
     , ForwardMessageRequest          (..)
     , FileUpload                     (..)
     , FileUploadContent              (..)
@@ -68,6 +69,7 @@ module Web.Telegram.API.Bot.Requests
     ) where
 
 import           Data.Aeson
+import           Data.Aeson.Types                      (typeMismatch)
 import qualified Data.ByteString                       as BS
 import qualified Data.ByteString.Lazy                  as LBS
 import           Data.Maybe
@@ -120,14 +122,14 @@ utf8Part inputName = partBS inputName . T.encodeUtf8
 -- | This object represents request for 'setWebhookWithCertificate'
 data SetWebhookRequest = SetWebhookRequest
   {
-    webhook_url         :: Text -- ^ HTTPS url to send updates to. Use `setWebhook` function and an empty string to remove webhook integration
-  , webhook_certificate :: FileUpload -- ^ Upload your public key certificate so that the root certificate in use can be checked.
+    webhook_url             :: Text -- ^ HTTPS url to send updates to. Use `setWebhook` function and an empty string to remove webhook integration
+  , webhook_certificate     :: FileUpload -- ^ Upload your public key certificate so that the root certificate in use can be checked.
   , webhook_max_connections :: Maybe Int
 -- TODO: implement , webhook_allowed_updates :: Maybe [Text]
   }
   | SetWebhookWithoutCertRequest
   {
-    webhook_url  :: Text
+    webhook_url             :: Text
   , webhook_max_connections :: Maybe Int
   , webhook_allowed_updates :: Maybe [Text]
   } deriving (Generic)
@@ -144,7 +146,7 @@ instance ToMultipartFormData SetWebhookRequest where
     [ utf8Part         "url"         $ webhook_url req
     , fileUploadToPart "certificate" $ webhook_certificate req ] ++
     catMaybes
-    [ utf8Part         "max_connections" . T.pack . show <$> webhook_max_connections req
+    [ utf8Part         "max_connections" . tshow <$> webhook_max_connections req
     -- TODO: , ??? "allowed_updates" ??? <$> webhook_allowed_updates req
     ]
 
@@ -156,9 +158,9 @@ setWebhookRequest' url = SetWebhookWithoutCertRequest url Nothing Nothing
 
 data GetUpdatesRequest = GetUpdatesRequest
   {
-    updates_offset :: Maybe Int -- ^ Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update are returned. An update is considered confirmed as soon as 'getUpdates' is called with an offset higher than its update_id. The negative offset can be specified to retrieve updates starting from -offset update from the end of the updates queue. All previous updates will forgotten.
-  , updates_limit  :: Maybe Int -- ^ Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100.
-  , updates_timeout :: Maybe Int -- ^ Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive, short polling should be used for testing purposes only.
+    updates_offset          :: Maybe Int -- ^ Identifier of the first update to be returned. Must be greater by one than the highest among the identifiers of previously received updates. By default, updates starting with the earliest unconfirmed update are returned. An update is considered confirmed as soon as 'getUpdates' is called with an offset higher than its update_id. The negative offset can be specified to retrieve updates starting from -offset update from the end of the updates queue. All previous updates will forgotten.
+  , updates_limit           :: Maybe Int -- ^ Limits the number of updates to be retrieved. Values between 1—100 are accepted. Defaults to 100.
+  , updates_timeout         :: Maybe Int -- ^ Timeout in seconds for long polling. Defaults to 0, i.e. usual short polling. Should be positive, short polling should be used for testing purposes only.
   , updates_allowed_updates :: Maybe [Text] -- ^ List the types of updates you want your bot to receive. For example, specify [“message”, “edited_channel_post”, “callback_query”] to only receive updates of these types. See 'Update' for a complete list of available update types. Specify an empty list to receive all updates regardless of type (default). If not specified, the previous setting will be used.
   } deriving (Show, Generic)
 
@@ -171,10 +173,27 @@ instance FromJSON GetUpdatesRequest where
 getUpdatesRequest :: GetUpdatesRequest
 getUpdatesRequest = GetUpdatesRequest Nothing Nothing Nothing Nothing
 
+-- | Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+data ChatId = ChatId Integer | ChatChannel Text
+  deriving (Show)
+
+instance ToJSON ChatId where
+  toJSON (ChatId integer)   = toJSON integer
+  toJSON (ChatChannel text) = String text
+
+instance FromJSON ChatId where
+  parseJSON value@Number{} = ChatId <$> parseJSON value
+  parseJSON (String text)  = pure $ ChatChannel text
+  parseJSON wat            = typeMismatch "Integer or String" wat
+
+chatIdToPart :: ChatId -> Text
+chatIdToPart (ChatId integer)   = tshow integer
+chatIdToPart (ChatChannel text) = text
+
 -- | This object represents request for 'sendMessage'
 data SendMessageRequest = SendMessageRequest
   {
-    message_chat_id                  :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    message_chat_id                  :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , message_text                     :: Text -- ^ Text of the message to be sent
   , message_parse_mode               :: Maybe ParseMode -- ^ Send 'Markdown', if you want Telegram apps to show bold, italic and inline URLs in your bot's message
   , message_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in this message
@@ -189,14 +208,14 @@ instance ToJSON SendMessageRequest where
 instance FromJSON SendMessageRequest where
   parseJSON = parseJsonDrop 8
 
-sendMessageRequest :: Text -> Text -> SendMessageRequest
+sendMessageRequest :: ChatId -> Text -> SendMessageRequest
 sendMessageRequest chatId text = SendMessageRequest chatId text Nothing Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'forwardMessage'
 data ForwardMessageRequest = ForwardMessageRequest
   {
-    forward_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-  , forward_from_chat_id         :: Text -- ^ Unique identifier for the chat where the original message was sent (or channel username in the format @@channelusername@)
+    forward_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , forward_from_chat_id         :: ChatId -- ^ Unique identifier for the chat where the original message was sent (or channel username in the format @@channelusername@)
   , forward_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , forward_message_id           :: Int -- ^ Unique message identifier
   } deriving (Show, Generic)
@@ -207,13 +226,13 @@ instance ToJSON ForwardMessageRequest where
 instance FromJSON ForwardMessageRequest where
   parseJSON = parseJsonDrop 8
 
-forwardMessageRequest :: Text -> Text -> Int -> ForwardMessageRequest
+forwardMessageRequest :: ChatId -> ChatId -> Int -> ForwardMessageRequest
 forwardMessageRequest chatId fromChatId forwardMessageId = ForwardMessageRequest chatId fromChatId Nothing forwardMessageId
 
 -- | This object represents request for 'sendPhoto'
 data SendPhotoRequest payload = SendPhotoRequest
   {
-    photo_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    photo_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , photo_photo                :: payload -- ^ Photo to send. You can either pass a file_id as String to resend a photo that is already on the Telegram servers, or upload a new photo.
   , photo_caption              :: Maybe Text -- ^ Photo caption (may also be used when resending photos by file_id), 0-200 characters.
   , photo_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
@@ -227,19 +246,19 @@ instance ToJSON (SendPhotoRequest Text) where
 instance FromJSON (SendPhotoRequest Text) where
   parseJSON = parseJsonDrop 6
 
-sendPhotoRequest :: Text -> Text -> SendPhotoRequest Text
+sendPhotoRequest :: ChatId -> Text -> SendPhotoRequest Text
 sendPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
 
-uploadPhotoRequest :: Text -> FileUpload -> SendPhotoRequest FileUpload
+uploadPhotoRequest :: ChatId -> FileUpload -> SendPhotoRequest FileUpload
 uploadPhotoRequest chatId photo = SendPhotoRequest chatId photo Nothing Nothing Nothing Nothing
 
 instance ToMultipartFormData (SendPhotoRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (photo_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ photo_chat_id req) ] ++
     catMaybes
     [ utf8Part "caption" <$> photo_caption req
     , partLBS "disable_notification" . encode <$> photo_disable_notification req
-    , utf8Part "reply_to_message_id" . T.pack . show <$> photo_reply_to_message_id req
+    , utf8Part "reply_to_message_id" . tshow <$> photo_reply_to_message_id req
     , partLBS "reply_markup" . encode <$> photo_reply_markup req
     ] ++
     [ fileUploadToPart "photo" (photo_photo req) ]
@@ -247,7 +266,7 @@ instance ToMultipartFormData (SendPhotoRequest FileUpload) where
 -- | This object represents request for 'sendAudio'
 data SendAudioRequest payload = SendAudioRequest
   {
-    _audio_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    _audio_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _audio_audio                :: payload -- ^ Audio to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
   , _audio_caption              :: Maybe Text -- ^ Audio caption, 0-200 characters
   , _audio_duration             :: Maybe Int -- ^ Duration of the audio in seconds
@@ -266,27 +285,27 @@ instance FromJSON (SendAudioRequest Text) where
 
 instance ToMultipartFormData (SendAudioRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (_audio_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ _audio_chat_id req) ] ++
     catMaybes
-    [ utf8Part "duration" . T.pack . show <$> _audio_duration req
+    [ utf8Part "duration" . tshow <$> _audio_duration req
     , utf8Part "performer" <$> _audio_performer req
     , utf8Part "title" <$> _audio_title req
     , partLBS "disable_notification" . encode <$> _audio_disable_notification req
-    , utf8Part "reply_to_message_id" . T.pack . show <$> _audio_reply_to_message_id req
+    , utf8Part "reply_to_message_id" . tshow <$> _audio_reply_to_message_id req
     , partLBS "reply_markup" . encode <$> _audio_reply_markup req
     ] ++
     [ fileUploadToPart "audio" (_audio_audio req) ]
 
-sendAudioRequest :: Text -> Text -> SendAudioRequest Text
+sendAudioRequest :: ChatId -> Text -> SendAudioRequest Text
 sendAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
-uploadAudioRequest :: Text -> FileUpload -> SendAudioRequest FileUpload
+uploadAudioRequest :: ChatId -> FileUpload -> SendAudioRequest FileUpload
 uploadAudioRequest chatId audio = SendAudioRequest chatId audio Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendSticker'
 data SendStickerRequest payload = SendStickerRequest
   {
-    sticker_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    sticker_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , sticker_sticker              :: payload -- ^ Sticker to send. You can either pass a file_id as String to resend a sticker that is already on the Telegram servers, or upload a new sticker.
   , sticker_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , sticker_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
@@ -301,24 +320,24 @@ instance FromJSON (SendStickerRequest Text) where
 
 instance ToMultipartFormData (SendStickerRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (sticker_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ sticker_chat_id req) ] ++
     catMaybes
     [ partLBS "disable_notification" . encode <$> sticker_disable_notification req
-    , utf8Part "reply_to_message_id" . T.pack . show <$> sticker_reply_to_message_id req
+    , utf8Part "reply_to_message_id" . tshow <$> sticker_reply_to_message_id req
     , partLBS "reply_markup" . encode <$> sticker_reply_markup req
     ] ++
     [ fileUploadToPart "sticker" (sticker_sticker req) ]
 
-sendStickerRequest :: Text -> Text -> SendStickerRequest Text
+sendStickerRequest :: ChatId -> Text -> SendStickerRequest Text
 sendStickerRequest chatId sticker = SendStickerRequest chatId sticker Nothing Nothing Nothing
 
-uploadStickerRequest :: Text -> FileUpload -> SendStickerRequest FileUpload
+uploadStickerRequest :: ChatId -> FileUpload -> SendStickerRequest FileUpload
 uploadStickerRequest chatId sticker = SendStickerRequest chatId sticker Nothing Nothing Nothing
 
 -- | This object represents request for 'sendDocument'
 data SendDocumentRequest payload = SendDocumentRequest
   {
-    document_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    document_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , document_document             :: payload -- ^ File to send. You can either pass a file_id as String to resend a file that is already on the Telegram servers, or upload a new file.
   , document_caption              :: Maybe Text -- ^ Document caption (may also be used when resending documents by file_id), 0-200 characters
   , document_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
@@ -334,25 +353,25 @@ instance FromJSON (SendDocumentRequest Text) where
 
 instance ToMultipartFormData (SendDocumentRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (document_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ document_chat_id req) ] ++
     catMaybes
     [ utf8Part "caption" <$> document_caption req
     , partLBS "disable_notification" . encode <$> document_disable_notification req
-    , utf8Part "reply_to_message_id" . T.pack . show <$> document_reply_to_message_id req
+    , utf8Part "reply_to_message_id" . tshow <$> document_reply_to_message_id req
     , partLBS "reply_markup" . encode <$> document_reply_markup req
     ] ++
     [ fileUploadToPart "document" (document_document req) ]
 
-sendDocumentRequest :: Text -> Text -> SendDocumentRequest Text
+sendDocumentRequest :: ChatId -> Text -> SendDocumentRequest Text
 sendDocumentRequest chatId document = SendDocumentRequest chatId document Nothing Nothing Nothing Nothing
 
-uploadDocumentRequest :: Text -> FileUpload -> SendDocumentRequest FileUpload
+uploadDocumentRequest :: ChatId -> FileUpload -> SendDocumentRequest FileUpload
 uploadDocumentRequest chatId document = SendDocumentRequest chatId document Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendVideo'
 data SendVideoRequest payload = SendVideoRequest
   {
-    _video_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    _video_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _video_video                :: payload -- ^ Video to send. You can either pass a file_id as String to resend a video that is already on the Telegram servers, or upload a new video.
   , _video_duration             :: Maybe Int -- ^ Duration of sent video in seconds
   , _video_caption              :: Maybe Text -- ^ Video caption, 0-200 characters.
@@ -369,26 +388,26 @@ instance FromJSON (SendVideoRequest Text) where
 
 instance ToMultipartFormData (SendVideoRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (_video_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ _video_chat_id req) ] ++
     catMaybes
     [ partLBS "duration" . encode <$> _video_duration req
     , utf8Part "caption" <$> _video_caption req
     , partLBS "disable_notification" . encode <$> _video_disable_notification req
-    , utf8Part "reply_to_message_id" . T.pack . show <$> _video_reply_to_message_id req
+    , utf8Part "reply_to_message_id" . tshow <$> _video_reply_to_message_id req
     , partLBS "reply_markup" . encode <$> _video_reply_markup req
     ] ++
     [ fileUploadToPart "video" (_video_video req) ]
 
-sendVideoRequest :: Text -> Text -> SendVideoRequest Text
+sendVideoRequest :: ChatId -> Text -> SendVideoRequest Text
 sendVideoRequest chatId video = SendVideoRequest chatId video Nothing Nothing Nothing Nothing Nothing
 
-uploadVideoRequest :: Text -> FileUpload -> SendVideoRequest FileUpload
+uploadVideoRequest :: ChatId -> FileUpload -> SendVideoRequest FileUpload
 uploadVideoRequest chatId video = SendVideoRequest chatId video Nothing Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendVoice'
 data SendVoiceRequest payload = SendVoiceRequest
   {
-    _voice_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    _voice_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _voice_voice                :: payload -- ^ Audio file to send. You can either pass a file_id as String to resend an audio that is already on the Telegram servers, or upload a new audio file.
   , _voice_caption              :: Maybe Text -- ^ Voice message caption, 0-200 characters
   , _voice_duration             :: Maybe Int -- ^ Duration of sent audio in seconds
@@ -405,25 +424,25 @@ instance FromJSON (SendVoiceRequest Text) where
 
 instance ToMultipartFormData (SendVoiceRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (_voice_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ _voice_chat_id req) ] ++
     catMaybes
     [ partLBS "duration" . encode <$> _voice_duration req
     , partLBS "disable_notification" . encode <$> _voice_disable_notification req
-    , utf8Part "reply_to_message_id" . T.pack . show <$> _voice_reply_to_message_id req
+    , utf8Part "reply_to_message_id" . tshow <$> _voice_reply_to_message_id req
     , partLBS "reply_markup" . encode <$> _voice_reply_markup req
     ] ++
     [ fileUploadToPart "voice" (_voice_voice req) ]
 
-sendVoiceRequest :: Text -> Text -> SendVoiceRequest Text
+sendVoiceRequest :: ChatId -> Text -> SendVoiceRequest Text
 sendVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing Nothing
 
-uploadVoiceRequest :: Text -> FileUpload -> SendVoiceRequest FileUpload
+uploadVoiceRequest :: ChatId -> FileUpload -> SendVoiceRequest FileUpload
 uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
   {
-    location_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    location_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , location_latitude             :: Float -- ^ Latitude of location
   , location_longitude            :: Float -- ^ Longitude of location
   , location_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
@@ -437,13 +456,13 @@ instance ToJSON SendLocationRequest where
 instance FromJSON SendLocationRequest where
   parseJSON = parseJsonDrop 9
 
-sendLocationRequest :: Text -> Float -> Float -> SendLocationRequest
+sendLocationRequest :: ChatId -> Float -> Float -> SendLocationRequest
 sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing
 
 -- | This object represents request for 'sendVenue'
 data SendVenueRequest = SendVenueRequest
   {
-    _venue_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    _venue_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _venue_latitude             :: Float -- ^ Latitude of the venue
   , _venue_longitude            :: Float -- ^ Longitude of the venue
   , _venue_title                :: Text -- ^ Name of the venue
@@ -460,13 +479,13 @@ instance ToJSON SendVenueRequest where
 instance FromJSON SendVenueRequest where
   parseJSON = parseJsonDrop 7
 
-sendVenueRequest :: Text -> Float -> Float -> Text -> Text -> SendVenueRequest
+sendVenueRequest :: ChatId -> Float -> Float -> Text -> Text -> SendVenueRequest
 sendVenueRequest chatId latitude longitude title address = SendVenueRequest chatId latitude longitude title address Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendContact'
 data SendContactRequest = SendContactRequest
   {
-    _contact_chat_id              :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+    _contact_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , _contact_phone_number         :: Text       -- ^ Contact's phone number
   , _contact_first_name           :: Text       -- ^ Contact's first name
   , _contact_last_name            :: Maybe Text -- ^ Contact's last name
@@ -481,7 +500,7 @@ instance ToJSON SendContactRequest where
 instance FromJSON SendContactRequest where
   parseJSON = parseJsonDrop 9
 
-sendContactRequest :: Text -> Text -> Text -> SendContactRequest
+sendContactRequest :: ChatId -> Text -> Text -> SendContactRequest
 sendContactRequest chatId phoneNumber firstName = SendContactRequest chatId phoneNumber firstName Nothing Nothing Nothing Nothing
 
 -- | Type of action to broadcast.
@@ -518,7 +537,7 @@ instance FromJSON ChatAction where
 -- | This object represents request for 'sendChatAction'
 data SendChatActionRequest = SendChatActionRequest
   {
-    action_chat_id :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+    action_chat_id :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
   , action_action  :: ChatAction -- ^ Type of action to broadcast.
   } deriving (Show, Generic)
 
@@ -528,13 +547,13 @@ instance ToJSON SendChatActionRequest where
 instance FromJSON SendChatActionRequest where
   parseJSON = parseJsonDrop 7
 
-sendChatActionRequest :: Text -> ChatAction -> SendChatActionRequest
+sendChatActionRequest :: ChatId -> ChatAction -> SendChatActionRequest
 sendChatActionRequest = SendChatActionRequest
 
 -- | This object represents request for 'sendGame'
 data SendGameRequest = SendGameRequest
   {
-    game_chat_id              :: Text -- ^ Unique identifier for the target chat
+    game_chat_id              :: Integer -- ^ Unique identifier for the target chat
   , game_game_short_name      :: Text -- ^ Short name of the game, serves as the unique identifier for the game. Set up your games via Botfather.
   , game_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , game_reply_to_message_id  :: Maybe Int -- ^  If the message is a reply, ID of the original message
@@ -547,7 +566,7 @@ instance ToJSON SendGameRequest where
 instance FromJSON SendGameRequest where
   parseJSON = parseJsonDrop 5
 
-sendGameRequest :: Text -> Text -> SendGameRequest
+sendGameRequest :: Integer -> Text -> SendGameRequest
 sendGameRequest chatId shortName = SendGameRequest chatId shortName Nothing Nothing Nothing
 
 data AnswerInlineQueryRequest = AnswerInlineQueryRequest
@@ -646,7 +665,7 @@ forceReply = ForceReply True Nothing
 
 data EditMessageTextRequest = EditMessageTextRequest
   {
-    emt_chat_id                  :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+    emt_chat_id                  :: Maybe ChatId -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
   , emt_message_id               :: Maybe Int -- ^ if `inline_message_id` is not specified. Unique identifier of the sent message
   , emt_inline_message_id        :: Maybe Text -- ^ Required if chat_id and message_id are not specified. Identifier of the inline message
   , emt_text                     :: Text -- ^ New text of the message
@@ -661,7 +680,7 @@ instance ToJSON EditMessageTextRequest where
 instance FromJSON EditMessageTextRequest where
   parseJSON = parseJsonDrop 4
 
-editMessageTextRequest :: Text -> Int -> Text -> EditMessageTextRequest
+editMessageTextRequest :: ChatId -> Int -> Text -> EditMessageTextRequest
 editMessageTextRequest chatId messageId text = EditMessageTextRequest (Just chatId) (Just messageId) Nothing text Nothing Nothing Nothing
 
 editInlineMessageTextRequest :: Text -> Text -> EditMessageTextRequest
@@ -669,7 +688,7 @@ editInlineMessageTextRequest inlineMessageId text = EditMessageTextRequest Nothi
 
 data EditMessageCaptionRequest = EditMessageCaptionRequest
   {
-    emc_chat_id           :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+    emc_chat_id           :: Maybe ChatId -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
   , emc_message_id        :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
   , emc_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
   , emc_caption           :: Maybe Text -- ^ New caption of the message
@@ -682,7 +701,7 @@ instance ToJSON EditMessageCaptionRequest where
 instance FromJSON EditMessageCaptionRequest where
   parseJSON = parseJsonDrop 4
 
-editMessageCaptionRequest :: Text -> Int -> Maybe Text -> EditMessageCaptionRequest
+editMessageCaptionRequest :: ChatId -> Int -> Maybe Text -> EditMessageCaptionRequest
 editMessageCaptionRequest chatId messageId caption = EditMessageCaptionRequest (Just chatId) (Just messageId) Nothing caption Nothing
 
 editInlineMessageCaptionRequest :: Text -> Maybe Text -> EditMessageCaptionRequest
@@ -690,7 +709,7 @@ editInlineMessageCaptionRequest inlineMessageId caption = EditMessageCaptionRequ
 
 data EditMessageReplyMarkupRequest = EditMessageReplyMarkupRequest
   {
-    emrm_chat_id           :: Maybe Text -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
+    emrm_chat_id           :: Maybe ChatId -- ^ Required if `inline_message_id` is not specified. Unique identifier for the target chat or username of the target channel (in the format `@channelusername`)
   , emrm_message_id        :: Maybe Int -- ^ Required if `inline_message_id` is not specified. Unique identifier of the sent message
   , emrm_inline_message_id :: Maybe Text -- ^ Required if `chat_id` and `message_id` are not specified. Identifier of the inline message
   , emrm_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard.
@@ -702,8 +721,11 @@ instance ToJSON EditMessageReplyMarkupRequest where
 instance FromJSON EditMessageReplyMarkupRequest where
   parseJSON = parseJsonDrop 5
 
-editMessageReplyMarkupRequest :: Text -> Int -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
+editMessageReplyMarkupRequest :: ChatId -> Int -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
 editMessageReplyMarkupRequest chatId messageId keyboard = EditMessageReplyMarkupRequest (Just chatId) (Just messageId) Nothing keyboard
 
 editInlineMessageReplyMarkupRequest :: Text -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
 editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyMarkupRequest Nothing Nothing (Just inlineMessageId) keyboard
+
+tshow :: Show a => a -> Text
+tshow = T.pack . show
