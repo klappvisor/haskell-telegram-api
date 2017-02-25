@@ -26,7 +26,7 @@ success, nosuccess :: (Show a, Show b) =>Either a b ->Expectation
 success   e = e `shouldSatisfy` isRight
 nosuccess e = e `shouldSatisfy` isLeft
 
-spec :: Token -> Text -> Text -> Spec
+spec :: Token -> ChatId -> Text -> Spec
 spec token chatId botName = do
   manager <- runIO $ newManager tlsManagerSettings
   dataDir <- runIO getDataDir
@@ -45,7 +45,7 @@ spec token chatId botName = do
       text m `shouldBe` Just "test message"
 
     it "should return error message" $ do
-      res <- sendMessage token (sendMessageRequest "" "test message") manager
+      res <- sendMessage token (sendMessageRequest (ChatChannel "") "test message") manager
       nosuccess res
       let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
       msg `shouldBe` "Bad Request"
@@ -110,7 +110,7 @@ spec token chatId botName = do
 
   describe "/sendPhoto" $ do
     it "should return error message" $ do
-      let photo = (sendPhotoRequest "" "photo_id") {
+      let photo = (sendPhotoRequest (ChatChannel "") "photo_id") {
         photo_caption = Just "photo caption"
       }
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
@@ -134,7 +134,7 @@ spec token chatId botName = do
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
-      let audio = (sendAudioRequest "" "audio_id") {
+      let audio = (sendAudioRequest (ChatChannel "") "audio_id") {
         _audio_performer = Just "performer"
       , _audio_title = Just "title"
       }
@@ -262,8 +262,9 @@ spec token chatId botName = do
 
   describe "/getUserProfilePhotos" $
    it "should get user profile photos" $ do
-     Right Response { result = photos } <-
-       getUserProfilePhotos token (read (T.unpack chatId)) Nothing Nothing manager
+     Right Response { result = photos } <- do
+       let ChatId userId = chatId
+       getUserProfilePhotos token userId Nothing Nothing manager
      total_count photos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook and /getWebhookInfo" $ do

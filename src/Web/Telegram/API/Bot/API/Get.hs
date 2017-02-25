@@ -17,8 +17,8 @@ module Web.Telegram.API.Bot.API.Get
   ) where
 
 import           Data.Proxy
-import           Data.Text                        (Text)
-import           Network.HTTP.Client              (Manager)
+import           Data.Text                      (Text)
+import           Network.HTTP.Client            (Manager)
 import           Servant.API
 import           Servant.Client
 import           Web.Telegram.API.Bot.API.Core
@@ -32,7 +32,7 @@ type TelegramBotGetAPI =
          :> QueryParam "file_id" Text
          :> Get '[JSON] FileResponse
     :<|> TelegramToken :> "getUserProfilePhotos"
-         :> QueryParam "user_id" Int
+         :> QueryParam "user_id" Integer
          :> QueryParam "offset" Int
          :> QueryParam "limit" Int
          :> Get '[JSON] UserProfilePhotosResponse
@@ -43,7 +43,7 @@ getApi = Proxy
 
 getMe_                     :: Token -> ClientM GetMeResponse
 getFile_                   :: Token -> Maybe Text -> ClientM FileResponse
-getUserProfilePhotos_      :: Token -> Maybe Int -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
+getUserProfilePhotos_      :: Token -> Maybe Integer -> Maybe Int -> Maybe Int -> ClientM UserProfilePhotosResponse
 getMe_
   :<|> getFile_
   :<|> getUserProfilePhotos_
@@ -67,9 +67,9 @@ getFileM :: Text -> TelegramClient FileResponse
 getFileM fileId = run_ getFile_ (Just fileId)
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
-getUserProfilePhotos :: Token -> Int -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
+getUserProfilePhotos :: Token -> Integer -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
 getUserProfilePhotos token userId offset limit = runClient (getUserProfilePhotosM userId offset limit) token
 
 -- | See 'getUserProfilePhotos'
-getUserProfilePhotosM :: Int -> Maybe Int -> Maybe Int -> TelegramClient UserProfilePhotosResponse
+getUserProfilePhotosM :: Integer -> Maybe Int -> Maybe Int -> TelegramClient UserProfilePhotosResponse
 getUserProfilePhotosM userId offset limit = asking $ \t -> getUserProfilePhotos_ t (Just userId) offset limit
