@@ -6,6 +6,7 @@ module Web.Telegram.API.Bot.API.Updates
   ( -- * Functions
     getUpdates
   , getUpdatesM
+  , getUpdatesM'
   , setWebhook
   , setWebhookM
   , setWebhookWithCertificate
@@ -19,8 +20,8 @@ module Web.Telegram.API.Bot.API.Updates
   , updatesApi
   ) where
 
-import           Data.Proxy
 import           Data.Maybe
+import           Data.Proxy
 import           Data.Text                        (Text, empty)
 import           Network.HTTP.Client              (Manager)
 import           Servant.API
@@ -61,7 +62,7 @@ getUpdates_
   :<|> deleteWebhook_
   :<|> getWebhookInfo_ = client updatesApi
 
--- | Use this method to receive incoming updates using long polling. An Array of 'Update' objects is returned. Use `getUpdateM` for more features
+-- | Use this method to receive incoming updates using long polling. A list of 'Update' objects is returned. Use `getUpdatesM` for more features
 getUpdates
     :: Token
     -> Maybe Int -- ^ offset
@@ -69,16 +70,16 @@ getUpdates
     -> Maybe Int -- ^ timeout
     -> Manager
     -> IO (Either ServantError UpdatesResponse)
-getUpdates token offset limit timeout = runClient (getUpdatesM' request) token
+getUpdates token offset limit timeout = runClient (getUpdatesM request) token
     where request = GetUpdatesRequest offset limit timeout Nothing
 
--- | Get update with default parameters See 'getUpdate' for details.
-getUpdatesM :: TelegramClient UpdatesResponse
-getUpdatesM = getUpdatesM' getUpdatesRequest
+-- | Get update with default parameters See 'getUpdates' for details.
+getUpdatesM' :: TelegramClient UpdatesResponse
+getUpdatesM' = getUpdatesM getUpdatesRequest
 
 -- | See 'getUpdates'
-getUpdatesM' :: GetUpdatesRequest -> TelegramClient UpdatesResponse
-getUpdatesM' = run_ getUpdates_
+getUpdatesM :: GetUpdatesRequest -> TelegramClient UpdatesResponse
+getUpdatesM = run_ getUpdates_
 
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
@@ -104,7 +105,7 @@ setWebhookWithCertificate = runM setWebhookWithCertificateM
 setWebhookWithCertificateM :: SetWebhookRequest -> TelegramClient SetWebhookResponse
 setWebhookWithCertificateM = run_ setWebhookWithCert_
 
--- | Use this method to remove webhook integration if you decide to switch back to getUpdates. Returns True on success.
+-- | Use this method to remove webhook integration if you decide to switch back to 'getUpdates'. Returns True on success.
 deleteWebhook :: Token -> Manager -> IO (Either ServantError (Response Bool))
 deleteWebhook = runClient deleteWebhookM
 
