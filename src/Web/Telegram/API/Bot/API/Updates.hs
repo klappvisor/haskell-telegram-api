@@ -6,6 +6,7 @@ module Web.Telegram.API.Bot.API.Updates
   ( -- * Functions
     getUpdates
   , getUpdatesM
+  , getUpdatesM'
   , setWebhook
   , setWebhookM
   , setWebhookWithCertificate
@@ -73,6 +74,10 @@ getUpdates token offset limit timeout = runClient (getUpdatesM request) token
     where request = GetUpdatesRequest offset limit timeout Nothing
 
 -- | Get update with default parameters See 'getUpdates' for details.
+getUpdatesM' :: TelegramClient UpdatesResponse
+getUpdatesM' = getUpdatesM getUpdatesRequest
+
+-- | See 'getUpdates'
 getUpdatesM :: GetUpdatesRequest -> TelegramClient UpdatesResponse
 getUpdatesM = run_ getUpdates_
 
