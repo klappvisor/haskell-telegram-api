@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE DeriveAnyClass    #-}
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 -- | This module contains objects which represent data of Telegram Bot API responses
@@ -65,12 +65,13 @@ module Web.Telegram.API.Bot.Data
 import           Prelude hiding (id)
 
 import           Data.Aeson
-import           Data.Maybe()
 import           Data.Aeson.Types
-import           Data.Text (Text)
 import qualified Data.Char as Char
-import           GHC.Generics
+import           Data.Int (Int64)
 import           Data.List
+import           Data.Text (Text)
+import           GHC.Generics
+
 import           Web.Telegram.API.Bot.JsonExt
 
 -- | This object represents a Telegram user or bot.
@@ -105,8 +106,13 @@ instance FromJSON Contact where
 
 -- | This object represents a chat.
 data Chat = Chat
-  {
-    chat_id :: Int                -- ^ Unique identifier for this chat, not exceeding 1e13 by absolute value
+  { chat_id :: Int64
+    -- ^ Unique identifier for this chat.
+    -- This number may be greater than 32 bits and some programming languages
+    -- may have difficulty/silent defects in interpreting it.
+    -- But it is smaller than 52 bits,
+    -- so a signed 64 bit integer or double-precision float type are safe for
+    -- storing this identifier.
   , chat_type :: ChatType         -- ^ Type of chat, can be either 'Private', 'Group', 'Supergroup' or 'Channel'
   , chat_title :: Maybe Text      -- ^ Title, for channels and group chats
   , chat_username :: Maybe Text   -- ^ Username, for private chats and channels if available
