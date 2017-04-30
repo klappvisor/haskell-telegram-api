@@ -1,3 +1,18 @@
+## 0.6.1.1
+
+Bugfixes:
+
+* Migration to `Int64` to represent chat id and fix integer overflow issue
+
+## 0.6.1.0
+
+* Added `ChatId` data type since it can be integer or string starting from `@`, f.e. `@channelusername`
+* Changes in `getUpdates` and `getUpdateM` function
+
+## 0.6.0.1
+
+* Bump aeson upper bound to include 1.1.*
+
 ## 0.6.0.0
 
 * Added `TelegramClient`, see example of usage in README.md

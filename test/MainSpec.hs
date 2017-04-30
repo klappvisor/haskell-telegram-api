@@ -264,7 +264,7 @@ spec token chatId botName = do
    it "should get user profile photos" $ do
      Right Response { result = photos } <- do
        let ChatId userId = chatId
-       getUserProfilePhotos token userId Nothing Nothing manager
+       getUserProfilePhotos token (fromIntegral userId) Nothing Nothing manager
      total_count photos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook and /getWebhookInfo" $ do

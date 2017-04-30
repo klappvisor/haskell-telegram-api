@@ -73,6 +73,7 @@ import           Data.Aeson.Types                      (typeMismatch)
 import qualified Data.ByteString                       as BS
 import qualified Data.ByteString.Lazy                  as LBS
 import           Data.Maybe
+import           Data.Int                              (Int64)
 import           Data.Text                             (Text)
 import qualified Data.Text                             as T
 import qualified Data.Text.Encoding                    as T
@@ -174,7 +175,7 @@ getUpdatesRequest :: GetUpdatesRequest
 getUpdatesRequest = GetUpdatesRequest Nothing Nothing Nothing Nothing
 
 -- | Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
-data ChatId = ChatId Integer | ChatChannel Text
+data ChatId = ChatId Int64 | ChatChannel Text
   deriving (Show)
 
 instance ToJSON ChatId where
@@ -184,7 +185,7 @@ instance ToJSON ChatId where
 instance FromJSON ChatId where
   parseJSON value@Number{} = ChatId <$> parseJSON value
   parseJSON (String text)  = pure $ ChatChannel text
-  parseJSON wat            = typeMismatch "Integer or String" wat
+  parseJSON wat            = typeMismatch "Int64 or String" wat
 
 chatIdToPart :: ChatId -> Text
 chatIdToPart (ChatId integer)   = tshow integer

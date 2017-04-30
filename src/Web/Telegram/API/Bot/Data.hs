@@ -817,8 +817,8 @@ data Message = Message
   , group_chat_created :: Maybe Bool      -- ^ Service message: the group has been created
   , supergroup_chat_created :: Maybe Bool -- ^ Service message: the supergroup has been created
   , channel_chat_created :: Maybe Bool    -- ^ Service message: the channel has been created
-  , migrate_to_chat_id :: Maybe Int       -- ^ The group has been migrated to a supergroup with the specified identifier, not exceeding 1e13 by absolute value
-  , migrate_from_chat_id :: Maybe Int     -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
+  , migrate_to_chat_id :: Maybe Int64     -- ^ The group has been migrated to a supergroup with the specified identifier, not exceeding 1e13 by absolute value
+  , migrate_from_chat_id :: Maybe Int64   -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
   , pinned_message :: Maybe Message       -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
   } deriving (FromJSON, ToJSON, Show, Generic)
 
