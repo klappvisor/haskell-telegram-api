@@ -36,6 +36,15 @@ module Web.Telegram.API.Bot.Data
     , InputMessageContent           (..)
     , KeyboardButton                (..)
     , WebhookInfo                   (..)
+    , LabeledPrice                  (..)
+    , CurrencyCode                  (..)
+    , Invoice                       (..)
+    , ShippingAddress               (..)
+    , OrderInfo                     (..)
+    , ShippingOption                (..)
+    , SuccessfulPayment             (..)
+    , ShippingQuery                 (..)
+    , PreCheckoutQuery              (..)
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
@@ -885,3 +894,131 @@ instance ToJSON WebhookInfo where
 
 instance FromJSON WebhookInfo where
   parseJSON = parseJsonDrop 4
+
+-- Payments
+
+data LabeledPrice
+  -- | This object represents a portion of the price for goods or services.
+  = LabeledPrice
+  {
+    lp_label :: Text -- ^ Portion label
+  , lp_amount :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  } deriving (Show, Generic)
+
+instance ToJSON LabeledPrice where
+  toJSON = toJsonDrop 3
+
+instance FromJSON LabeledPrice where
+  parseJSON = parseJsonDrop 3
+
+newtype CurrencyCode = CurrencyCode Text
+  deriving (Show, Eq, Ord)
+
+data Invoice
+  -- | This object contains basic information about an invoice.
+  = Invoice
+  {
+    inv_title :: Text -- ^ Product name
+  , inv_description :: Text -- ^ Product description
+  , inv_start_parameter :: Text -- ^ Unique bot deep-linking parameter that can be used to generate this invoice
+  , inv_currency :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , inv_total_amount :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  } deriving (Show, Generic)
+
+instance ToJSON Invoice where
+  toJSON = toJsonDrop 4
+
+instance FromJSON Invoice where
+  parseJSON = parseJsonDrop 4
+
+data ShippingAddress = ShippingAddress
+  {
+    ship_addr_country_code :: Text -- ^ ISO 3166-1 alpha-2 country code
+  , ship_addr_state :: Maybe Text -- ^ State, if applicable
+  , ship_addr_city :: Text -- ^ City
+  , ship_addr_street_line1 :: Text -- ^ First line for the address
+  , ship_addr_street_line2 :: Text -- ^ Second line for the address
+  , ship_addr_post_code :: Text -- ^ Address post code
+  } deriving (Show, Generic)
+
+instance ToJSON ShippingAddress where
+  toJSON = toJsonDrop 10
+
+instance FromJSON ShippingAddress where
+  parseJSON = parseJsonDrop 10
+
+data OrderInfo = OrderInfo
+  {
+    ord_info_name :: Maybe Text -- ^ User name
+  , ord_info_phone_number :: Maybe Text -- ^ User's phone number
+  , ord_info_email :: Maybe Text -- ^ User email
+  , ord_info_shipping_address :: Maybe ShippingAddress -- ^ User shipping address
+  } deriving (Show, Generic)
+
+instance ToJSON OrderInfo where
+  toJSON = toJsonDrop 9
+
+instance FromJSON OrderInfo where
+  parseJSON = parseJsonDrop 9
+
+data ShippingOption = ShippingOption
+  {
+    ship_opt_id :: Text -- ^ Shipping option identifier
+  , ship_opt_title :: Text -- ^ Option title
+  , ship_opt_prices :: [LabeledPrice] -- ^ List of price portions
+  } deriving (Show, Generic)
+
+instance ToJSON ShippingOption where
+  toJSON = toJsonDrop 9
+
+instance FromJSON ShippingOption where
+  parseJSON = parseJsonDrop 9
+
+data SuccessfulPayment = SuccessfulPayment
+  {
+    suc_pmnt_currency :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , suc_pmnt_total_amount :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  , suc_pmnt_invoice_payload :: Text -- ^ Bot specified invoice payload
+  , suc_pmnt_shipping_option_id :: Maybe Text -- ^  Identifier of the shipping option chosen by the user
+  , suc_pmnt_order_info :: Maybe OrderInfo -- ^ Order info provided by the user
+  , suc_pmnt_telegram_payment_charge_id :: Text -- ^ Telegram payment identifier
+  , suc_pmnt_provider_payment_charge_id :: Text -- ^ Provider payment identifier
+  } deriving (Show, Generic)
+
+instance ToJSON SuccessfulPayment where
+  toJSON = toJsonDrop 9
+
+instance FromJSON SuccessfulPayment where
+  parseJSON = parseJsonDrop 9
+
+data ShippingQuery = ShippingQuery
+  {
+    ship_q_id :: Text -- ^ Unique query identifier
+  , ship_q_from :: User -- ^ User who sent the query
+  , ship_q_invoice_payload :: Text -- ^ Bot specified invoice payload
+  , ship_q_shipping_address :: ShippingAddress -- ^ User specified shipping address
+  } deriving (Show, Generic)
+
+
+instance ToJSON ShippingQuery where
+  toJSON = toJsonDrop 7
+
+instance FromJSON ShippingQuery where
+  parseJSON = parseJsonDrop 7
+
+data PreCheckoutQuery = PreCheckoutQuery
+  {
+    pre_che_id :: Text -- ^ Unique query identifier
+  , pre_che_from :: User -- ^ User who sent the query
+  , pre_che_currency :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , pre_che_total_amount :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  , pre_che_invoice_payload :: Text -- ^ Bot specified invoice payload
+  , pre_che_shipping_option_id :: Maybe Text -- ^ Identifier of the shipping option chosen by the user
+  , pre_che_order_info :: Maybe OrderInfo -- ^ Order info provided by the user
+  } deriving (Show, Generic)
+
+instance ToJSON PreCheckoutQuery where
+  toJSON = toJsonDrop 8
+
+instance FromJSON PreCheckoutQuery where
+  parseJSON = parseJsonDrop 8
