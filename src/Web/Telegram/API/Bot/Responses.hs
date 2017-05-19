@@ -91,3 +91,7 @@ type GetChatMembersCountResponse = Response Int
 type GetChatMemberResponse = Response ChatMember
 
 type GetWebhookInfoResponse = Response WebhookInfo
+
+type AnswerShippingQueryResponse = Response Bool
+
+type AnswerPreCheckoutQueryResponse = Response Bool

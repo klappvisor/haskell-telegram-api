@@ -752,6 +752,8 @@ data Update = Update
   , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
   , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
   , callback_query       :: Maybe CallbackQuery -- ^ This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
+  , shipping_query       :: Maybe ShippingQuery -- ^  New incoming shipping query. Only for invoices with flexible price
+  , pre_checkout_query   :: Maybe PreCheckoutQuery -- ^ New incoming pre-checkout query. Contains full information about checkout
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a point on the map.
@@ -829,6 +831,8 @@ data Message = Message
   , migrate_to_chat_id :: Maybe Int64     -- ^ The group has been migrated to a supergroup with the specified identifier, not exceeding 1e13 by absolute value
   , migrate_from_chat_id :: Maybe Int64   -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
   , pinned_message :: Maybe Message       -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
+  , invoice :: Maybe Invoice              -- ^  Message is an invoice for a payment, information about the invoice.
+  , successful_payment :: SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
