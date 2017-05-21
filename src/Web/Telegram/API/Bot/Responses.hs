@@ -29,8 +29,8 @@ module Web.Telegram.API.Bot.Responses
     ) where
 
 import           Data.Aeson
+import           Data.Int                     (Int64)
 import           GHC.Generics
-import           Data.Int (Int64)
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.JsonExt
 

@@ -10,9 +10,9 @@ import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified JsonSpec
 import qualified MainSpec
-import qualified PaymentsSpec
 import           Options.Applicative
-import           System.Environment           (withArgs, lookupEnv)
+import qualified PaymentsSpec
+import           System.Environment           (lookupEnv, withArgs)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
 import qualified UpdatesSpec

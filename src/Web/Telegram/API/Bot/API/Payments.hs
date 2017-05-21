@@ -1,6 +1,6 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Web.Telegram.API.Bot.API.Payments
   ( -- * Functions

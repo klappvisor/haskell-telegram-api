@@ -78,8 +78,8 @@ import           Data.Aeson
 import           Data.Aeson.Types                      (typeMismatch)
 import qualified Data.ByteString                       as BS
 import qualified Data.ByteString.Lazy                  as LBS
-import           Data.Maybe
 import           Data.Int                              (Int64)
+import           Data.Maybe
 import           Data.Text                             (Text)
 import qualified Data.Text                             as T
 import qualified Data.Text.Encoding                    as T
@@ -87,13 +87,12 @@ import           GHC.Generics
 import           Network.HTTP.Client.MultipartFormData
 import           Network.Mime
 import           Servant.Client.MultipartFormData      (ToMultipartFormData (..))
-import           Web.Telegram.API.Bot.Data             (InlineKeyboardButton,
+import           Web.Telegram.API.Bot.Data             (CurrencyCode,
+                                                        InlineKeyboardButton,
                                                         InlineKeyboardMarkup,
                                                         InlineQueryResult,
                                                         KeyboardButton,
-                                                        ParseMode,
-                                                        CurrencyCode,
-                                                        LabeledPrice,
+                                                        LabeledPrice, ParseMode,
                                                         ShippingOption)
 import           Web.Telegram.API.Bot.JsonExt
 
@@ -628,7 +627,7 @@ data ReplyKeyboard =
   -- | This object represents a custom keyboard with reply options
   ReplyInlineKeyboardMarkup
   {
-    reply_inline_keyboard      :: [[InlineKeyboardButton]] -- ^ Array of button rows, each represented by an Array of InlineKeyboardButton objects
+    reply_inline_keyboard :: [[InlineKeyboardButton]] -- ^ Array of button rows, each represented by an Array of InlineKeyboardButton objects
   }
   | ReplyKeyboardMarkup
   {
@@ -739,26 +738,26 @@ editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyM
 
 data SendInvoiceRequest = SendInvoiceRequest
   {
-    snd_inv_chat_id :: Int64 -- ^ Unique identifier for the target private chat
-  , snd_inv_title :: Text -- ^ Product name
-  , snd_inv_description :: Text -- ^ Product description
-  , snd_inv_payload :: Text -- ^ Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
-  , snd_inv_provider_token :: Text -- ^ Payments provider token, obtained via Botfather
-  , snd_inv_start_parameter :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
-  , snd_inv_currency :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
-  , snd_inv_prices :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
-  , snd_inv_photo_url :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
-  , snd_inv_photo_size :: Maybe Int -- ^ Photo size
-  , snd_inv_photo_width :: Maybe Int -- ^ Photo width
-  , snd_inv_photo_height :: Maybe Int -- ^ Photo height
-  , snd_inv_need_name :: Maybe Bool -- ^ Pass `True`, if you require the user's full name to complete the order
-  , snd_inv_need_phone_number :: Maybe Bool -- ^ Pass `True`, if you require the user's phone number to complete the order
-  , snd_inv_need_email :: Maybe Bool -- ^ Pass `True`, if you require the user's email to complete the order
+    snd_inv_chat_id               :: Int64 -- ^ Unique identifier for the target private chat
+  , snd_inv_title                 :: Text -- ^ Product name
+  , snd_inv_description           :: Text -- ^ Product description
+  , snd_inv_payload               :: Text -- ^ Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
+  , snd_inv_provider_token        :: Text -- ^ Payments provider token, obtained via Botfather
+  , snd_inv_start_parameter       :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
+  , snd_inv_currency              :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , snd_inv_prices                :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+  , snd_inv_photo_url             :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
+  , snd_inv_photo_size            :: Maybe Int -- ^ Photo size
+  , snd_inv_photo_width           :: Maybe Int -- ^ Photo width
+  , snd_inv_photo_height          :: Maybe Int -- ^ Photo height
+  , snd_inv_need_name             :: Maybe Bool -- ^ Pass `True`, if you require the user's full name to complete the order
+  , snd_inv_need_phone_number     :: Maybe Bool -- ^ Pass `True`, if you require the user's phone number to complete the order
+  , snd_inv_need_email            :: Maybe Bool -- ^ Pass `True`, if you require the user's email to complete the order
   , snd_inv_need_shipping_address :: Maybe Bool -- ^ Pass `True`, if you require the user's shipping address to complete the order
-  , snd_inv_is_flexible :: Maybe Bool -- ^ Pass `True`, if the final price depends on the shipping method
-  , snd_inv_disable_notification :: Maybe Bool -- ^ Sends the message silently. Users will receive a notification with no sound.
-  , snd_inv_reply_to_message :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , snd_inv_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
+  , snd_inv_is_flexible           :: Maybe Bool -- ^ Pass `True`, if the final price depends on the shipping method
+  , snd_inv_disable_notification  :: Maybe Bool -- ^ Sends the message silently. Users will receive a notification with no sound.
+  , snd_inv_reply_to_message      :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , snd_inv_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
   } deriving (Show, Generic)
 
 instance ToJSON SendInvoiceRequest where
@@ -784,9 +783,9 @@ data AnswerShippingQueryRequest
   = AnswerShippingQueryRequest
   {
     asq_shipping_query_id :: Text -- ^ Unique identifier for the query to be answered
-  , asq_ok :: Bool -- ^ Specify True if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)
-  , asq_shipping_options :: Maybe [ShippingOption] -- ^ Required if ok is True. A JSON-serialized array of available shipping options.
-  , asq_error_message :: Maybe Text -- ^ Required if ok is False. Error message in human readable form that explains why it is impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable'). Telegram will display this message to the user.
+  , asq_ok                :: Bool -- ^ Specify True if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)
+  , asq_shipping_options  :: Maybe [ShippingOption] -- ^ Required if ok is True. A JSON-serialized array of available shipping options.
+  , asq_error_message     :: Maybe Text -- ^ Required if ok is False. Error message in human readable form that explains why it is impossible to complete the order (e.g. "Sorry, delivery to your desired address is unavailable'). Telegram will display this message to the user.
   } deriving (Show, Generic)
 
 instance ToJSON AnswerShippingQueryRequest where
@@ -806,8 +805,8 @@ data AnswerPreCheckoutQueryRequest
   = AnswerPreCheckoutQueryRequest
   {
     apc_pre_checkout_query_id :: Text -- ^ 	Unique identifier for the query to be answered
-  , apc_ok :: Bool -- ^ Specify True if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order. Use False if there are any problems.
-  , apc_error_message :: Maybe Text -- ^ Required if ok is False. Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details. Please choose a different color or garment!"). Telegram will display this message to the user.
+  , apc_ok                    :: Bool -- ^ Specify True if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order. Use False if there are any problems.
+  , apc_error_message         :: Maybe Text -- ^ Required if ok is False. Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g. "Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details. Please choose a different color or garment!"). Telegram will display this message to the user.
   } deriving (Show, Generic)
 
 instance ToJSON AnswerPreCheckoutQueryRequest where
