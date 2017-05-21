@@ -10,6 +10,7 @@ import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified JsonSpec
 import qualified MainSpec
+import qualified PaymentsSpec
 import           Options.Applicative
 import           System.Environment           (withArgs)
 import           Test.Hspec
@@ -22,6 +23,7 @@ data Options = Options
   {
     opt_integration :: Bool   -- ^ Run integration tests
   , opt_token       :: Maybe String   -- ^ Bot token from BotFather
+  , opt_paymentsToken :: Maybe String   -- ^ Test Stripe payments token
   , opt_chatId      :: Maybe String   -- ^ Id of a chat or of your bot
   , opt_botName     :: Maybe String   -- ^ Bot name
   , opt_hSpecOpts   :: Maybe [String] -- ^ Command line options to pass to hSpec
@@ -37,6 +39,11 @@ options = Options
         <> short 't'
         <> metavar "BOT_TOKEN"
         <> help "Bot Token" ))
+    <*> optional ( strOption
+         ( long "paymentsToken"
+        <> short 's'
+        <> metavar "STRIPE_TOKEN"
+        <> help "Test Stripe payments token" ))
     <*> optional ( strOption
          ( long "chatid"
         <> short 'c'
@@ -56,28 +63,30 @@ main = do
     Options{..} <- execParser opts
     let integration = opt_integration
         token = fmap (\x -> Token ("bot" <> T.pack x)) opt_token
+        paymentsToken = T.pack <$> opt_paymentsToken
         chatId = readChatId <$> opt_chatId
         botName = T.pack <$> opt_botName
         hspecArgs = fromMaybe [] opt_hSpecOpts
-    withArgs hspecArgs $ hspec (runSpec' integration token chatId botName)
+    withArgs hspecArgs $ hspec (runSpec' integration token chatId botName paymentsToken)
     where opts = info (helper <*> options)
             ( fullDesc
            <> progDescDoc description)
-runSpec' :: Bool -> Maybe Token -> Maybe ChatId -> Maybe Text -> SpecWith ()
-runSpec' integration token chatId botName = do
+runSpec' :: Bool -> Maybe Token -> Maybe ChatId -> Maybe Text -> Maybe Text -> SpecWith ()
+runSpec' integration token chatId botName paymentToken = do
     describe "Unit tests" $
       describe "Json tests" JsonSpec.spec
-    if integration then runIntegrationSpec token chatId botName
+    if integration then runIntegrationSpec token chatId botName paymentToken
     else describe "Integration tests" $ it "skipping..." $
         pendingWith "Use --integration switch to run integration tests"
 
 
-runIntegrationSpec :: Maybe Token -> Maybe ChatId -> Maybe Text -> SpecWith ()
-runIntegrationSpec (Just token) (Just chatId) (Just botName) = do
+runIntegrationSpec :: Maybe Token -> Maybe ChatId -> Maybe Text -> Maybe Text -> SpecWith ()
+runIntegrationSpec (Just token) (Just chatId) (Just botName) (Just paymentsToken) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
+        describe "Payments integration tests" $ PaymentsSpec.spec token chatId botName paymentsToken
         describe "Updates API spec" $ UpdatesSpec.spec token botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
-runIntegrationSpec _ _ _ = describe "Integration tests" $
+runIntegrationSpec _ _ _ _ = describe "Integration tests" $
         fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
 
 description ::  Maybe PP.Doc

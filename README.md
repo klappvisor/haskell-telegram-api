@@ -139,7 +139,7 @@ stack build
 To run test you have to create your own bot. Go to [BotFather](https://telegram.me/botfather) and create the bot. As the result you will have private bot's access token. Keep it safe!
 
 ```
-stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -b BOT_NAME -- HSPEC_ARGS"
+stack test --test-arguments "--integration -t BOT_TOKEN -s STRIPE_TOKEN -c CHAT_ID -b BOT_NAME -- HSPEC_ARGS"
 ```
 
 where
@@ -153,7 +153,7 @@ The help option is available for the tests and for hspec:
 
 ```
 stack test --test-arguments "-h"
-stack test --test-arguments "--integration -t BOT_TOKEN -c CHAT_ID -b BOT_NAME -- -h"
+stack test --test-arguments "--integration -t BOT_TOKEN -s STRIPE_TOKEN -c CHAT_ID -b BOT_NAME -- -h"
 ```
 
 Note: Inline Spec is disabled for now...

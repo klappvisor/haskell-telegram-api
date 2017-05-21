@@ -22,7 +22,7 @@ import           Web.Telegram.API.Bot
 import           Paths_telegram_api
 
 -- to print out remote response if response success not match
-success, nosuccess :: (Show a, Show b) =>Either a b ->Expectation
+success, nosuccess :: (Show a, Show b) => Either a b -> Expectation
 success   e = e `shouldSatisfy` isRight
 nosuccess e = e `shouldSatisfy` isLeft
 
