@@ -832,7 +832,7 @@ data Message = Message
   , migrate_from_chat_id :: Maybe Int64   -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
   , pinned_message :: Maybe Message       -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
   , invoice :: Maybe Invoice              -- ^  Message is an invoice for a payment, information about the invoice.
-  , successful_payment :: SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
+  , successful_payment :: Maybe SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
