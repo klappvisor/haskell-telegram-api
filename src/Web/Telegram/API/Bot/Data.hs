@@ -36,6 +36,15 @@ module Web.Telegram.API.Bot.Data
     , InputMessageContent           (..)
     , KeyboardButton                (..)
     , WebhookInfo                   (..)
+    , LabeledPrice                  (..)
+    , CurrencyCode                  (..)
+    , Invoice                       (..)
+    , ShippingAddress               (..)
+    , OrderInfo                     (..)
+    , ShippingOption                (..)
+    , SuccessfulPayment             (..)
+    , ShippingQuery                 (..)
+    , PreCheckoutQuery              (..)
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
@@ -62,14 +71,14 @@ module Web.Telegram.API.Bot.Data
 
     ) where
 
-import           Prelude hiding (id)
+import           Prelude                      hiding (id)
 
 import           Data.Aeson
 import           Data.Aeson.Types
-import qualified Data.Char as Char
-import           Data.Int (Int64)
+import qualified Data.Char                    as Char
+import           Data.Int                     (Int64)
 import           Data.List
-import           Data.Text (Text)
+import           Data.Text                    (Text)
 import           GHC.Generics
 
 import           Web.Telegram.API.Bot.JsonExt
@@ -77,10 +86,10 @@ import           Web.Telegram.API.Bot.JsonExt
 -- | This object represents a Telegram user or bot.
 data User = User
   {
-    user_id :: Int                -- ^ Unique identifier for this user or bot
+    user_id         :: Int        -- ^ Unique identifier for this user or bot
   , user_first_name :: Text       -- ^ User‘s or bot’s first name
-  , user_last_name :: Maybe Text  -- ^ User‘s or bot’s last name
-  , user_username :: Maybe Text   -- ^ User‘s or bot’s username
+  , user_last_name  :: Maybe Text -- ^ User‘s or bot’s last name
+  , user_username   :: Maybe Text -- ^ User‘s or bot’s username
   } deriving (Show, Generic)
 
 instance ToJSON User where
@@ -106,18 +115,18 @@ instance FromJSON Contact where
 
 -- | This object represents a chat.
 data Chat = Chat
-  { chat_id :: Int64
+  { chat_id                             :: Int64
     -- ^ Unique identifier for this chat.
     -- This number may be greater than 32 bits and some programming languages
     -- may have difficulty/silent defects in interpreting it.
     -- But it is smaller than 52 bits,
     -- so a signed 64 bit integer or double-precision float type are safe for
     -- storing this identifier.
-  , chat_type :: ChatType         -- ^ Type of chat, can be either 'Private', 'Group', 'Supergroup' or 'Channel'
-  , chat_title :: Maybe Text      -- ^ Title, for channels and group chats
-  , chat_username :: Maybe Text   -- ^ Username, for private chats and channels if available
-  , chat_first_name :: Maybe Text -- ^ First name of the other party in a private chat
-  , chat_last_name :: Maybe Text  -- ^ Last name of the other party in a private chat
+  , chat_type                           :: ChatType   -- ^ Type of chat, can be either 'Private', 'Group', 'Supergroup' or 'Channel'
+  , chat_title                          :: Maybe Text -- ^ Title, for channels and group chats
+  , chat_username                       :: Maybe Text -- ^ Username, for private chats and channels if available
+  , chat_first_name                     :: Maybe Text -- ^ First name of the other party in a private chat
+  , chat_last_name                      :: Maybe Text -- ^ Last name of the other party in a private chat
   , chat_all_members_are_administrators :: Maybe Bool -- ^ True if a group has ‘All Members Are Admins’ enabled.
   } deriving (Show, Generic)
 
@@ -193,11 +202,11 @@ instance FromJSON Audio where
 -- | This object represents a general file (as opposed to 'PhotoSize', 'Voice' messages and 'Audio' files).
 data Document = Document
   {
-    doc_file_id   :: Text             -- ^ Unique file identifier
-  , doc_thumb     :: Maybe PhotoSize  -- ^ Document thumbnail as defined by sender
-  , doc_file_name :: Maybe Text       -- ^ Original filename as defined by sender
-  , doc_mime_type :: Maybe Text       -- ^ MIME type of the file as defined by sender
-  , doc_file_size :: Maybe Int        -- ^ File size
+    doc_file_id   :: Text            -- ^ Unique file identifier
+  , doc_thumb     :: Maybe PhotoSize -- ^ Document thumbnail as defined by sender
+  , doc_file_name :: Maybe Text      -- ^ Original filename as defined by sender
+  , doc_mime_type :: Maybe Text      -- ^ MIME type of the file as defined by sender
+  , doc_file_size :: Maybe Int       -- ^ File size
   } deriving (Show, Generic)
 
 instance ToJSON Document where
@@ -209,12 +218,12 @@ instance FromJSON Document where
 -- | This object represents a game. Use BotFather to create and edit games, their short names will act as unique identifiers.
 data Game = Game
   {
-    game_title :: Text -- ^ Title of the game
-  , game_description :: Text -- ^ Description of the game
-  , game_photo :: [PhotoSize] -- ^ Photo that will be displayed in the game message in chats.
-  , game_text :: Maybe Text -- ^ Brief description of the game or high scores included in the game message. Can be automatically edited to include current high scores for the game when the bot calls setGameScore, or manually edited using editMessageText. 0-4096 characters.
+    game_title         :: Text -- ^ Title of the game
+  , game_description   :: Text -- ^ Description of the game
+  , game_photo         :: [PhotoSize] -- ^ Photo that will be displayed in the game message in chats.
+  , game_text          :: Maybe Text -- ^ Brief description of the game or high scores included in the game message. Can be automatically edited to include current high scores for the game when the bot calls setGameScore, or manually edited using editMessageText. 0-4096 characters.
   , game_text_entities :: Maybe [MessageEntity] -- ^ Special entities that appear in text, such as usernames, URLs, bot commands, etc.
-  , game_animation :: Maybe Animation -- ^ Animation that will be displayed in the game message in chats. Upload via BotFather
+  , game_animation     :: Maybe Animation -- ^ Animation that will be displayed in the game message in chats. Upload via BotFather
   } deriving (Show, Generic)
 
 instance ToJSON Game where
@@ -226,8 +235,8 @@ instance FromJSON Game where
 -- | This object represents an animation file to be displayed in the message containing a game.
 data Animation = Animation
   {
-    anim_file_id :: Text -- ^ Unique file identifier
-  , anim_thumb :: Maybe PhotoSize -- ^ Animation thumbnail as defined by sender
+    anim_file_id   :: Text -- ^ Unique file identifier
+  , anim_thumb     :: Maybe PhotoSize -- ^ Animation thumbnail as defined by sender
   , anim_file_name :: Maybe Text -- ^ Original animation filename as defined by sender
   , anim_mime_type :: Maybe Text -- ^ MIME type of the file as defined by sender
   , anim_file_size :: Maybe Int -- ^ File size
@@ -292,11 +301,11 @@ instance FromJSON Voice where
 -- | This object represents an incoming inline query. When the user sends an empty query, your bot could return some default or trending results.
 data InlineQuery = InlineQuery
   {
-    query_id        :: Text -- ^ Unique identifier for this query
-  , query_from      :: User -- ^ Sender
-  , query_location  :: Maybe Location -- ^ Sender location, only for bots that request user location
-  , query_query     :: Text -- ^ Text of the query
-  , query_offset    :: Text -- ^ Offset of the results to be returned, can be controlled by the bot
+    query_id       :: Text -- ^ Unique identifier for this query
+  , query_from     :: User -- ^ Sender
+  , query_location :: Maybe Location -- ^ Sender location, only for bots that request user location
+  , query_query    :: Text -- ^ Text of the query
+  , query_offset   :: Text -- ^ Offset of the results to be returned, can be controlled by the bot
   } deriving (Show, Generic)
 
 instance ToJSON InlineQuery where
@@ -308,11 +317,11 @@ instance FromJSON InlineQuery where
 -- | This object represents a result of an inline query that was chosen by the user and sent to their chat partner.
 data ChosenInlineResult = ChosenInlineResult
   {
-    chosen_result_id          :: Text -- ^ The unique identifier for the result that was chosen
-  , chosen_from               :: User -- ^ The user that chose the result
-  , chosen_location           :: Maybe Location -- ^ Sender location, only for bots that require user location
-  , chosen_inline_message_id  :: Maybe Text -- ^ Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
-  , chosen_query              :: Text -- ^ The query that was used to obtain the result
+    chosen_result_id         :: Text -- ^ The unique identifier for the result that was chosen
+  , chosen_from              :: User -- ^ The user that chose the result
+  , chosen_location          :: Maybe Location -- ^ Sender location, only for bots that require user location
+  , chosen_inline_message_id :: Maybe Text -- ^ Identifier of the sent inline message. Available only if there is an inline keyboard attached to the message. Will be also received in callback queries and can be used to edit the message.
+  , chosen_query             :: Text -- ^ The query that was used to obtain the result
   } deriving (Show, Generic)
 
 instance ToJSON ChosenInlineResult where
@@ -326,31 +335,31 @@ data InputMessageContent =
   -- | Represents the content of a text message to be sent as the result of an inline query.
   InputTextMessageContent
   {
-    imc_message_text :: Text -- ^ Text of the message to be sent, 1-4096 characters
-  , imc_parse_mode :: Maybe ParseMode -- ^ Send 'Markdown' or 'HTML', if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
+    imc_message_text             :: Text -- ^ Text of the message to be sent, 1-4096 characters
+  , imc_parse_mode               :: Maybe ParseMode -- ^ Send 'Markdown' or 'HTML', if you want Telegram apps to show bold, italic, fixed-width text or inline URLs in your bot's message.
   , imc_disable_web_page_preview :: Maybe Bool -- ^ Disables link previews for links in the sent message
   }
   -- | Represents the content of a location message to be sent as the result of an inline query.
   | InputLocationMessageContent
   {
-    imc_latitude :: Float -- ^ Latitude of the location in degrees
+    imc_latitude  :: Float -- ^ Latitude of the location in degrees
   , imc_longitude :: Float -- ^ Longitude of the location in degrees
   }
   -- | Represents the content of a venue message to be sent as the result of an inline query.
   | InputVenueMessageContent
   {
-    imc_latitude :: Float -- ^ Latitude of the location in degrees
-  , imc_longitude :: Float -- ^ Longitude of the location in degrees
-  , imc_title :: Text -- ^ Name of the venue
-  , imc_address :: Text -- ^ Address of the venue
+    imc_latitude      :: Float -- ^ Latitude of the location in degrees
+  , imc_longitude     :: Float -- ^ Longitude of the location in degrees
+  , imc_title         :: Text -- ^ Name of the venue
+  , imc_address       :: Text -- ^ Address of the venue
   , imc_foursquare_id :: Maybe Text -- ^ Foursquare identifier of the venue, if known
   }
   -- | Represents the content of a contact message to be sent as the result of an inline query.
   | InputContactMessageContent
   {
     imc_phone_number :: Text -- ^ Contact's phone number
-  , imc_first_name :: Text -- ^ Contact's first name
-  , imc_last_name :: Maybe Text -- ^ Contact's last name
+  , imc_first_name   :: Text -- ^ Contact's first name
+  , imc_last_name    :: Maybe Text -- ^ Contact's last name
   } deriving (Show, Generic)
 
 instance ToJSON InputMessageContent where
@@ -363,237 +372,237 @@ data InlineQueryResult =
   -- | Represents a link to an article or web page.
   InlineQueryResultArticle
   {
-    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 Bytes
-  , iq_res_title                           :: Maybe Text -- ^ Title of the result
-  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent
-  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
-  , iq_res_url                             :: Maybe Text -- ^ URL of the result
-  , iq_res_hide_url                        :: Maybe Bool -- ^ Pass True, if you don't want the URL to be shown in the message
-  , iq_res_description                     :: Maybe Text -- ^ Short description of the result
-  , iq_res_thumb_url                       :: Maybe Text -- ^ Url of the thumbnail for the result
-  , iq_res_thumb_width                     :: Maybe Int -- ^ Thumbnail width
-  , iq_res_thumb_height                    :: Maybe Int -- ^ Thumbnail height
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_title                 :: Maybe Text -- ^ Title of the result
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_url                   :: Maybe Text -- ^ URL of the result
+  , iq_res_hide_url              :: Maybe Bool -- ^ Pass True, if you don't want the URL to be shown in the message
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_thumb_url             :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width           :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height          :: Maybe Int -- ^ Thumbnail height
   }
   -- | Represents a link to a photo. By default, this photo will be sent by the user with optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   | InlineQueryResultPhoto
   {
-    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_photo_url                       :: Text -- ^ A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
-  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail for the photo
-  , iq_res_photo_width                     :: Maybe Int -- ^ Optional. Width of the photo
-  , iq_res_photo_height                    :: Maybe Int -- ^ Optional. Height of the photo
-  , iq_res_title                           :: Maybe Text -- ^ Title for the result
-  , iq_res_description                     :: Maybe Text -- ^ Short description of the result
-  , iq_res_caption                         :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
-  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
-  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the photo
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_photo_url             :: Text -- ^ A valid URL of the photo. Photo must be in jpeg format. Photo size must not exceed 5MB
+  , iq_res_thumb_url             :: Maybe Text -- ^ URL of the thumbnail for the photo
+  , iq_res_photo_width           :: Maybe Int -- ^ Optional. Width of the photo
+  , iq_res_photo_height          :: Maybe Int -- ^ Optional. Height of the photo
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the photo
   }
   -- | Represents a link to an animated GIF file. By default, this animated GIF file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
   | InlineQueryResultGif
   {
-    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_gif_url                         :: Text -- ^ A valid URL for the GIF file. File size must not exceed 1MB
-  , iq_res_gif_width                       :: Maybe Int -- ^ Width of the GIF
-  , iq_res_gif_height                      :: Maybe Int -- ^ Height of the GIF
-  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the static thumbnail for the result (jpeg or gif)
-  , iq_res_title                           :: Maybe Text -- ^ Title for the result
-  , iq_res_caption                         :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
-  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
-  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the GIF animation
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_gif_url               :: Text -- ^ A valid URL for the GIF file. File size must not exceed 1MB
+  , iq_res_gif_width             :: Maybe Int -- ^ Width of the GIF
+  , iq_res_gif_height            :: Maybe Int -- ^ Height of the GIF
+  , iq_res_thumb_url             :: Maybe Text -- ^ URL of the static thumbnail for the result (jpeg or gif)
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the GIF animation
   }
   -- | Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
   | InlineQueryResultMpeg4Gif
   {
-    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_mpeg4_url                       :: Text -- ^ A valid URL for the MP4 file. File size must not exceed 1MB
-  , iq_res_mpeg4_width                     :: Maybe Int -- ^ Video width
-  , iq_res_mpeg4_height                    :: Maybe Int -- ^ Video height
-  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the static thumbnail (jpeg or gif) for the result
-  , iq_res_title                           :: Maybe Text -- ^ Title for the result
-  , iq_res_caption                         :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
-  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
-  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video animation
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_mpeg4_url             :: Text -- ^ A valid URL for the MP4 file. File size must not exceed 1MB
+  , iq_res_mpeg4_width           :: Maybe Int -- ^ Video width
+  , iq_res_mpeg4_height          :: Maybe Int -- ^ Video height
+  , iq_res_thumb_url             :: Maybe Text -- ^ URL of the static thumbnail (jpeg or gif) for the result
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video animation
   }
   -- | Represents link to a page containing an embedded video player or a video file.
   | InlineQueryResultVideo
   {
-    iq_res_id                              :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_video_url                       :: Text -- ^ A valid URL for the embedded video player or video file
-  , iq_res_mime_type                       :: Text -- ^ Mime type of the content of video url, “text/html” or “video/mp4”
-  , iq_res_thumb_url                       :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the video
-  , iq_res_title                           :: Maybe Text -- ^ Title for the result
-  , iq_res_caption                         :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
-  , iq_res_video_width                     :: Maybe Int -- ^ Video width
-  , iq_res_video_height                    :: Maybe Int -- ^ Video height
-  , iq_res_video_duration                  :: Maybe Int -- ^ Video duration in seconds
-  , iq_res_description                     :: Maybe Text -- ^ Short description of the result
-  , iq_res_reply_markup                    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
-  , iq_res_input_message_content           :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_video_url             :: Text -- ^ A valid URL for the embedded video player or video file
+  , iq_res_mime_type             :: Text -- ^ Mime type of the content of video url, “text/html” or “video/mp4”
+  , iq_res_thumb_url             :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the video
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
+  , iq_res_video_width           :: Maybe Int -- ^ Video width
+  , iq_res_video_height          :: Maybe Int -- ^ Video height
+  , iq_res_video_duration        :: Maybe Int -- ^ Video duration in seconds
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video
   }
   -- | Represents a link to an mp3 audio file. By default, this audio file will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
   | InlineQueryResultAudio
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_audio_url :: Text -- ^ A valid URL for the audio file
-  , iq_res_title :: Maybe Text -- ^ Title
-  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
-  , iq_res_performer :: Maybe Text -- ^ Performer
-  , iq_res_audio_duration :: Maybe Int -- ^ Audio duration in seconds
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_audio_url             :: Text -- ^ A valid URL for the audio file
+  , iq_res_title                 :: Maybe Text -- ^ Title
+  , iq_res_caption               :: Maybe Text -- ^ Caption, 0-200 characters
+  , iq_res_performer             :: Maybe Text -- ^ Performer
+  , iq_res_audio_duration        :: Maybe Int -- ^ Audio duration in seconds
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the audio
   }
   -- | Represents a link to a voice recording in an .ogg container encoded with OPUS. By default, this voice recording will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the the voice message.
   | InlineQueryResultVoice
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_voice_url :: Text -- ^ A valid URL for the voice recording
-  , iq_res_title :: Maybe Text -- ^ Recording title
-  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
-  , iq_res_voice_duration :: Maybe Int -- ^ Recording duration in seconds
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_voice_url             :: Text -- ^ A valid URL for the voice recording
+  , iq_res_title                 :: Maybe Text -- ^ Recording title
+  , iq_res_caption               :: Maybe Text -- ^ Caption, 0-200 characters
+  , iq_res_voice_duration        :: Maybe Int -- ^ Recording duration in seconds
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the voice recording
   }
   -- | Represents a link to a file. By default, this file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the file. Currently, only .PDF and .ZIP files can be sent using this method.
   | InlineQueryResultDocument
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_title :: Maybe Text -- ^ Title for the result
-  , iq_res_caption :: Maybe Text -- ^ Caption of the document to be sent, 0-200 characters
-  , iq_res_document_url :: Text -- ^ A valid URL for the file
-  , iq_res_mime_type :: Text -- ^ Mime type of the content of the file, either “application/pdf” or “application/zip”
-  , iq_res_description :: Maybe Text -- ^ Short description of the result
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the document to be sent, 0-200 characters
+  , iq_res_document_url          :: Text -- ^ A valid URL for the file
+  , iq_res_mime_type             :: Text -- ^ Mime type of the content of the file, either “application/pdf” or “application/zip”
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the file
-  , iq_res_thumb_url :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the file
-  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
-  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  , iq_res_thumb_url             :: Maybe Text -- ^ URL of the thumbnail (jpeg only) for the file
+  , iq_res_thumb_width           :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height          :: Maybe Int -- ^ Thumbnail height
   }
   -- | Represents a location on a map. By default, the location will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the location.
   | InlineQueryResultLocation
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 Bytes
-  , iq_res_latitude :: Float -- ^ Location latitude in degrees
-  , iq_res_longitude :: Float -- ^ Location longitude in degrees
-  , iq_res_title :: Maybe Text -- ^ Location title
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_latitude              :: Float -- ^ Location latitude in degrees
+  , iq_res_longitude             :: Float -- ^ Location longitude in degrees
+  , iq_res_title                 :: Maybe Text -- ^ Location title
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the location
-  , iq_res_thumb_url :: Maybe Text -- ^ Url of the thumbnail for the result
-  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
-  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  , iq_res_thumb_url             :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width           :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height          :: Maybe Int -- ^ Thumbnail height
   }
   -- | Represents a venue. By default, the venue will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the venue.
   | InlineQueryResultVenue
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 Bytes
-  , iq_res_latitude :: Float -- ^ Latitude of the venue location in degrees
-  , iq_res_longitude :: Float -- ^ Longitude of the venue location in degrees
-  , iq_res_title :: Maybe Text -- ^ Title of the venue
-  , iq_res_address :: Text -- ^ Address of the venue
-  , iq_res_foursquare_id :: Maybe Text -- ^ Foursquare identifier of the venue if known
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_latitude              :: Float -- ^ Latitude of the venue location in degrees
+  , iq_res_longitude             :: Float -- ^ Longitude of the venue location in degrees
+  , iq_res_title                 :: Maybe Text -- ^ Title of the venue
+  , iq_res_address               :: Text -- ^ Address of the venue
+  , iq_res_foursquare_id         :: Maybe Text -- ^ Foursquare identifier of the venue if known
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the venue
-  , iq_res_thumb_url :: Maybe Text -- ^ Url of the thumbnail for the result
-  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
-  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  , iq_res_thumb_url             :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width           :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height          :: Maybe Int -- ^ Thumbnail height
   }
   -- | Represents a link to a photo stored on the Telegram servers. By default, this photo will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   | InlineQueryResultContact
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 Bytes
-  , iq_res_phone_number :: Text -- ^ Contact's phone number
-  , iq_res_first_name :: Text -- ^ Contact's first name
-  , iq_res_last_name :: Maybe Text -- ^ Contact's last name
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 Bytes
+  , iq_res_phone_number          :: Text -- ^ Contact's phone number
+  , iq_res_first_name            :: Text -- ^ Contact's first name
+  , iq_res_last_name             :: Maybe Text -- ^ Contact's last name
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the contact
-  , iq_res_thumb_url :: Maybe Text -- ^ Url of the thumbnail for the result
-  , iq_res_thumb_width :: Maybe Int -- ^ Thumbnail width
-  , iq_res_thumb_height :: Maybe Int -- ^ Thumbnail height
+  , iq_res_thumb_url             :: Maybe Text -- ^ Url of the thumbnail for the result
+  , iq_res_thumb_width           :: Maybe Int -- ^ Thumbnail width
+  , iq_res_thumb_height          :: Maybe Int -- ^ Thumbnail height
   }
   -- | Represents a Game.
   | InlineQueryResultGame
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
+    iq_res_id              :: Text -- ^ Unique identifier for this result, 1-64 bytes
   , iq_res_game_short_name :: Text -- ^ Short name of the game
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+  , iq_res_reply_markup    :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   }
   -- | Represents a link to a photo stored on the Telegram servers. By default, this photo will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the photo.
   | InlineQueryResultCachedPhoto
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_photo_file_id :: Text -- ^ A valid file identifier of the photo
-  , iq_res_title :: Maybe Text -- ^ Title for the result
-  , iq_res_description :: Maybe Text -- ^ Short description of the result
-  , iq_res_caption :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_photo_file_id         :: Text -- ^ A valid file identifier of the photo
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the photo
   }
   -- | Represents a link to an animated GIF file stored on the Telegram servers. By default, this animated GIF file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with specified content instead of the animation.
   | InlineQueryResultCachedGif
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_gif_file_id :: Text -- ^ A valid file identifier for the GIF file
-  , iq_res_title :: Maybe Text -- ^ Title for the result
-  , iq_res_caption :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_gif_file_id           :: Text -- ^ A valid file identifier for the GIF file
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the GIF animation
   }
   -- | Represents a link to a video animation (H.264/MPEG-4 AVC video without sound) stored on the Telegram servers. By default, this animated MPEG-4 file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the animation.
   | InlineQueryResultCachedMpeg4Gif
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_mpeg4_file_id :: Text -- ^ A valid file identifier for the MP4 file
-  , iq_res_title :: Maybe Text -- ^ Title for the result
-  , iq_res_caption :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_mpeg4_file_id         :: Text -- ^ A valid file identifier for the MP4 file
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video animation
   }
   -- | Represents a link to a sticker stored on the Telegram servers. By default, this sticker will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the sticker.
   | InlineQueryResultCachedSticker
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_sticker_file_id :: Text -- ^ A valid file identifier of the sticker
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_sticker_file_id       :: Text -- ^ A valid file identifier of the sticker
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the sticker
   }
   -- | Represents a link to a file stored on the Telegram servers. By default, this file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the file. Currently, only pdf-files and zip archives can be sent using this method.
   | InlineQueryResultCachedDocument
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_title :: Maybe Text -- ^ Title for the result
-  , iq_res_document_file_id :: Text -- ^ A valid file identifier for the file
-  , iq_res_description :: Maybe Text -- ^ Short description of the result
-  , iq_res_caption :: Maybe Text -- ^ Caption of the document to be sent, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_document_file_id      :: Text -- ^ A valid file identifier for the file
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the document to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the file
   }
   -- | Represents a link to a video file stored on the Telegram servers. By default, this video file will be sent by the user with an optional caption. Alternatively, you can use input_message_content to send a message with the specified content instead of the video.
   | InlineQueryResultCachedVideo
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_video_file_id :: Text -- ^ A valid file identifier for the video file
-  , iq_res_title :: Maybe Text -- ^ Title for the result
-  , iq_res_description :: Maybe Text -- ^ Short description of the result
-  , iq_res_caption :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_video_file_id         :: Text -- ^ A valid file identifier for the video file
+  , iq_res_title                 :: Maybe Text -- ^ Title for the result
+  , iq_res_description           :: Maybe Text -- ^ Short description of the result
+  , iq_res_caption               :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video
   }
   -- | Represents a link to a voice message stored on the Telegram servers. By default, this voice message will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the voice message.
   | InlineQueryResultCachedVoice
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_voice_file_id :: Text -- ^ A valid file identifier for the voice message
-  , iq_res_title :: Maybe Text -- ^ Voice message title
-  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_voice_file_id         :: Text -- ^ A valid file identifier for the voice message
+  , iq_res_title                 :: Maybe Text -- ^ Voice message title
+  , iq_res_caption               :: Maybe Text -- ^ Caption, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the voice message
   }
   -- | Represents a link to an mp3 audio file stored on the Telegram servers. By default, this audio file will be sent by the user. Alternatively, you can use input_message_content to send a message with the specified content instead of the audio.
   | InlineQueryResultCachedAudio
   {
-    iq_res_id :: Text -- ^ Unique identifier for this result, 1-64 bytes
-  , iq_res_audio_file_id :: Text -- ^ A valid file identifier for the audio file
-  , iq_res_caption :: Maybe Text -- ^ Caption, 0-200 characters
-  , iq_res_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
+    iq_res_id                    :: Text -- ^ Unique identifier for this result, 1-64 bytes
+  , iq_res_audio_file_id         :: Text -- ^ A valid file identifier for the audio file
+  , iq_res_caption               :: Maybe Text -- ^ Caption, 0-200 characters
+  , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ An Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ ontent of the message to be sent instead of the audio
   } deriving (Show, Generic)
 
@@ -686,11 +695,11 @@ data InlineKeyboardMarkup = InlineKeyboardMarkup
 
 data InlineKeyboardButton = InlineKeyboardButton
   {
-    ikb_text :: Text
-  , ikb_url :: Maybe Text
-  , ikb_callback_data :: Maybe Text
-  , ikb_switch_inline_query :: Maybe Text
-  , ikb_callback_game :: Maybe CallbackGame
+    ikb_text                             :: Text
+  , ikb_url                              :: Maybe Text
+  , ikb_callback_data                    :: Maybe Text
+  , ikb_switch_inline_query              :: Maybe Text
+  , ikb_callback_game                    :: Maybe CallbackGame
   , ikb_switch_inline_query_current_chat :: Maybe Text -- ^ If set, pressing the button will insert the bot‘s username and the specified inline query in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.
   } deriving (Show, Generic)
 
@@ -716,13 +725,13 @@ instance FromJSON CallbackGame where
 
 data CallbackQuery = CallbackQuery
   {
-    cq_id :: Text
-  , cq_from :: User
-  , cq_message :: Maybe Message
+    cq_id                :: Text
+  , cq_from              :: User
+  , cq_message           :: Maybe Message
   , cq_inline_message_id :: Maybe Text
-  , cq_chat_instance :: Text
-  , cq_data :: Maybe Text
-  , cq_game_short_name :: Maybe Text
+  , cq_chat_instance     :: Text
+  , cq_data              :: Maybe Text
+  , cq_game_short_name   :: Maybe Text
   } deriving (Show, Generic)
 
 instance ToJSON CallbackQuery where
@@ -743,6 +752,8 @@ data Update = Update
   , inline_query         :: Maybe InlineQuery -- ^ New incoming inline query
   , chosen_inline_result :: Maybe ChosenInlineResult -- ^ The result of a inline query that was chosen by a user and sent to their chat partner
   , callback_query       :: Maybe CallbackQuery -- ^ This object represents an incoming callback query from a callback button in an inline keyboard. If the button that originated the query was attached to a message sent by the bot, the field message will be presented. If the button was attached to a message sent via the bot (in inline mode), the field inline_message_id will be presented.
+  , shipping_query       :: Maybe ShippingQuery -- ^  New incoming shipping query. Only for invoices with flexible price
+  , pre_checkout_query   :: Maybe PreCheckoutQuery -- ^ New incoming pre-checkout query. Contains full information about checkout
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents a point on the map.
@@ -759,7 +770,7 @@ data Location = Location
 --       Maximum file size to download is 20 MB
 data File = File
   {
-    file_id :: Text         -- ^ Unique identifier for this file
+    file_id   :: Text       -- ^ Unique identifier for this file
   , file_size :: Maybe Int  -- ^ File size, if known
   , file_path :: Maybe Text -- ^ File path. Use @https://api.telegram.org/file/bot<token>/<file_path>@ to get the file.
   } deriving (FromJSON, ToJSON, Show, Generic)
@@ -767,13 +778,13 @@ data File = File
 -- | This object represent a user's profile pictures.
 data UserProfilePhotos = UserProfilePhotos
   {
-    total_count :: Int      -- ^ Total number of profile pictures the target user has
-  , photos :: [[PhotoSize]] -- ^ Requested profile pictures (in up to 4 sizes each)
+    total_count :: Int           -- ^ Total number of profile pictures the target user has
+  , photos      :: [[PhotoSize]] -- ^ Requested profile pictures (in up to 4 sizes each)
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 data ChatMember = ChatMember
   {
-    cm_user :: User -- ^ Information about the user
+    cm_user   :: User -- ^ Information about the user
   , cm_status :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
   } deriving (Show, Generic)
 
@@ -786,50 +797,52 @@ instance FromJSON ChatMember where
 -- | This object represents a message.
 data Message = Message
   {
-    message_id :: Int                     -- ^ Unique message identifier
-  , from :: Maybe User                    -- ^ Sender, can be empty for messages sent to channels
-  , date :: Int                           -- ^ Date the message was sent in Unix time
-  , chat :: Chat                          -- ^ Conversation the message belongs to
-  , forward_from :: Maybe User            -- ^ For forwarded messages, sender of the original message
-  , forward_from_chat :: Maybe Chat       -- ^ For messages forwarded from a channel, information about the original channel
-  , forward_from_message_id :: Maybe Int  -- ^ For forwarded channel posts, identifier of the original message in the channel
-  , forward_date :: Maybe Int             -- ^ For forwarded messages, date the original message was sent in Unix time
-  , reply_to_message :: Maybe Message     -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
-  , edit_date :: Maybe Int                -- ^ Date the message was last edited in Unix time
-  , text :: Maybe Text                    -- ^ For text messages, the actual UTF-8 text of the message
-  , entities :: Maybe [MessageEntity]     -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
-  , audio :: Maybe Audio                  -- ^ Message is an audio file, information about the file
-  , document :: Maybe Document            -- ^ Message is a general file, information about the file
-  , game :: Maybe Game                    -- ^ Message is a game, information about the game
-  , photo :: Maybe [PhotoSize]            -- ^ Message is a photo, available sizes of the photo
-  , sticker :: Maybe Sticker              -- ^ Message is a sticker, information about the sticker
-  , video :: Maybe Video                  -- ^ Message is a video, information about the video
-  , voice :: Maybe Voice                  -- ^ Message is a voice message, information about the file
-  , caption :: Maybe Text                 -- ^ Caption for the photo or video
-  , contact :: Maybe Contact              -- ^ Message is a shared contact, information about the contact
-  , location :: Maybe Location            -- ^ Message is a shared location, information about the location
-  , venue :: Maybe Venue                  -- ^ Message is a venue, information about the venue
-  , new_chat_member :: Maybe User         -- ^ A new member was added to the group, information about them (this member may be the bot itself)
-  , left_chat_member :: Maybe User        -- ^ A member was removed from the group, information about them (this member may be the bot itself)
-  , new_chat_title :: Maybe Text          -- ^ A chat title was changed to this value
-  , new_chat_photo :: Maybe [PhotoSize]   -- ^ A chat photo was change to this value
-  , delete_chat_photo :: Maybe Bool       -- ^ Service message: the chat photo was deleted
-  , group_chat_created :: Maybe Bool      -- ^ Service message: the group has been created
+    message_id              :: Int -- ^ Unique message identifier
+  , from                    :: Maybe User -- ^ Sender, can be empty for messages sent to channels
+  , date                    :: Int -- ^ Date the message was sent in Unix time
+  , chat                    :: Chat -- ^ Conversation the message belongs to
+  , forward_from            :: Maybe User -- ^ For forwarded messages, sender of the original message
+  , forward_from_chat       :: Maybe Chat -- ^ For messages forwarded from a channel, information about the original channel
+  , forward_from_message_id :: Maybe Int -- ^ For forwarded channel posts, identifier of the original message in the channel
+  , forward_date            :: Maybe Int -- ^ For forwarded messages, date the original message was sent in Unix time
+  , reply_to_message        :: Maybe Message -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
+  , edit_date               :: Maybe Int -- ^ Date the message was last edited in Unix time
+  , text                    :: Maybe Text -- ^ For text messages, the actual UTF-8 text of the message
+  , entities                :: Maybe [MessageEntity] -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
+  , audio                   :: Maybe Audio -- ^ Message is an audio file, information about the file
+  , document                :: Maybe Document -- ^ Message is a general file, information about the file
+  , game                    :: Maybe Game -- ^ Message is a game, information about the game
+  , photo                   :: Maybe [PhotoSize] -- ^ Message is a photo, available sizes of the photo
+  , sticker                 :: Maybe Sticker -- ^ Message is a sticker, information about the sticker
+  , video                   :: Maybe Video -- ^ Message is a video, information about the video
+  , voice                   :: Maybe Voice -- ^ Message is a voice message, information about the file
+  , caption                 :: Maybe Text -- ^ Caption for the photo or video
+  , contact                 :: Maybe Contact -- ^ Message is a shared contact, information about the contact
+  , location                :: Maybe Location -- ^ Message is a shared location, information about the location
+  , venue                   :: Maybe Venue -- ^ Message is a venue, information about the venue
+  , new_chat_member         :: Maybe User -- ^ A new member was added to the group, information about them (this member may be the bot itself)
+  , left_chat_member        :: Maybe User -- ^ A member was removed from the group, information about them (this member may be the bot itself)
+  , new_chat_title          :: Maybe Text -- ^ A chat title was changed to this value
+  , new_chat_photo          :: Maybe [PhotoSize] -- ^ A chat photo was change to this value
+  , delete_chat_photo       :: Maybe Bool -- ^ Service message: the chat photo was deleted
+  , group_chat_created      :: Maybe Bool -- ^ Service message: the group has been created
   , supergroup_chat_created :: Maybe Bool -- ^ Service message: the supergroup has been created
-  , channel_chat_created :: Maybe Bool    -- ^ Service message: the channel has been created
-  , migrate_to_chat_id :: Maybe Int64     -- ^ The group has been migrated to a supergroup with the specified identifier, not exceeding 1e13 by absolute value
-  , migrate_from_chat_id :: Maybe Int64   -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
-  , pinned_message :: Maybe Message       -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
+  , channel_chat_created    :: Maybe Bool -- ^ Service message: the channel has been created
+  , migrate_to_chat_id      :: Maybe Int64 -- ^ The group has been migrated to a supergroup with the specified identifier, not exceeding 1e13 by absolute value
+  , migrate_from_chat_id    :: Maybe Int64 -- ^ The supergroup has been migrated from a group with the specified identifier, not exceeding 1e13 by absolute value
+  , pinned_message          :: Maybe Message -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
+  , invoice                 :: Maybe Invoice -- ^  Message is an invoice for a payment, information about the invoice.
+  , successful_payment      :: Maybe SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
 data MessageEntity = MessageEntity
   {
-    me_type :: Text       -- ^ Type of the entity. Can be mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs), text_mention (for users without usernames)
-  , me_offset :: Int      -- ^ Offset in UTF-16 code units to the start of the entity
-  , me_length :: Int      -- ^ Length of the entity in UTF-16 code units
-  , me_url :: Maybe Text  -- ^ For “text_link” only, url that will be opened after user taps on the text
-  , me_user :: Maybe User -- ^ For “text_mention” only, the mentioned user
+    me_type   :: Text -- ^ Type of the entity. Can be mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs), text_mention (for users without usernames)
+  , me_offset :: Int -- ^ Offset in UTF-16 code units to the start of the entity
+  , me_length :: Int -- ^ Length of the entity in UTF-16 code units
+  , me_url    :: Maybe Text -- ^ For “text_link” only, url that will be opened after user taps on the text
+  , me_user   :: Maybe User -- ^ For “text_mention” only, the mentioned user
   } deriving (Show, Generic)
 
 instance ToJSON MessageEntity where
@@ -841,10 +854,10 @@ instance FromJSON MessageEntity where
 -- | This object represents a venue.
 data Venue = Venue
   {
-    venue_location :: Location          -- ^ Venue location
-  , venue_title :: Text                 -- ^ Name of the venue
-  , venue_address :: Text               -- ^ Address of the venue
-  , venue_foursquare_id :: Maybe Text   -- ^ Foursquare identifier of the venue
+    venue_location      :: Location -- ^ Venue location
+  , venue_title         :: Text -- ^ Name of the venue
+  , venue_address       :: Text -- ^ Address of the venue
+  , venue_foursquare_id :: Maybe Text -- ^ Foursquare identifier of the venue
   } deriving (Show, Generic)
 
 instance ToJSON Venue where
@@ -871,13 +884,13 @@ keyboardButton buttonText = KeyboardButton buttonText Nothing Nothing
 
 data WebhookInfo = WebhookInfo
   {
-    whi_url :: Text -- ^ Webhook URL, may be empty if webhook is not set up
+    whi_url                    :: Text -- ^ Webhook URL, may be empty if webhook is not set up
   , whi_has_custom_certificate :: Bool -- ^ True, if a custom certificate was provided for webhook certificate checks
-  , whi_pending_update_count :: Int -- ^ Number of updates awaiting delivery
-  , whi_last_error_date :: Maybe Int -- ^ Unix time for the most recent error that happened when trying to deliver an update via webhook
-  , whi_last_error_message :: Maybe Text -- ^ Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
-  , whi_max_connections :: Maybe Int -- ^ Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
-  , whi_allowed_updates :: Maybe [Text] -- ^ A list of update types the bot is subscribed to. Defaults to all update types
+  , whi_pending_update_count   :: Int -- ^ Number of updates awaiting delivery
+  , whi_last_error_date        :: Maybe Int -- ^ Unix time for the most recent error that happened when trying to deliver an update via webhook
+  , whi_last_error_message     :: Maybe Text -- ^ Error message in human-readable format for the most recent error that happened when trying to deliver an update via webhook
+  , whi_max_connections        :: Maybe Int -- ^ Maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery
+  , whi_allowed_updates        :: Maybe [Text] -- ^ A list of update types the bot is subscribed to. Defaults to all update types
   } deriving (Show, Generic)
 
 instance ToJSON WebhookInfo where
@@ -885,3 +898,138 @@ instance ToJSON WebhookInfo where
 
 instance FromJSON WebhookInfo where
   parseJSON = parseJsonDrop 4
+
+-- Payments
+
+data LabeledPrice
+  -- | This object represents a portion of the price for goods or services.
+  = LabeledPrice
+  {
+    lp_label  :: Text -- ^ Portion label
+  , lp_amount :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  } deriving (Show, Generic)
+
+instance ToJSON LabeledPrice where
+  toJSON = toJsonDrop 3
+
+instance FromJSON LabeledPrice where
+  parseJSON = parseJsonDrop 3
+
+newtype CurrencyCode = CurrencyCode Text
+  deriving (Show, Eq, Ord)
+
+instance ToJSON CurrencyCode where
+  toJSON (CurrencyCode code) = toJSON code
+
+instance FromJSON CurrencyCode where
+  parseJSON (String code) = pure $ CurrencyCode code
+  parseJSON _ = fail "Unable to parse CurrencyCode"
+
+data Invoice
+  -- | This object contains basic information about an invoice.
+  = Invoice
+  {
+    inv_title           :: Text -- ^ Product name
+  , inv_description     :: Text -- ^ Product description
+  , inv_start_parameter :: Text -- ^ Unique bot deep-linking parameter that can be used to generate this invoice
+  , inv_currency        :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , inv_total_amount    :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  } deriving (Show, Generic)
+
+instance ToJSON Invoice where
+  toJSON = toJsonDrop 4
+
+instance FromJSON Invoice where
+  parseJSON = parseJsonDrop 4
+
+data ShippingAddress = ShippingAddress
+  {
+    ship_addr_country_code :: Text -- ^ ISO 3166-1 alpha-2 country code
+  , ship_addr_state        :: Maybe Text -- ^ State, if applicable
+  , ship_addr_city         :: Text -- ^ City
+  , ship_addr_street_line1 :: Text -- ^ First line for the address
+  , ship_addr_street_line2 :: Text -- ^ Second line for the address
+  , ship_addr_post_code    :: Text -- ^ Address post code
+  } deriving (Show, Generic)
+
+instance ToJSON ShippingAddress where
+  toJSON = toJsonDrop 10
+
+instance FromJSON ShippingAddress where
+  parseJSON = parseJsonDrop 10
+
+data OrderInfo = OrderInfo
+  {
+    ord_info_name             :: Maybe Text -- ^ User name
+  , ord_info_phone_number     :: Maybe Text -- ^ User's phone number
+  , ord_info_email            :: Maybe Text -- ^ User email
+  , ord_info_shipping_address :: Maybe ShippingAddress -- ^ User shipping address
+  } deriving (Show, Generic)
+
+instance ToJSON OrderInfo where
+  toJSON = toJsonDrop 9
+
+instance FromJSON OrderInfo where
+  parseJSON = parseJsonDrop 9
+
+data ShippingOption = ShippingOption
+  {
+    ship_opt_id     :: Text -- ^ Shipping option identifier
+  , ship_opt_title  :: Text -- ^ Option title
+  , ship_opt_prices :: [LabeledPrice] -- ^ List of price portions
+  } deriving (Show, Generic)
+
+instance ToJSON ShippingOption where
+  toJSON = toJsonDrop 9
+
+instance FromJSON ShippingOption where
+  parseJSON = parseJsonDrop 9
+
+data SuccessfulPayment = SuccessfulPayment
+  {
+    suc_pmnt_currency                   :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , suc_pmnt_total_amount               :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  , suc_pmnt_invoice_payload            :: Text -- ^ Bot specified invoice payload
+  , suc_pmnt_shipping_option_id         :: Maybe Text -- ^  Identifier of the shipping option chosen by the user
+  , suc_pmnt_order_info                 :: Maybe OrderInfo -- ^ Order info provided by the user
+  , suc_pmnt_telegram_payment_charge_id :: Text -- ^ Telegram payment identifier
+  , suc_pmnt_provider_payment_charge_id :: Text -- ^ Provider payment identifier
+  } deriving (Show, Generic)
+
+instance ToJSON SuccessfulPayment where
+  toJSON = toJsonDrop 9
+
+instance FromJSON SuccessfulPayment where
+  parseJSON = parseJsonDrop 9
+
+data ShippingQuery = ShippingQuery
+  {
+    ship_q_id               :: Text -- ^ Unique query identifier
+  , ship_q_from             :: User -- ^ User who sent the query
+  , ship_q_invoice_payload  :: Text -- ^ Bot specified invoice payload
+  , ship_q_shipping_address :: ShippingAddress -- ^ User specified shipping address
+  } deriving (Show, Generic)
+
+
+instance ToJSON ShippingQuery where
+  toJSON = toJsonDrop 7
+
+instance FromJSON ShippingQuery where
+  parseJSON = parseJsonDrop 7
+
+data PreCheckoutQuery = PreCheckoutQuery
+  {
+    pre_che_id                 :: Text -- ^ Unique query identifier
+  , pre_che_from               :: User -- ^ User who sent the query
+  , pre_che_currency           :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , pre_che_total_amount       :: Int -- ^ Total price in the smallest units of the currency (integer, not float/double). For example, for a price of US$ 1.45 pass amount = 145. See the exp parameter in <https://core.telegram.org/bots/payments/currencies.json currencies.json>, it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+  , pre_che_invoice_payload    :: Text -- ^ Bot specified invoice payload
+  , pre_che_shipping_option_id :: Maybe Text -- ^ Identifier of the shipping option chosen by the user
+  , pre_che_order_info         :: Maybe OrderInfo -- ^ Order info provided by the user
+  } deriving (Show, Generic)
+
+instance ToJSON PreCheckoutQuery where
+  toJSON = toJsonDrop 8
+
+instance FromJSON PreCheckoutQuery where
+  parseJSON = parseJsonDrop 8

@@ -24,6 +24,7 @@ import           Web.Telegram.API.Bot.API.Get      as API
 import           Web.Telegram.API.Bot.API.Messages as API
 import           Web.Telegram.API.Bot.API.Queries  as API
 import           Web.Telegram.API.Bot.API.Updates  as API
+import           Web.Telegram.API.Bot.API.Payments as API
 
 type TelegramBotAPI =
        TelegramBotMessagesAPI
@@ -32,6 +33,7 @@ type TelegramBotAPI =
   :<|> TelegramBotEditAPI
   :<|> TelegramBotQueriesAPI
   :<|> TelegramBotGetAPI
+  :<|> TelegramBotPaymentsAPI
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI

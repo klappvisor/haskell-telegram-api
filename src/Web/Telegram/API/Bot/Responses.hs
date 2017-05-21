@@ -24,11 +24,13 @@ module Web.Telegram.API.Bot.Responses
     , GetChatMembersCountResponse
     , GetChatMemberResponse
     , GetWebhookInfoResponse
+    , AnswerShippingQueryResponse
+    , AnswerPreCheckoutQueryResponse
     ) where
 
 import           Data.Aeson
+import           Data.Int                     (Int64)
 import           GHC.Generics
-import           Data.Int (Int64)
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.JsonExt
 
@@ -91,3 +93,7 @@ type GetChatMembersCountResponse = Response Int
 type GetChatMemberResponse = Response ChatMember
 
 type GetWebhookInfoResponse = Response WebhookInfo
+
+type AnswerShippingQueryResponse = Response Bool
+
+type AnswerPreCheckoutQueryResponse = Response Bool
