@@ -918,6 +918,13 @@ instance FromJSON LabeledPrice where
 newtype CurrencyCode = CurrencyCode Text
   deriving (Show, Eq, Ord)
 
+instance ToJSON CurrencyCode where
+  toJSON (CurrencyCode code) = toJSON code
+
+instance FromJSON CurrencyCode where
+  parseJSON (String code) = pure $ CurrencyCode code
+  parseJSON _ = fail "Unable to parse CurrencyCode"
+
 data Invoice
   -- | This object contains basic information about an invoice.
   = Invoice

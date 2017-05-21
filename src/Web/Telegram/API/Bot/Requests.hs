@@ -91,7 +91,10 @@ import           Web.Telegram.API.Bot.Data             (InlineKeyboardButton,
                                                         InlineKeyboardMarkup,
                                                         InlineQueryResult,
                                                         KeyboardButton,
-                                                        ParseMode)
+                                                        ParseMode,
+                                                        CurrencyCode,
+                                                        LabeledPrice,
+                                                        ShippingOption)
 import           Web.Telegram.API.Bot.JsonExt
 
 
@@ -736,33 +739,33 @@ editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyM
 
 data SendInvoiceRequest = SendInvoiceRequest
   {
-    inv_chat_id :: Int64 -- ^ Unique identifier for the target private chat
-  , inv_title :: Text -- ^ Product name
-  , inv_description :: Text -- ^ Product description
-  , inv_payload :: Text -- ^ Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
-  , inv_provider_token :: Text -- ^ Payments provider token, obtained via Botfather
-  , inv_start_parameter :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
-  , inv_currency :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
-  , inv_prices :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
-  , inv_photo_url :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
-  , inv_photo_size :: Maybe Int -- ^ Photo size
-  , inv_photo_width :: Maybe Int -- ^ Photo width
-  , inv_photo_height :: Maybe Int -- ^ Photo height
-  , inv_need_name :: Maybe Bool -- ^ Pass `True`, if you require the user's full name to complete the order
-  , inv_need_phone_number :: Maybe Bool -- ^ Pass `True`, if you require the user's phone number to complete the order
-  , inv_need_email :: Maybe Bool -- ^ Pass `True`, if you require the user's email to complete the order
-  , inv_need_shipping_address :: Maybe Bool -- ^ Pass `True`, if you require the user's shipping address to complete the order
-  , inv_is_flexible :: Maybe Bool -- ^ Pass `True`, if the final price depends on the shipping method
-  , inv_disable_notification :: Maybe Bool -- ^ Sends the message silently. Users will receive a notification with no sound.
-  , inv_reply_to_message :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , inv_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
+    snd_inv_chat_id :: Int64 -- ^ Unique identifier for the target private chat
+  , snd_inv_title :: Text -- ^ Product name
+  , snd_inv_description :: Text -- ^ Product description
+  , snd_inv_payload :: Text -- ^ Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
+  , snd_inv_provider_token :: Text -- ^ Payments provider token, obtained via Botfather
+  , snd_inv_start_parameter :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
+  , snd_inv_currency :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , snd_inv_prices :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+  , snd_inv_photo_url :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
+  , snd_inv_photo_size :: Maybe Int -- ^ Photo size
+  , snd_inv_photo_width :: Maybe Int -- ^ Photo width
+  , snd_inv_photo_height :: Maybe Int -- ^ Photo height
+  , snd_inv_need_name :: Maybe Bool -- ^ Pass `True`, if you require the user's full name to complete the order
+  , snd_inv_need_phone_number :: Maybe Bool -- ^ Pass `True`, if you require the user's phone number to complete the order
+  , snd_inv_need_email :: Maybe Bool -- ^ Pass `True`, if you require the user's email to complete the order
+  , snd_inv_need_shipping_address :: Maybe Bool -- ^ Pass `True`, if you require the user's shipping address to complete the order
+  , snd_inv_is_flexible :: Maybe Bool -- ^ Pass `True`, if the final price depends on the shipping method
+  , snd_inv_disable_notification :: Maybe Bool -- ^ Sends the message silently. Users will receive a notification with no sound.
+  , snd_inv_reply_to_message :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , snd_inv_reply_markup :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
   } deriving (Show, Generic)
 
 instance ToJSON SendInvoiceRequest where
-  toJSON = toJsonDrop 4
+  toJSON = toJsonDrop 8
 
 instance FromJSON SendInvoiceRequest where
-  parseJSON = parseJsonDrop 4
+  parseJSON = parseJsonDrop 8
 
 sendInvoiceRequest :: Int64 -- ^ Unique identifier for the target private chat
   -> Text -- ^ Product name
@@ -792,11 +795,11 @@ instance ToJSON AnswerShippingQueryRequest where
 instance FromJSON AnswerShippingQueryRequest where
   parseJSON = parseJsonDrop 4
 
-okShippingQueryRequest :: Text -> [ShippingOptions] -> AnswerShippingQueryRequest
-okShippingQueryRequest shippingQueryId options = AnswerShippingQueryRequest shippingQueryId True options Nothing
+okShippingQueryRequest :: Text -> [ShippingOption] -> AnswerShippingQueryRequest
+okShippingQueryRequest queryId options = AnswerShippingQueryRequest queryId True (Just options) Nothing
 
 errorShippingQueryRequest :: Text -> Text -> AnswerShippingQueryRequest
-errorShippingQueryRequest shippingQueryId errorMessage = AnswerShippingQueryRequest shippingQueryId False Nothing errorMessage
+errorShippingQueryRequest queryId errorMsg = AnswerShippingQueryRequest queryId False Nothing (Just errorMsg)
 
 data AnswerPreCheckoutQueryRequest
   -- | Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an `Update` with the field pre_checkout_query. Use this method to respond to such pre-checkout queries. On success, True is returned. Note: The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.

@@ -14,7 +14,6 @@ module Web.Telegram.API.Bot.API.Payments
   ) where
 
 import           Data.Proxy
-import           Network.HTTP.Client            (Manager)
 import           Servant.API
 import           Servant.Client
 import           Web.Telegram.API.Bot.API.Core

@@ -24,6 +24,8 @@ module Web.Telegram.API.Bot.Responses
     , GetChatMembersCountResponse
     , GetChatMemberResponse
     , GetWebhookInfoResponse
+    , AnswerShippingQueryResponse
+    , AnswerPreCheckoutQueryResponse
     ) where
 
 import           Data.Aeson
