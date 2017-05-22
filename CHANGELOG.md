@@ -1,3 +1,17 @@
+## 0.6.3.0
+
+* New fields *gif_duration* in `InlineQueryResultGif` and *mpeg4_duration* in `InlineQueryResultMpeg4Gif`.
+* Replaced the field *new_chat_member* in `Message` with *new_chat_members* (the old field will still be available for a while for compatibility purposes).
+* The `User` object now may have a *language_code* field that contains the IETF language tag of the user's language.
+* Added the `sendVideoNote` method, the new field *video_note* to `Message`, the fields `RecordVideoNote* or *UploadVideoNote* to `sendChatAction`.
+* Added a new type of button, the pay button to `InlineKeyboardButton`.
+* Updated dependencies
+
+## 0.6.2.0
+
+* Added new kinds of updates, *shipping_query* and *pre_checkout_query*, and new types of message content, *invoice* and *successful_payment*.
+* Added new methods for payments: `sendInvoiceM`, `answerShippingQueryM`, and `answerPreCheckoutQueryM`.
+
 ## 0.6.1.1
 
 Bugfixes:
