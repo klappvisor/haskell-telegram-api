@@ -298,7 +298,7 @@ uploadVideoNote = runM uploadVideoNoteM
 
 -- | See 'uploadVideoNote'
 uploadVideoNoteM :: SendVideoNoteRequest FileUpload -> TelegramClient MessageResponse
-uploadVideoNoteM = run_ uploadVoice_
+uploadVideoNoteM = run_ uploadVideoNote_
 
 -- | As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned.
 sendVideoNote :: Token -> SendVideoNoteRequest Text -> Manager -> IO (Either ServantError MessageResponse)

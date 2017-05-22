@@ -453,13 +453,13 @@ uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing 
 
 data SendVideoNoteRequest payload = SendVideoNoteRequest
   {
-    vid_note_chat_id :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  , vid_note_video_note :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
-  , vid_note_duration :: Maybe Int -- ^ Duration of sent video in seconds
-  , vid_note_length :: Maybe Int -- ^ Video width and height
-  , vid_note_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , vid_note_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , vid_note_reply_markup :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
+    _vid_note_chat_id :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , _vid_note_video_note :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
+  , _vid_note_duration :: Maybe Int -- ^ Duration of sent video in seconds
+  , _vid_note_length :: Maybe Int -- ^ Video width and height
+  , _vid_note_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _vid_note_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _vid_note_reply_markup :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendVideoNoteRequest Text) where
@@ -470,15 +470,15 @@ instance FromJSON (SendVideoNoteRequest Text) where
 
 instance ToMultipartFormData (SendVideoNoteRequest FileUpload) where
   toMultipartFormData req =
-    [ utf8Part "chat_id" (chatIdToPart $ vid_note_chat_id req) ] ++
+    [ utf8Part "chat_id" (chatIdToPart $ _vid_note_chat_id req) ] ++
     catMaybes
-    [ partLBS "duration" . encode <$> vid_note_duration req
-    , partLBS "length" . encode <$> vid_note_length req
-    , partLBS "disable_notification" . encode <$> vid_note_disable_notification req
-    , utf8Part "reply_to_message_id" . tshow <$> vid_note_reply_to_message_id req
-    , partLBS "reply_markup" . encode <$> vid_note_reply_markup req
+    [ partLBS "duration" . encode <$> _vid_note_duration req
+    , partLBS "length" . encode <$> _vid_note_length req
+    , partLBS "disable_notification" . encode <$> _vid_note_disable_notification req
+    , utf8Part "reply_to_message_id" . tshow <$> _vid_note_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> _vid_note_reply_markup req
     ] ++
-    [ fileUploadToPart "video_note" (vid_note_video_note req) ]
+    [ fileUploadToPart "video_note" (_vid_note_video_note req) ]
 
 sendVideoNoteRequest :: ChatId -> Text -> SendVideoNoteRequest Text
 sendVideoNoteRequest chatId videoNote = SendVideoNoteRequest chatId videoNote Nothing Nothing Nothing Nothing Nothing

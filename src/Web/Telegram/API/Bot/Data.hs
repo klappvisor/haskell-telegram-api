@@ -19,6 +19,7 @@ module Web.Telegram.API.Bot.Data
     , Sticker                       (..)
     , Video                         (..)
     , Voice                         (..)
+    , VideoNote                     (..)
     , Venue                         (..)
     , Contact                       (..)
     , Location                      (..)
@@ -109,6 +110,21 @@ instance ToJSON LanguageCode where
 instance FromJSON LanguageCode where
   parseJSON (String code) = pure $ LanguageCode code
   parseJSON _ = fail "Unable to parse LanguageCode"
+
+data VideoNote = VideoNote
+  {
+    vid_note_file_id   :: Text -- ^ Unique identifier for this file
+  , vid_note_length    :: Int -- ^ Video width and height as defined by sender
+  , vid_note_duration  :: Int -- ^ Duration of the video in seconds as defined by sender
+  , vid_note_thumb     :: Maybe PhotoSize -- ^ Video thumbnail
+  , vid_note_file_size :: Maybe Int -- ^ File size
+  } deriving (Show, Generic)
+
+instance ToJSON VideoNote where
+  toJSON = toJsonDrop 9
+
+instance FromJSON VideoNote where
+  parseJSON = parseJsonDrop 9
 
 -- | This object represents a phone contact.
 data Contact = Contact
@@ -649,10 +665,10 @@ inlineQueryResultPhoto :: Text -> Text -> Text -> InlineQueryResult
 inlineQueryResultPhoto id photoUrl thumbUlr = InlineQueryResultPhoto id photoUrl (Just thumbUlr) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 inlineQueryResultGif :: Text -> Text -> Text -> InlineQueryResult
-inlineQueryResultGif id gifUrl thumbUrl = InlineQueryResultGif id gifUrl Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+inlineQueryResultGif id gifUrl thumbUrl = InlineQueryResultGif id gifUrl Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing Nothing
 
 inlineQueryResultMpeg4Gif :: Text -> Text -> Text -> InlineQueryResult
-inlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id mpeg4Url Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing
+inlineQueryResultMpeg4Gif id mpeg4Url thumbUrl = InlineQueryResultMpeg4Gif id mpeg4Url Nothing Nothing (Just thumbUrl) Nothing Nothing Nothing Nothing Nothing
 
 inlineQueryResultVideo :: Text -> Text -> Text -> Text -> Text -> InlineQueryResult
 inlineQueryResultVideo id videoUrl mimeType thumbUrl title = InlineQueryResultVideo id videoUrl mimeType (Just thumbUrl) (Just title) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
@@ -726,7 +742,7 @@ instance FromJSON InlineKeyboardButton where
 
 inlineKeyboardButton :: Text -> InlineKeyboardButton
 inlineKeyboardButton buttonText =
-  InlineKeyboardButton buttonText Nothing Nothing Nothing Nothing Nothing
+  InlineKeyboardButton buttonText Nothing Nothing Nothing Nothing Nothing Nothing
 
 data CallbackGame = CallbackGame
   {
