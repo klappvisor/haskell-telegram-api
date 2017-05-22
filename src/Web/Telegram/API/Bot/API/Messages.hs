@@ -32,6 +32,10 @@ module Web.Telegram.API.Bot.API.Messages
   , uploadVoiceM
   , sendVoice
   , sendVoiceM
+  , uploadVideoNote
+  , uploadVideoNoteM
+  , sendVideoNote
+  , sendVideoNoteM
   , sendLocation
   , sendLocationM
   , sendVenue
@@ -102,6 +106,12 @@ type TelegramBotMessagesAPI =
     :<|> TelegramToken :> "sendVoice"
          :> ReqBody '[JSON] (SendVoiceRequest Text)
          :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendVideoNote"
+         :> MultipartFormDataReqBody (SendVideoNoteRequest FileUpload)
+         :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendVideoNote"
+         :> ReqBody '[JSON] (SendVideoNoteRequest Text)
+         :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "sendLocation"
          :> ReqBody '[JSON] SendLocationRequest
          :> Post '[JSON] MessageResponse
@@ -136,6 +146,8 @@ uploadVideo_               :: Token -> SendVideoRequest FileUpload -> ClientM Me
 sendVideo_                 :: Token -> SendVideoRequest Text -> ClientM MessageResponse
 uploadVoice_               :: Token -> SendVoiceRequest FileUpload -> ClientM MessageResponse
 sendVoice_                 :: Token -> SendVoiceRequest Text -> ClientM MessageResponse
+uploadVideoNote_           :: Token -> SendVideoNoteRequest FileUpload -> ClientM MessageResponse
+sendVideoNote_             :: Token -> SendVideoNoteRequest Text -> ClientM MessageResponse
 sendLocation_              :: Token -> SendLocationRequest -> ClientM MessageResponse
 sendVenue_                 :: Token -> SendVenueRequest-> ClientM MessageResponse
 sendContact_               :: Token -> SendContactRequest -> ClientM MessageResponse
@@ -155,6 +167,8 @@ sendMessage_
   :<|> sendVideo_
   :<|> uploadVoice_
   :<|> sendVoice_
+  :<|> uploadVideoNote_
+  :<|> sendVideoNote_
   :<|> sendLocation_
   :<|> sendVenue_
   :<|> sendContact_
@@ -277,6 +291,22 @@ sendVoice = runM sendVoiceM
 -- | See 'sendVoice'
 sendVoiceM :: SendVoiceRequest Text -> TelegramClient MessageResponse
 sendVoiceM = run_ sendVoice_
+
+-- | As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned.
+uploadVideoNote :: Token -> SendVideoNoteRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadVideoNote = runM uploadVideoNoteM
+
+-- | See 'uploadVideoNote'
+uploadVideoNoteM :: SendVideoNoteRequest FileUpload -> TelegramClient MessageResponse
+uploadVideoNoteM = run_ uploadVideoNote_
+
+-- | As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned.
+sendVideoNote :: Token -> SendVideoNoteRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendVideoNote = runM sendVideoNoteM
+
+-- | See 'sendVoice'
+sendVideoNoteM :: SendVideoNoteRequest Text -> TelegramClient MessageResponse
+sendVideoNoteM = run_ sendVideoNote_
 
 -- | Use this method to send point on the map. On success, the sent 'Message' is returned.
 sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ServantError MessageResponse)

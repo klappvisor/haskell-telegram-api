@@ -18,6 +18,7 @@ module Web.Telegram.API.Bot.Requests
     , SendStickerRequest             (..)
     , SendVideoRequest               (..)
     , SendVoiceRequest               (..)
+    , SendVideoNoteRequest           (..)
     , SendLocationRequest            (..)
     , SendVenueRequest               (..)
     , SendContactRequest             (..)
@@ -52,6 +53,8 @@ module Web.Telegram.API.Bot.Requests
     , uploadVideoRequest
     , sendVoiceRequest
     , uploadVoiceRequest
+    , sendVideoNoteRequest
+    , uploadVideoNoteRequest
     , sendLocationRequest
     , sendVenueRequest
     , sendContactRequest
@@ -448,6 +451,41 @@ sendVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing No
 uploadVoiceRequest :: ChatId -> FileUpload -> SendVoiceRequest FileUpload
 uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing Nothing Nothing Nothing
 
+data SendVideoNoteRequest payload = SendVideoNoteRequest
+  {
+    _vid_note_chat_id :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , _vid_note_video_note :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
+  , _vid_note_duration :: Maybe Int -- ^ Duration of sent video in seconds
+  , _vid_note_length :: Maybe Int -- ^ Video width and height
+  , _vid_note_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
+  , _vid_note_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _vid_note_reply_markup :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
+  } deriving (Show, Generic)
+
+instance ToJSON (SendVideoNoteRequest Text) where
+  toJSON = toJsonDrop 9
+
+instance FromJSON (SendVideoNoteRequest Text) where
+  parseJSON = parseJsonDrop 9
+
+instance ToMultipartFormData (SendVideoNoteRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (chatIdToPart $ _vid_note_chat_id req) ] ++
+    catMaybes
+    [ partLBS "duration" . encode <$> _vid_note_duration req
+    , partLBS "length" . encode <$> _vid_note_length req
+    , partLBS "disable_notification" . encode <$> _vid_note_disable_notification req
+    , utf8Part "reply_to_message_id" . tshow <$> _vid_note_reply_to_message_id req
+    , partLBS "reply_markup" . encode <$> _vid_note_reply_markup req
+    ] ++
+    [ fileUploadToPart "video_note" (_vid_note_video_note req) ]
+
+sendVideoNoteRequest :: ChatId -> Text -> SendVideoNoteRequest Text
+sendVideoNoteRequest chatId videoNote = SendVideoNoteRequest chatId videoNote Nothing Nothing Nothing Nothing Nothing
+
+uploadVideoNoteRequest :: ChatId -> FileUpload -> SendVideoNoteRequest FileUpload
+uploadVideoNoteRequest chatId videoNote = SendVideoNoteRequest chatId videoNote Nothing Nothing Nothing Nothing Nothing
+
 -- | This object represents request for 'sendLocation'
 data SendLocationRequest = SendLocationRequest
   {
@@ -520,28 +558,34 @@ data ChatAction = Typing
                 | RecordAudio
                 | UploadAudio
                 | UploadDocument
-                | FindLocation deriving (Show, Generic)
+                | FindLocation
+                | RecordVideoNote
+                | UploadVideoNote deriving (Show, Generic)
 
 instance ToJSON ChatAction where
-  toJSON Typing         = "typing"
-  toJSON UploadPhoto    = "upload_photo"
-  toJSON RecordVideo    = "record_video"
-  toJSON UploadVideo    = "upload_video"
-  toJSON RecordAudio    = "record_audio"
-  toJSON UploadAudio    = "upload_audio"
-  toJSON UploadDocument = "upload_document"
-  toJSON FindLocation   = "find_location"
+  toJSON Typing          = "typing"
+  toJSON UploadPhoto     = "upload_photo"
+  toJSON RecordVideo     = "record_video"
+  toJSON UploadVideo     = "upload_video"
+  toJSON RecordAudio     = "record_audio"
+  toJSON UploadAudio     = "upload_audio"
+  toJSON UploadDocument  = "upload_document"
+  toJSON FindLocation    = "find_location"
+  toJSON RecordVideoNote = "record_video_note"
+  toJSON UploadVideoNote = "upload_video_note"
 
 instance FromJSON ChatAction where
-  parseJSON "typing"          = pure Typing
-  parseJSON "upload_photo"    = pure UploadPhoto
-  parseJSON "record_video"    = pure RecordVideo
-  parseJSON "upload_video"    = pure UploadVideo
-  parseJSON "record_audio"    = pure RecordAudio
-  parseJSON "upload_audio"    = pure UploadAudio
-  parseJSON "upload_document" = pure UploadDocument
-  parseJSON "find_location"   = pure FindLocation
-  parseJSON _                 = fail "Failed to parse ChatAction"
+  parseJSON "typing"            = pure Typing
+  parseJSON "upload_photo"      = pure UploadPhoto
+  parseJSON "record_video"      = pure RecordVideo
+  parseJSON "upload_video"      = pure UploadVideo
+  parseJSON "record_audio"      = pure RecordAudio
+  parseJSON "upload_audio"      = pure UploadAudio
+  parseJSON "upload_document"   = pure UploadDocument
+  parseJSON "find_location"     = pure FindLocation
+  parseJSON "record_video_note" = pure RecordVideoNote
+  parseJSON "upload_video_note" = pure UploadVideoNote
+  parseJSON _                   = fail "Failed to parse ChatAction"
 
 -- | This object represents request for 'sendChatAction'
 data SendChatActionRequest = SendChatActionRequest

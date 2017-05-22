@@ -184,6 +184,15 @@ spec token chatId botName = do
       Right Response { result = Message { voice = Just voice } } <-
         uploadVoice token voiceReq manager
       voice_duration voice `shouldBe` 10
+  describe "/sendVideoNote" $
+    it "should upload video note" $ do
+      let fileUpload = localFileUpload $ testFile "lego-square.mp4"
+          videoNoteReq = (uploadVideoNoteRequest chatId fileUpload)
+            { _vid_note_length = Just 320 }
+      res <- uploadVideoNote token videoNoteReq manager
+      success res
+      let Right Response { result = Message { video_note = Just video } } = res
+      vid_note_duration video `shouldBe` 6
 
   describe "/sendVideo" $
     it "should upload video" $ do
