@@ -6,6 +6,7 @@
 module Web.Telegram.API.Bot.Data
     ( -- * Types
       User                          (..)
+    , LanguageCode                  (..)
     , ChatMember                    (..)
     , Chat                          (..)
     , Message                       (..)
@@ -86,10 +87,11 @@ import           Web.Telegram.API.Bot.JsonExt
 -- | This object represents a Telegram user or bot.
 data User = User
   {
-    user_id         :: Int        -- ^ Unique identifier for this user or bot
-  , user_first_name :: Text       -- ^ User‘s or bot’s first name
-  , user_last_name  :: Maybe Text -- ^ User‘s or bot’s last name
-  , user_username   :: Maybe Text -- ^ User‘s or bot’s username
+    user_id            :: Int        -- ^ Unique identifier for this user or bot
+  , user_first_name    :: Text       -- ^ User‘s or bot’s first name
+  , user_last_name     :: Maybe Text -- ^ User‘s or bot’s last name
+  , user_username      :: Maybe Text -- ^ User‘s or bot’s username
+  , user_language_code :: Maybe LanguageCode
   } deriving (Show, Generic)
 
 instance ToJSON User where
@@ -97,6 +99,16 @@ instance ToJSON User where
 
 instance FromJSON User where
   parseJSON = parseJsonDrop 5
+
+newtype LanguageCode = LanguageCode Text
+  deriving (Show, Eq, Ord)
+
+instance ToJSON LanguageCode where
+  toJSON (LanguageCode code) = toJSON code
+
+instance FromJSON LanguageCode where
+  parseJSON (String code) = pure $ LanguageCode code
+  parseJSON _ = fail "Unable to parse LanguageCode"
 
 -- | This object represents a phone contact.
 data Contact = Contact
@@ -409,6 +421,7 @@ data InlineQueryResult =
   , iq_res_caption               :: Maybe Text -- ^ Caption of the GIF file to be sent, 0-200 characters
   , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the GIF animation
+  , iq_res_gif_duration          :: Maybe Int -- ^ Duration of the GIF
   }
   -- | Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this animated MPEG-4 file will be sent by the user with optional caption. Alternatively, you can provide message_text to send it instead of the animation.
   | InlineQueryResultMpeg4Gif
@@ -422,6 +435,7 @@ data InlineQueryResult =
   , iq_res_caption               :: Maybe Text -- ^ Caption of the MPEG-4 file to be sent, 0-200 characters
   , iq_res_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ Inline keyboard attached to the message
   , iq_res_input_message_content :: Maybe InputMessageContent -- ^ Content of the message to be sent instead of the video animation
+  , iq_res_mpeg4_duration        :: Maybe Int -- ^ Video duration
   }
   -- | Represents link to a page containing an embedded video player or a video file.
   | InlineQueryResultVideo
@@ -695,12 +709,13 @@ data InlineKeyboardMarkup = InlineKeyboardMarkup
 
 data InlineKeyboardButton = InlineKeyboardButton
   {
-    ikb_text                             :: Text
-  , ikb_url                              :: Maybe Text
-  , ikb_callback_data                    :: Maybe Text
-  , ikb_switch_inline_query              :: Maybe Text
-  , ikb_callback_game                    :: Maybe CallbackGame
+    ikb_text                             :: Text -- ^ Label text on the button
+  , ikb_url                              :: Maybe Text -- ^ HTTP url to be opened when button is pressed
+  , ikb_callback_data                    :: Maybe Text -- ^ Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes
+  , ikb_switch_inline_query              :: Maybe Text -- ^  If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot‘s username and the specified inline query in the input field. Can be empty, in which case just the bot’s username will be inserted.
+  , ikb_callback_game                    :: Maybe CallbackGame -- ^  Description of the game that will be launched when the user presses the button. NOTE: This type of button must always be the first button in the first row.
   , ikb_switch_inline_query_current_chat :: Maybe Text -- ^ If set, pressing the button will insert the bot‘s username and the specified inline query in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.
+  , ikb_pay                              :: Maybe Bool -- ^ Specify True, to send a Pay button. NOTE: This type of button must always be the first button in the first row.
   } deriving (Show, Generic)
 
 instance ToJSON InlineKeyboardButton where
