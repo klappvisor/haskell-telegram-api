@@ -848,6 +848,8 @@ data Message = Message
   , pinned_message          :: Maybe Message -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
   , invoice                 :: Maybe Invoice -- ^  Message is an invoice for a payment, information about the invoice.
   , successful_payment      :: Maybe SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
+  , video_note              :: Maybe VideoNote -- ^ Message is a video note, information about the video message
+  , new_chat_members        :: Maybe [User] -- ^ New members that were added to the group or supergroup and information about them (the bot itself may be one of these members)
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
