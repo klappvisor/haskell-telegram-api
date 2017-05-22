@@ -558,28 +558,34 @@ data ChatAction = Typing
                 | RecordAudio
                 | UploadAudio
                 | UploadDocument
-                | FindLocation deriving (Show, Generic)
+                | FindLocation
+                | RecordVideoNote
+                | UploadVideoNote deriving (Show, Generic)
 
 instance ToJSON ChatAction where
-  toJSON Typing         = "typing"
-  toJSON UploadPhoto    = "upload_photo"
-  toJSON RecordVideo    = "record_video"
-  toJSON UploadVideo    = "upload_video"
-  toJSON RecordAudio    = "record_audio"
-  toJSON UploadAudio    = "upload_audio"
-  toJSON UploadDocument = "upload_document"
-  toJSON FindLocation   = "find_location"
+  toJSON Typing          = "typing"
+  toJSON UploadPhoto     = "upload_photo"
+  toJSON RecordVideo     = "record_video"
+  toJSON UploadVideo     = "upload_video"
+  toJSON RecordAudio     = "record_audio"
+  toJSON UploadAudio     = "upload_audio"
+  toJSON UploadDocument  = "upload_document"
+  toJSON FindLocation    = "find_location"
+  toJSON RecordVideoNote = "record_video_note"
+  toJSON UploadVideoNote = "upload_video_note"
 
 instance FromJSON ChatAction where
-  parseJSON "typing"          = pure Typing
-  parseJSON "upload_photo"    = pure UploadPhoto
-  parseJSON "record_video"    = pure RecordVideo
-  parseJSON "upload_video"    = pure UploadVideo
-  parseJSON "record_audio"    = pure RecordAudio
-  parseJSON "upload_audio"    = pure UploadAudio
-  parseJSON "upload_document" = pure UploadDocument
-  parseJSON "find_location"   = pure FindLocation
-  parseJSON _                 = fail "Failed to parse ChatAction"
+  parseJSON "typing"            = pure Typing
+  parseJSON "upload_photo"      = pure UploadPhoto
+  parseJSON "record_video"      = pure RecordVideo
+  parseJSON "upload_video"      = pure UploadVideo
+  parseJSON "record_audio"      = pure RecordAudio
+  parseJSON "upload_audio"      = pure UploadAudio
+  parseJSON "upload_document"   = pure UploadDocument
+  parseJSON "find_location"     = pure FindLocation
+  parseJSON "record_video_note" = pure RecordVideoNote
+  parseJSON "upload_video_note" = pure UploadVideoNote
+  parseJSON _                   = fail "Failed to parse ChatAction"
 
 -- | This object represents request for 'sendChatAction'
 data SendChatActionRequest = SendChatActionRequest
