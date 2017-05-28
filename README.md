@@ -41,7 +41,7 @@ main = do
   print "done!"
 ```
 
-### Runing IO directly
+### Running IO directly
 
 `getMe` example
 
@@ -89,7 +89,7 @@ main = do
       print $ message_id m
       print $ text m
   where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
-        chatId = "<chat_id> or <@channelusername>"
+        chatId = ChatId <chat_id> -- use ChatId 10231 or ChatChannel "<@channelusername>"
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
 ```
 
@@ -100,16 +100,16 @@ There are two ways to create requests:
 
 With data type constructor:
 ```haskell
-let request = SendMessageRequest "chatId" "text" Nothing (Just True) Nothing Nothing Nothing
+let request = SendMessageRequest (ChatId int64_chatId) "text" Nothing (Just True) Nothing Nothing Nothing
 ```
 Using default instance:
 
 ```haskell
-let request = sendMessageRequest "chatId" "text" -- only with required fields
+let request = sendMessageRequest (ChatId int64_chatId) "text" -- only with required fields
 ```
 
 ```haskell
-let request = (sendMessageRequest "chatId" "text") {
+let request = (sendMessageRequest ChatId int64_chatId) "text") {
   message_disable_notification = Just True -- with optional fields
 }
 ```
