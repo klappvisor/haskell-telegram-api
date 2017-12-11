@@ -116,7 +116,7 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
       msg `shouldBe` "Bad Request"
     it "should upload photo and resend it by id" $ do
-      let fileUpload = localFileUpload (testFile "christmas-cat.jpg")
+      let fileUpload = localFileUpload $ testFile "christmas-cat.jpg"
       let upload = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "uploaded photo"
       }
@@ -142,7 +142,7 @@ spec token chatId botName = do
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
     it "should upload audio and resend it by id" $ do
-      let fileUpload = localFileUpload (testFile "concerto-for-2-trumpets-in-c-major.mp3")
+      let fileUpload = localFileUpload $ testFile "concerto-for-2-trumpets-in-c-major.mp3"
           audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
           audioPerformer = "Michel Rondeau"
           audio = (uploadAudioRequest chatId fileUpload) {
@@ -170,7 +170,7 @@ spec token chatId botName = do
         sendSticker token sticker manager
       sticker_file_id sticker `shouldBe` "CAADAgADGgADkWgMAAGXlYGBiM_d2wI" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
-      let fileUpload = localFileUpload (testFile "haskell-logo.webp")
+      let fileUpload = localFileUpload $ testFile "haskell-logo.webp"
           stickerReq = uploadStickerRequest chatId fileUpload
       Right Response { result = Message { sticker = Just sticker } } <-
         uploadSticker token stickerReq manager
@@ -179,7 +179,7 @@ spec token chatId botName = do
   describe "/sendVoice" $
     it "should upload voice" $ do
       -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
-      let fileUpload = localFileUpload (testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg")
+      let fileUpload = localFileUpload $ testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg"
           voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
       Right Response { result = Message { voice = Just voice } } <-
         uploadVoice token voiceReq manager
@@ -197,7 +197,7 @@ spec token chatId botName = do
   describe "/sendVideo" $
     it "should upload video" $ do
       -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
-      let fileUpload = localFileUpload (testFile "lego-video.mp4")
+      let fileUpload = localFileUpload $ testFile "lego-video.mp4"
           videoReq = uploadVideoRequest chatId fileUpload
       Right Response { result = Message { video = Just video } } <-
         uploadVideo token videoReq manager
@@ -205,7 +205,7 @@ spec token chatId botName = do
 
   describe "/sendDocument" $
     it "should upload document" $ do
-      let fileUpload = localFileUpload (testFile "wikipedia-telegram.txt")
+      let fileUpload = localFileUpload $ testFile "wikipedia-telegram.txt"
           documentReq = uploadDocumentRequest chatId fileUpload
       Right Response { result = Message { document = Just document } } <-
         uploadDocument token documentReq manager
