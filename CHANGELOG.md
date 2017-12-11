@@ -1,3 +1,7 @@
+## 0.7.0.0
+
+* Upgraded to servant-0.11 
+
 ## 0.6.3.0
 
 * New fields *gif_duration* in `InlineQueryResultGif` and *mpeg4_duration* in `InlineQueryResultMpeg4Gif`.

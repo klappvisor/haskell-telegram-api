@@ -116,7 +116,7 @@ spec token chatId botName = do
       Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
       msg `shouldBe` "Bad Request"
     it "should upload photo and resend it by id" $ do
-      let fileUpload = localFileUpload (testFile "christmas-cat.jpg")
+      let fileUpload = localFileUpload $ testFile "christmas-cat.jpg"
       let upload = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "uploaded photo"
       }
@@ -142,20 +142,21 @@ spec token chatId botName = do
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
     it "should upload audio and resend it by id" $ do
-      let fileUpload = localFileUpload (testFile "concerto-for-2-trumpets-in-c-major.mp3")
+      let fileUpload = localFileUpload $ testFile "concerto-for-2-trumpets-in-c-major.mp3"
           audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
           audioPerformer = "Michel Rondeau"
           audio = (uploadAudioRequest chatId fileUpload) {
             _audio_performer = Just audioPerformer,
             _audio_title = Just audioTitle
           }
-      Right Response {
+      res <- uploadAudio token audio manager    
+      let Right Response {
         result = Message {
           audio = Just Audio {
             audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer
           }
         }
-      } <- uploadAudio token audio manager
+      } = res
       title `shouldBe` audioTitle
       performer `shouldBe` audioPerformer
       let audio = sendAudioRequest chatId file_id
@@ -170,19 +171,21 @@ spec token chatId botName = do
         sendSticker token sticker manager
       sticker_file_id sticker `shouldBe` "CAADAgADGgADkWgMAAGXlYGBiM_d2wI" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
-      let fileUpload = localFileUpload (testFile "haskell-logo.webp")
+      let fileUpload = localFileUpload $ testFile "haskell-logo.webp"
           stickerReq = uploadStickerRequest chatId fileUpload
-      Right Response { result = Message { sticker = Just sticker } } <-
-        uploadSticker token stickerReq manager
+      res <- uploadSticker token stickerReq manager
+      success res
+      let Right Response { result = Message { sticker = Just sticker } } = res      
       sticker_height sticker `shouldBe` 128
 
   describe "/sendVoice" $
     it "should upload voice" $ do
       -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
-      let fileUpload = localFileUpload (testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg")
+      let fileUpload = localFileUpload $ testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg"
           voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
-      Right Response { result = Message { voice = Just voice } } <-
-        uploadVoice token voiceReq manager
+      res <- uploadVoice token voiceReq manager
+      success res
+      let Right Response { result = Message { voice = Just voice } } = res
       voice_duration voice `shouldBe` 10
   describe "/sendVideoNote" $
     it "should upload video note" $ do
@@ -197,15 +200,17 @@ spec token chatId botName = do
   describe "/sendVideo" $
     it "should upload video" $ do
       -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
-      let fileUpload = localFileUpload (testFile "lego-video.mp4")
+      let fileUpload = localFileUpload $ testFile "lego-video.mp4"
           videoReq = uploadVideoRequest chatId fileUpload
-      Right Response { result = Message { video = Just video } } <-
-        uploadVideo token videoReq manager
+      res <- uploadVideo token videoReq manager
+      success res
+      let Right Response { result = Message { video = Just video } } = res
+        
       video_width video `shouldBe` 560
 
   describe "/sendDocument" $
     it "should upload document" $ do
-      let fileUpload = localFileUpload (testFile "wikipedia-telegram.txt")
+      let fileUpload = localFileUpload $ testFile "wikipedia-telegram.txt"
           documentReq = uploadDocumentRequest chatId fileUpload
       Right Response { result = Message { document = Just document } } <-
         uploadDocument token documentReq manager

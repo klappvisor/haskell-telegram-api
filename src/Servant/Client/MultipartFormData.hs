@@ -1,11 +1,12 @@
-{-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE DeriveDataTypeable  #-}
-{-# LANGUAGE FlexibleInstances   #-}
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies        #-}
-{-# LANGUAGE TypeOperators       #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DeriveDataTypeable    #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 module Servant.Client.MultipartFormData
   ( ToMultipartFormData (..)
@@ -14,25 +15,27 @@ module Servant.Client.MultipartFormData
 
 import           Control.Exception
 import           Control.Monad
-import           Control.Monad.Reader.Class
-import           Control.Monad.IO.Class
 import           Control.Monad.Error.Class
-import           Data.ByteString.Lazy       hiding (pack, filter, map, null, elem)
+import           Control.Monad.IO.Class
+import           Control.Monad.Reader.Class
+import           Data.ByteString.Lazy                  hiding (elem, filter,
+                                                        map, null, pack, any)
 import           Data.Proxy
+import           Data.Foldable (toList)
 import           Data.String.Conversions
-import           Data.Typeable              (Typeable)
-import           Network.HTTP.Client        hiding (Proxy, path)
-import qualified Network.HTTP.Client        as Client
+import           Data.Typeable                         (Typeable)
+import           Network.HTTP.Client                   hiding (Proxy, path)
+import qualified Network.HTTP.Client                   as Client
 import           Network.HTTP.Client.MultipartFormData
 import           Network.HTTP.Media
 import           Network.HTTP.Types
-import qualified Network.HTTP.Types         as H
-import qualified Network.HTTP.Types.Header  as HTTP
+import qualified Network.HTTP.Types                    as H
+import qualified Network.HTTP.Types.Header             as HTTP
 import           Servant.API
-import           Servant.Common.BaseUrl
 import           Servant.Client
-import           Servant.Common.Req         (Req, catchConnectionError,
-                                             reqAccept, reqToRequest)
+import           Servant.Common.Req                    (Req, UrlReq (..), ClientEnv (..),
+                                                        catchConnectionError,
+                                                        reqAccept, reqToRequest)
 -- | A type that can be converted to a multipart/form-data value.
 class ToMultipartFormData a where
   -- | Convert a Haskell value to a multipart/form-data-friendly intermediate type.
@@ -52,20 +55,20 @@ instance (ToMultipartFormData b, MimeUnrender ct a, cts' ~ (ct ': cts)
           formDataBody (toMultipartFormData reqData) requestWithoutBody
     in snd <$> performRequestCT' reqToRequest' (Proxy :: Proxy ct) H.methodPost req
 
--- copied `performRequest` from servant-0.7.1, then modified so it takes a variant of `reqToRequest`
+-- copied `performRequest` from servant-0.11, then modified so it takes a variant of `reqToRequest`
 -- as an argument.
 performRequest' :: (Req -> BaseUrl -> IO Request)
-               -> Method -> Req -> Manager -> BaseUrl
+               -> Method -> Req
                -> ClientM ( Int, ByteString, MediaType
                           , [HTTP.Header], Response ByteString)
-performRequest' reqToRequest' reqMethod req manager reqHost = do
+performRequest' reqToRequest' reqMethod req = do
+  m <- asks manager
+  reqHost <- asks baseUrl
   partialRequest <- liftIO $ reqToRequest' req reqHost
 
-  let request = partialRequest { Client.method = reqMethod
-                               , checkResponse = \ _request _response -> return ()
-                               }
+  let request = partialRequest { Client.method = reqMethod }
 
-  eResponse <- liftIO $ catchConnectionError $ Client.httpLbs request manager
+  eResponse <- liftIO $ catchConnectionError $ Client.httpLbs request m
   case eResponse of
     Left err ->
       throwError . ConnectionError $ SomeException err
@@ -81,21 +84,20 @@ performRequest' reqToRequest' reqMethod req manager reqHost = do
                    Nothing -> throwError $ InvalidContentTypeHeader (cs t) body
                    Just t' -> pure t'
       unless (status_code >= 200 && status_code < 300) $
-        throwError $ FailureResponse status ct body
+        throwError $ FailureResponse (UrlReq reqHost req) status ct body
       return (status_code, body, ct, hdrs, response)
 
--- copied `performRequestCT` from servant-0.7.1, then modified so it takes a variant of `reqToRequest`
+-- copied `performRequestCT` from servant-0.11, then modified so it takes a variant of `reqToRequest`
 -- as an argument.
-performRequestCT' :: MimeUnrender ct result =>
-  (Req -> BaseUrl -> IO Request) ->
-  Proxy ct -> Method -> Req
+performRequestCT' :: MimeUnrender ct result => 
+    (Req -> BaseUrl -> IO Request)
+    -> Proxy ct -> Method -> Req
     -> ClientM ([HTTP.Header], result)
 performRequestCT' reqToRequest' ct reqMethod req = do
-  let acceptCT = contentType ct
-  ClientEnv manager reqHost <- ask
+  let acceptCTS = contentTypes ct
   (_status, respBody, respCT, hdrs, _response) <-
-    performRequest' reqToRequest' reqMethod (req { reqAccept = [acceptCT] }) manager reqHost
-  unless (matches respCT acceptCT) $ throwError $ UnsupportedContentType respCT respBody
+    performRequest' reqToRequest' reqMethod (req { reqAccept = toList acceptCTS }) 
+  unless (any (matches respCT) acceptCTS) $ throwError $ UnsupportedContentType respCT respBody
   case mimeUnrender ct respBody of
     Left err -> throwError $ DecodeFailure err respCT respBody
     Right val -> return (hdrs, val)
