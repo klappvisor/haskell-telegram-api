@@ -75,6 +75,8 @@ module Web.Telegram.API.Bot.Requests
     , sendInvoiceRequest
     , okShippingQueryRequest
     , errorShippingQueryRequest
+    , okAnswerPrecheckoutQueryRequest
+    , errorAnswerPrecheckoutQueryRequest
     ) where
 
 import           Data.Aeson
@@ -858,6 +860,12 @@ instance ToJSON AnswerPreCheckoutQueryRequest where
 
 instance FromJSON AnswerPreCheckoutQueryRequest where
   parseJSON = parseJsonDrop 4
+
+okAnswerPrecheckoutQueryRequest :: Text -> AnswerPreCheckoutQueryRequest
+okAnswerPrecheckoutQueryRequest queryId = AnswerPreCheckoutQueryRequest queryId True Nothing
+
+errorAnswerPrecheckoutQueryRequest :: Text -> Text -> AnswerPreCheckoutQueryRequest
+errorAnswerPrecheckoutQueryRequest queryId errorMessage = AnswerPreCheckoutQueryRequest queryId False $ Just errorMessage
 
 tshow :: Show a => a -> Text
 tshow = T.pack . show
