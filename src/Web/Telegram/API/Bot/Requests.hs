@@ -34,6 +34,9 @@ module Web.Telegram.API.Bot.Requests
     , SendInvoiceRequest             (..)
     , AnswerShippingQueryRequest     (..)
     , AnswerPreCheckoutQueryRequest  (..)
+    , RestrictChatMemberRequest      (..)
+    , PromoteChatMemberRequest       (..)
+    , SetChatPhotoRequest            (..)
      -- * Functions
     , localFileUpload
     , setWebhookRequest
@@ -77,6 +80,8 @@ module Web.Telegram.API.Bot.Requests
     , errorShippingQueryRequest
     , okAnswerPrecheckoutQueryRequest
     , errorAnswerPrecheckoutQueryRequest
+    , restrictChatMemberRequest
+    , promoteChatMemberRequest
     ) where
 
 import           Data.Aeson
@@ -455,13 +460,13 @@ uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing 
 
 data SendVideoNoteRequest payload = SendVideoNoteRequest
   {
-    _vid_note_chat_id :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  , _vid_note_video_note :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
-  , _vid_note_duration :: Maybe Int -- ^ Duration of sent video in seconds
-  , _vid_note_length :: Maybe Int -- ^ Video width and height
+    _vid_note_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , _vid_note_video_note           :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
+  , _vid_note_duration             :: Maybe Int -- ^ Duration of sent video in seconds
+  , _vid_note_length               :: Maybe Int -- ^ Video width and height
   , _vid_note_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , _vid_note_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _vid_note_reply_markup :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
+  , _vid_note_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _vid_note_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendVideoNoteRequest Text) where
@@ -866,6 +871,60 @@ okAnswerPrecheckoutQueryRequest queryId = AnswerPreCheckoutQueryRequest queryId 
 
 errorAnswerPrecheckoutQueryRequest :: Text -> Text -> AnswerPreCheckoutQueryRequest
 errorAnswerPrecheckoutQueryRequest queryId errorMessage = AnswerPreCheckoutQueryRequest queryId False $ Just errorMessage
+
+data RestrictChatMemberRequest = RestrictChatMemberRequest
+  {
+    rcm_chat_id                   :: ChatId -- ^ Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
+  , rcm_user_id                   :: Int -- ^ Unique identifier of the target user
+  , rcm_until_date                :: Maybe Int -- ^ Date when restrictions will be lifted for the user, unix time. If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever
+  , rcm_can_send_messages         :: Maybe Bool -- ^ Pass True, if the user can send text messages, contacts, locations and venues
+  , rcm_can_send_media_messages   :: Maybe Bool -- ^ Pass True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages
+  , rcm_can_send_other_messages   :: Maybe Bool -- ^ Pass True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
+  , rcm_can_add_web_page_previews :: Maybe Bool -- ^ Pass True, if the user may add web page previews to their messages, implies can_send_media_messages
+  } deriving (Show, Generic)
+
+instance ToJSON RestrictChatMemberRequest where
+  toJSON = toJsonDrop 4
+
+instance FromJSON RestrictChatMemberRequest where
+  parseJSON = parseJsonDrop 4
+
+restrictChatMemberRequest :: ChatId -> Int -> RestrictChatMemberRequest
+restrictChatMemberRequest chatId userId = RestrictChatMemberRequest chatId userId Nothing Nothing Nothing Nothing Nothing
+
+data PromoteChatMemberRequest = PromoteChatMemberRequest
+  {
+    pcmr_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , pcmr_user_id              :: Int -- ^ Unique identifier of the target user
+  , pcmr_can_change_info      :: Maybe Bool -- ^ Pass True, if the administrator can change chat title, photo and other settings
+  , pcmr_can_post_messages    :: Maybe Bool -- ^ Pass True, if the administrator can create channel posts, channels only
+  , pcmr_can_edit_messages    :: Maybe Bool -- ^ Pass True, if the administrator can edit messages of other users and can pin messages, channels only
+  , pcmr_can_delete_messages  :: Maybe Bool -- ^ Pass True, if the administrator can delete messages of other users
+  , pcmr_can_invite_users     :: Maybe Bool -- ^ Pass True, if the administrator can invite new users to the chat
+  , pcmr_can_restrict_members :: Maybe Bool -- ^ Pass True, if the administrator can restrict, ban or unban chat members
+  , pcmr_can_pin_messages     :: Maybe Bool -- ^ Pass True, if the administrator can pin messages, supergroups only
+  , pcmr_can_promote_members  :: Maybe Bool -- ^ Pass True, if the administrator can add new administrators with a subset of his own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)
+  } deriving (Show, Generic)
+
+instance ToJSON PromoteChatMemberRequest where
+  toJSON = toJsonDrop 5
+
+instance FromJSON PromoteChatMemberRequest where
+  parseJSON = parseJsonDrop 5
+
+promoteChatMemberRequest :: ChatId -> Int -> PromoteChatMemberRequest
+promoteChatMemberRequest chatId userId = PromoteChatMemberRequest chatId userId Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+data SetChatPhotoRequest = SetChatPhotoRequest
+  {
+    scp_chat_id :: ChatId
+  , scp_photo   :: FileUpload
+  }
+
+instance ToMultipartFormData SetChatPhotoRequest where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (chatIdToPart $ scp_chat_id req)
+    , fileUploadToPart "photo" (scp_photo req) ]
 
 tshow :: Show a => a -> Text
 tshow = T.pack . show

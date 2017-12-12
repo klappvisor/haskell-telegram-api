@@ -1,15 +1,25 @@
-{-# LANGUAGE DataKinds                  #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators     #-}
 
 module Web.Telegram.API.Bot.API.Chats
   ( -- * Functions
     kickChatMember
   , kickChatMemberM
+  , kickChatMemberUntilM
   , leaveChat
   , leaveChatM
   , unbanChatMember
   , unbanChatMemberM
+  , restrictChatMemberM
+  , promoteChatMemberM
+  , exportChatInviteLinkM
+  , setChatPhotoM
+  , deleteChatPhotoM
+  , setChatTitleM
+  , setChatDescriptionM
+  , pinChatMessageM
+  , unpinChatMessageM
   , getChat
   , getChatM
   , getChatAdministrators
@@ -28,7 +38,9 @@ import           Data.Text                        (Text)
 import           Network.HTTP.Client              (Manager)
 import           Servant.API
 import           Servant.Client
+import           Servant.Client.MultipartFormData
 import           Web.Telegram.API.Bot.API.Core
+import           Web.Telegram.API.Bot.Requests
 import           Web.Telegram.API.Bot.Responses
 
 -- | Telegram Bot API
@@ -36,6 +48,7 @@ type TelegramBotChatsAPI =
          TelegramToken :> "kickChatMember"
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
+         :> QueryParam "until_date" Int
          :> Post '[JSON] KickChatMemberResponse
     :<|> TelegramToken :> "leaveChat"
          :> QueryParam "chat_id" Text
@@ -44,6 +57,37 @@ type TelegramBotChatsAPI =
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
          :> Post '[JSON] UnbanChatMemberResponse
+    :<|> TelegramToken :> "restrictChatMember"
+         :> ReqBody '[JSON] RestrictChatMemberRequest
+         :> Post '[JSON] RestrictChatMemberResponse
+    :<|> TelegramToken :> "promoteChatMember"
+         :> ReqBody '[JSON] PromoteChatMemberRequest
+         :> Post '[JSON] PromoteChatMemberResponse
+    :<|> TelegramToken :> "exportChatInviteLink"
+         :> QueryParam "chat_id" Text
+         :> Post '[JSON] ExportChatInviteLinkResponse
+    :<|> TelegramToken :> "setChatPhoto"
+         :> MultipartFormDataReqBody SetChatPhotoRequest
+         :> Post '[JSON] SetChatPhotoResponse
+    :<|> TelegramToken :> "deleteChatPhoto"
+         :> QueryParam "chat_id" Text
+         :> Post '[JSON] DeleteChatPhotoResponse
+    :<|> TelegramToken :> "setChatTitle"
+         :> QueryParam "chat_id" Text
+         :> QueryParam "title" Text
+         :> Post '[JSON] SetChatTitleResponse
+    :<|> TelegramToken :> "setChatDescription"
+         :> QueryParam "chat_id" Text
+         :> QueryParam "description" Text
+         :> Post '[JSON] SetChatDescriptionResponse
+    :<|> TelegramToken :> "pinChatMessage"
+         :> QueryParam "chat_id" Text
+         :> QueryParam "message_id" Int
+         :> QueryParam "disable_notification" Bool
+         :> Post '[JSON] PinChatMessageResponse
+    :<|> TelegramToken :> "unpinChatMessage"
+         :> QueryParam "chat_id" Text
+         :> Post '[JSON] UnpinChatMessageResponse
     :<|> TelegramToken :> "getChat"
          :> QueryParam "chat_id" Text
          :> Post '[JSON] GetChatResponse
@@ -62,9 +106,18 @@ type TelegramBotChatsAPI =
 chatsApi :: Proxy TelegramBotChatsAPI
 chatsApi = Proxy
 
-kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> ClientM KickChatMemberResponse
+kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> Maybe Int -> ClientM KickChatMemberResponse
 leaveChat_                 :: Token -> Maybe Text -> ClientM LeaveChatResponse
 unbanChatMember_           :: Token -> Maybe Text -> Maybe Int -> ClientM UnbanChatMemberResponse
+restrictChatMember_        :: Token -> RestrictChatMemberRequest -> ClientM RestrictChatMemberResponse
+promoteChatMember_         :: Token -> PromoteChatMemberRequest -> ClientM PromoteChatMemberResponse
+exportChatInviteLink_      :: Token -> Maybe Text -> ClientM ExportChatInviteLinkResponse
+setChatPhoto_              :: Token -> SetChatPhotoRequest -> ClientM SetChatPhotoResponse
+deleteChatPhoto_           :: Token -> Maybe Text -> ClientM DeleteChatPhotoResponse
+setChatTitle_              :: Token -> Maybe Text -> Maybe Text -> ClientM SetChatTitleResponse
+setChatDescription_        :: Token -> Maybe Text -> Maybe Text -> ClientM SetChatDescriptionResponse
+pinChatMessage_            :: Token -> Maybe Text -> Maybe Int -> Maybe Bool -> ClientM PinChatMessageResponse
+unpinChatMessage_          :: Token -> Maybe Text -> ClientM UnpinChatMessageResponse
 getChat_                   :: Token -> Maybe Text -> ClientM GetChatResponse
 getChatAdministrators_     :: Token -> Maybe Text -> ClientM GetChatAdministratorsResponse
 getChatMembersCount_       :: Token -> Maybe Text -> ClientM GetChatMembersCountResponse
@@ -72,18 +125,36 @@ getChatMember_             :: Token -> Maybe Text -> Maybe Int -> ClientM GetCha
 kickChatMember_
   :<|> leaveChat_
   :<|> unbanChatMember_
+  :<|> restrictChatMember_
+  :<|> promoteChatMember_
+  :<|> exportChatInviteLink_
+  :<|> setChatPhoto_
+  :<|> deleteChatPhoto_
+  :<|> setChatTitle_
+  :<|> setChatDescription_
+  :<|> pinChatMessage_
+  :<|> unpinChatMessage_
   :<|> getChat_
   :<|> getChatAdministrators_
   :<|> getChatMembersCount_
   :<|> getChatMember_ = client chatsApi
 
 -- | Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must be an administrator in the group for this to work.
-kickChatMember :: Token -> Text -> Int -> Manager -> IO (Either ServantError KickChatMemberResponse)
+kickChatMember :: Token
+    -> Text -- ^ Unique identifier for the target group or username of the target supergroup or channel (in the format @channelusername)
+    -> Int -- ^ Unique identifier of the target user
+    -> Manager -> IO (Either ServantError KickChatMemberResponse)
 kickChatMember token chatId userId = runClient (kickChatMemberM chatId userId) token
 
 -- | See 'kickChatMember'
 kickChatMemberM :: Text -> Int -> TelegramClient KickChatMemberResponse
 kickChatMemberM chatId userId = asking $ \t -> kickChatMember_ t (Just chatId) (Just userId)
+
+kickChatMemberUntilM :: Text -- ^ Unique identifier for the target group or username of the target supergroup or channel (in the format @channelusername)
+    -> Int -- ^ Unique identifier of the target user
+    -> Int -- ^ Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever
+    -> TelegramClient KickChatMemberResponse
+kickChatMemberUntilM chatId userId untilDate = kickChatMemberM chatId userId (Just untilDate)
 
 -- | Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
 leaveChat :: Token -> Text -> Manager -> IO (Either ServantError LeaveChatResponse)
@@ -100,6 +171,42 @@ unbanChatMember token chatId userId = runClient (unbanChatMemberM chatId userId)
 -- | See 'unbanChatMember'
 unbanChatMemberM :: Text -> Int -> TelegramClient UnbanChatMemberResponse
 unbanChatMemberM chatId userId = asking $ \t -> unbanChatMember_ t (Just chatId) (Just userId)
+
+-- | Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate admin rights. Pass True for all boolean parameters to lift restrictions from a user. Returns True on success.
+restrictChatMemberM :: RestrictChatMemberRequest -> TelegramClient RestrictChatMemberResponse
+restrictChatMemberM = run_ restrictChatMember_
+
+-- | Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Pass False for all boolean parameters to demote a user. Returns True on success.
+promoteChatMemberM :: PromoteChatMemberRequest -> TelegramClient PromoteChatMemberResponse
+promoteChatMemberM = run_ promoteChatMember_
+
+-- | Use this method to export an invite link to a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns exported invite link as String on success.
+exportChatInviteLinkM :: Text -> TelegramClient ExportChatInviteLinkResponse
+exportChatInviteLinkM chatId = run_ exportChatInviteLink_ (Just chatId)
+
+-- | Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
+setChatPhotoM :: SetChatPhotoRequest -> TelegramClient SetChatPhotoResponse
+setChatPhotoM = run_ setChatPhoto_
+
+-- | Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
+deleteChatPhotoM :: Text -> TelegramClient DeleteChatPhotoResponse
+deleteChatPhotoM chatId = run_ deleteChatPhoto_ (Just chatId)
+
+-- | Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
+setChatTitleM :: Text -> Maybe Text -> TelegramClient SetChatTitleResponse
+setChatTitleM chatId title = asking $ \t -> setChatTitle_ t (Just chatId) title
+
+-- | Use this method to change the description of a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
+setChatDescriptionM :: Text -> Maybe Text -> TelegramClient SetChatDescriptionResponse
+setChatDescriptionM chatId description = asking $ \t -> setChatDescription_ t (Just chatId) description
+
+-- | Use this method to pin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in the supergroup or 'can_edit_messages' admin right in the channel. Returns True on success.
+pinChatMessageM :: Text -> Int -> Maybe Bool -> TelegramClient PinChatMessageResponse
+pinChatMessageM chatId messageId disableNotifications = asking $ \tkn -> pinChatMessage_ tkn (Just chatId) (Just messageId) disableNotifications
+
+-- | Use this method to unpin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in the supergroup or 'can_edit_messages' admin right in the channel. Returns True on success.
+unpinChatMessageM :: Text -> TelegramClient UnpinChatMessageResponse
+unpinChatMessageM chatId = run_ unpinChatMessage_ (Just chatId)
 
 -- | Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.)
 getChat :: Token -> Text -> Manager -> IO (Either ServantError GetChatResponse)

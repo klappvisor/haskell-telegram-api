@@ -8,6 +8,7 @@ module Web.Telegram.API.Bot.Data
       User                          (..)
     , LanguageCode                  (..)
     , ChatMember                    (..)
+    , ChatPhoto (..)
     , Chat                          (..)
     , Message                       (..)
     , MessageEntity                 (..)
@@ -156,6 +157,9 @@ data Chat = Chat
   , chat_first_name                     :: Maybe Text -- ^ First name of the other party in a private chat
   , chat_last_name                      :: Maybe Text -- ^ Last name of the other party in a private chat
   , chat_all_members_are_administrators :: Maybe Bool -- ^ True if a group has ‘All Members Are Admins’ enabled.
+  , chat_photo                          :: Maybe ChatPhoto -- ^ Chat photo. Returned only in 'getChat'.
+  , chat_description                    :: Maybe Text -- ^ Description, for supergroups and channel chats. Returned only in `getChat`.
+  , chat_invite_link                    :: Maybe Text -- ^ Chat invite link, for supergroups and channel chats. Returned only in `getChat`.
   } deriving (Show, Generic)
 
 instance ToJSON Chat where
@@ -163,6 +167,8 @@ instance ToJSON Chat where
 
 instance FromJSON Chat where
   parseJSON = parseJsonDrop 5
+
+
 
 -- | Type of chat.
 data ChatType = Private
@@ -815,8 +821,22 @@ data UserProfilePhotos = UserProfilePhotos
 
 data ChatMember = ChatMember
   {
-    cm_user   :: User -- ^ Information about the user
-  , cm_status :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+    cm_user                      :: User -- ^ Information about the user
+  , cm_status                    :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+  , cm_until_date                :: Maybe Integer -- ^ Restictred and kicked only. Date when restrictions will be lifted for this user, unix time
+  , cm_can_be_edited             :: Maybe Bool -- ^ Administrators only. True, if the bot is allowed to edit administrator privileges of that user
+  , cm_can_change_info           :: Maybe Bool -- ^ Administrators only. True, if the administrator can change the chat title, photo and other settings
+  , cm_can_post_messages         :: Maybe Bool -- ^ Administrators only. True, if the administrator can post in the channel, channels only
+  , cm_can_edit_messages         :: Maybe Bool -- ^ Administrators only. True, if the administrator can edit messages of other users and can pin messages, channels only
+  , cm_can_delete_messages       :: Maybe Bool -- ^ Administrators only. True, if the administrator can delete messages of other users
+  , cm_can_invite_users          :: Maybe Bool -- ^ Administrators only. True, if the administrator can invite new users to the chat
+  , cm_can_restrict_members      :: Maybe Bool -- ^ Administrators only. True, if the administrator can restrict, ban or unban chat members
+  , cm_can_pin_messages          :: Maybe Bool -- ^ Administrators only. True, if the administrator can pin messages, supergroups only
+  , cm_can_promote_members       :: Maybe Bool -- ^ Administrators only. True, if the administrator can add new administrators with a subset of his own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)
+  , cm_can_send_messages         :: Maybe Bool -- ^ Restricted only. True, if the user can send text messages, contacts, locations and venues
+  , cm_can_send_media_messages   :: Maybe Bool -- ^ Restricted only. True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages
+  , cm_can_send_other_messages   :: Maybe Bool -- ^ Restricted only. True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
+  , cm_can_add_web_page_previews :: Maybe Bool -- ^ Restricted only. True, if user may add web page previews to his messages, implies can_send_media_messages
   } deriving (Show, Generic)
 
 instance ToJSON ChatMember where
@@ -824,6 +844,18 @@ instance ToJSON ChatMember where
 
 instance FromJSON ChatMember where
   parseJSON = parseJsonDrop 3
+
+data ChatPhoto = ChatPhoto
+  {
+    chat_photo_small_file_id :: Text -- ^ Unique file identifier of small (160x160) chat photo. This file_id can be used only for photo download.
+  , chat_photo_big_file_id   :: Text -- ^ Unique file identifier of big (640x640) chat photo. This file_id can be used only for photo download.
+  } deriving (Show, Generic)
+
+instance ToJSON ChatPhoto where
+  toJSON = toJsonDrop 11
+
+instance FromJSON ChatPhoto where
+  parseJSON = parseJsonDrop 11
 
 -- | This object represents a message.
 data Message = Message
