@@ -1,5 +1,5 @@
 name:                telegram-api
-version:             0.7.0.0
+version:             0.7.1.0
 synopsis:            Telegram Bot API bindings
 description:         High-level bindings to the Telegram Bot API
 homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
@@ -36,6 +36,7 @@ library
                      , Web.Telegram.API.Bot.API.Updates
                      , Web.Telegram.API.Bot.API.Chats
                      , Web.Telegram.API.Bot.API.Payments
+                     , Web.Telegram.API.Bot.API.Stickers
                      , Web.Telegram.API.Bot.Data
                      , Web.Telegram.API.Bot.Responses
                      , Web.Telegram.API.Bot.Requests

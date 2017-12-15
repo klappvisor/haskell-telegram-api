@@ -37,6 +37,9 @@ module Web.Telegram.API.Bot.Requests
     , RestrictChatMemberRequest      (..)
     , PromoteChatMemberRequest       (..)
     , SetChatPhotoRequest            (..)
+    , UploadStickerFileRequest       (..)
+    , CreateNewStickerSetRequest     (..)
+    , AddStickerToSetRequest         (..)
      -- * Functions
     , localFileUpload
     , setWebhookRequest
@@ -102,7 +105,8 @@ import           Web.Telegram.API.Bot.Data             (CurrencyCode,
                                                         InlineKeyboardMarkup,
                                                         InlineQueryResult,
                                                         KeyboardButton,
-                                                        LabeledPrice, ParseMode,
+                                                        LabeledPrice,
+                                                        MaskPosition, ParseMode,
                                                         ShippingOption)
 import           Web.Telegram.API.Bot.JsonExt
 
@@ -925,6 +929,70 @@ instance ToMultipartFormData SetChatPhotoRequest where
   toMultipartFormData req =
     [ utf8Part "chat_id" (chatIdToPart $ scp_chat_id req)
     , fileUploadToPart "photo" (scp_photo req) ]
+
+data UploadStickerFileRequest = UploadStickerFileRequest
+  {
+    upload_sticker_user_id     :: Int -- ^ User identifier of sticker file owner
+  , upload_sticker_png_sticker :: FileUpload -- ^ Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px.
+  }
+
+instance ToMultipartFormData UploadStickerFileRequest where
+  toMultipartFormData req =
+    [ utf8Part "user_id" (tshow $ upload_sticker_user_id req)
+    , fileUploadToPart "png_sticker" (upload_sticker_png_sticker req) ]
+
+data CreateNewStickerSetRequest payload = CreateNewStickerSetRequest
+  {
+    new_sticker_set_user_id        :: Int -- ^ User identifier of created sticker set owner
+  , new_sticker_set_name           :: Text -- ^ Short name of sticker set, to be used in t.me/addstickers/ URLs (e.g., animals). Can contain only english letters, digits and underscores. Must begin with a letter, can't contain consecutive underscores and must end in “_by_<bot username>”. <bot_username> is case insensitive. 1-64 characters.
+  , new_sticker_set_title          :: Text -- ^ Sticker set title, 1-64 characters
+  , new_sticker_set_png_sticker    :: payload -- ^ Yes 	Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More info on Sending Files »
+  , new_sticker_set_emojis         :: Text -- ^ One or more emoji corresponding to the sticker
+  , new_sticker_set_contains_masks :: Maybe Bool -- ^ Pass True, if a set of mask stickers should be created
+  , new_sticker_set_mask_position  :: Maybe MaskPosition -- ^ A JSON-serialized object for position where the mask should be placed on faces
+  } deriving (Show, Generic)
+
+instance ToJSON (CreateNewStickerSetRequest Text) where
+  toJSON = toJsonDrop 16
+
+instance FromJSON (CreateNewStickerSetRequest Text) where
+  parseJSON = parseJsonDrop 16
+
+instance ToMultipartFormData (CreateNewStickerSetRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "user_id" (tshow $ new_sticker_set_user_id req)
+    , utf8Part "name" $ new_sticker_set_name req
+    , utf8Part "title" $ new_sticker_set_title req
+    , utf8Part "emojis" $ new_sticker_set_emojis req
+    , fileUploadToPart "png_sticker" (new_sticker_set_png_sticker req) ] ++
+    catMaybes
+    [ partLBS "contains_masks" . encode <$> new_sticker_set_contains_masks req
+    , partLBS "mask_position" . encode <$> new_sticker_set_mask_position req ]
+
+data AddStickerToSetRequest payload = AddStickerToSetRequest
+  {
+    add_sticker_to_set_user_id       :: Int -- ^ User identifier of created sticker set owner
+  , add_sticker_to_set_name          :: Text -- ^ Short name of sticker set, to be used in t.me/addstickers/ URLs (e.g., animals). Can contain only english letters, digits and underscores. Must begin with a letter, can't contain consecutive underscores and must end in “_by_<bot username>”. <bot_username> is case insensitive. 1-64 characters.
+  , add_sticker_to_set_png_sticker   :: payload -- ^ Yes 	Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More info on Sending Files »
+  , add_sticker_to_set_emojis        :: Text -- ^ One or more emoji corresponding to the sticker
+  , add_sticker_to_set_mask_position :: Maybe MaskPosition -- ^ A JSON-serialized object for position where the mask should be placed on faces
+  } deriving (Show, Generic)
+
+instance ToJSON (AddStickerToSetRequest Text) where
+  toJSON = toJsonDrop 19
+
+instance FromJSON (AddStickerToSetRequest Text) where
+  parseJSON = parseJsonDrop 19
+
+instance ToMultipartFormData (AddStickerToSetRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "user_id" (tshow $ add_sticker_to_set_user_id req)
+    , utf8Part "name" $ add_sticker_to_set_name req
+    , utf8Part "emojis" $ add_sticker_to_set_emojis req
+    , fileUploadToPart "png_sticker" (add_sticker_to_set_png_sticker req) ] ++
+    catMaybes
+    [ partLBS "mask_position" . encode <$> add_sticker_to_set_mask_position req
+    ]
 
 tshow :: Show a => a -> Text
 tshow = T.pack . show

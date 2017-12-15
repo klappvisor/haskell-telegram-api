@@ -148,13 +148,13 @@ kickChatMember token chatId userId = runClient (kickChatMemberM chatId userId) t
 
 -- | See 'kickChatMember'
 kickChatMemberM :: Text -> Int -> TelegramClient KickChatMemberResponse
-kickChatMemberM chatId userId = asking $ \t -> kickChatMember_ t (Just chatId) (Just userId)
+kickChatMemberM chatId userId = asking $ \t -> kickChatMember_ t (Just chatId) (Just userId) Nothing
 
 kickChatMemberUntilM :: Text -- ^ Unique identifier for the target group or username of the target supergroup or channel (in the format @channelusername)
     -> Int -- ^ Unique identifier of the target user
     -> Int -- ^ Date when the user will be unbanned, unix time. If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever
     -> TelegramClient KickChatMemberResponse
-kickChatMemberUntilM chatId userId untilDate = kickChatMemberM chatId userId (Just untilDate)
+kickChatMemberUntilM chatId userId untilDate = asking $ \t -> kickChatMember_ t (Just chatId) (Just userId) (Just untilDate)
 
 -- | Use this method for your bot to leave a group, supergroup or channel. Returns True on success.
 leaveChat :: Token -> Text -> Manager -> IO (Either ServantError LeaveChatResponse)

@@ -8,7 +8,7 @@ module Web.Telegram.API.Bot.Data
       User                          (..)
     , LanguageCode                  (..)
     , ChatMember                    (..)
-    , ChatPhoto (..)
+    , ChatPhoto                     (..)
     , Chat                          (..)
     , Message                       (..)
     , MessageEntity                 (..)
@@ -48,6 +48,9 @@ module Web.Telegram.API.Bot.Data
     , SuccessfulPayment             (..)
     , ShippingQuery                 (..)
     , PreCheckoutQuery              (..)
+    , MaskPositionPoint             (..)
+    , MaskPosition                  (..)
+    , StickerSet                    (..)
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
@@ -168,8 +171,6 @@ instance ToJSON Chat where
 instance FromJSON Chat where
   parseJSON = parseJsonDrop 5
 
-
-
 -- | Type of chat.
 data ChatType = Private
               | Group
@@ -285,12 +286,14 @@ instance FromJSON Animation where
 -- | This object represents a sticker.
 data Sticker = Sticker
   {
-    sticker_file_id   :: Text             -- ^ Unique identifier for this file
-  , sticker_width     :: Int              -- ^ Sticker width
-  , sticker_height    :: Int              -- ^ Sticker height
-  , sticker_thumb     :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
-  , sticker_emoji     :: Maybe Text       -- ^ Emoji associated with the sticker
-  , sticker_file_size :: Maybe Int        -- ^ File size
+    sticker_file_id       :: Text             -- ^ Unique identifier for this file
+  , sticker_width         :: Int              -- ^ Sticker width
+  , sticker_height        :: Int              -- ^ Sticker height
+  , sticker_thumb         :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
+  , sticker_emoji         :: Maybe Text       -- ^ Emoji associated with the sticker
+  , sticker_set_name      :: Maybe Text
+  , sticker_mask_position :: Maybe MaskPosition
+  , sticker_file_size     :: Maybe Int        -- ^ File size
   } deriving (Show, Generic)
 
 instance ToJSON Sticker where
@@ -1098,3 +1101,49 @@ instance ToJSON PreCheckoutQuery where
 
 instance FromJSON PreCheckoutQuery where
   parseJSON = parseJsonDrop 8
+
+data StickerSet = StickerSet
+  {
+    stcr_set_name           :: Text -- ^ Sticker set name
+  , stcr_set_title          :: Text -- ^ Sticker set title
+  , stcr_set_contains_masks :: Bool -- ^ True, if the sticker set contains masks
+  , stcr_set_stickers       :: [Sticker] -- ^ List of all set stickers
+  } deriving (Show, Generic)
+
+instance ToJSON StickerSet where
+  toJSON = toJsonDrop 9
+
+instance FromJSON StickerSet where
+  parseJSON = parseJsonDrop 9
+
+data MaskPositionPoint = Forehead
+  | Eyes
+  | Mouth
+  | Chin deriving (Show, Generic)
+
+instance ToJSON MaskPositionPoint where
+  toJSON Forehead = "forehead"
+  toJSON Eyes = "eyes"
+  toJSON Mouth = "mouth"
+  toJSON Chin = "chin"
+
+instance FromJSON MaskPositionPoint where
+  parseJSON "forehead" = pure Forehead
+  parseJSON "eyes" = pure Eyes
+  parseJSON "mouth" = pure Mouth
+  parseJSON "chin" = pure Chin
+  parseJSON _ = fail $ "Failed to parse MaskPositionPoint"
+
+data MaskPosition = MaskPosition
+  {
+    mask_pos_point   :: MaskPositionPoint -- ^ The part of the face relative to which the mask should be placed
+  , mask_pos_x_shift :: Float -- ^ Shift by X-axis measured in widths of the mask scaled to the face size, from left to right. For example, choosing -1.0 will place mask just to the left of the default mask position.
+  , mask_pos_y_shift :: Float -- ^ Shift by Y-axis measured in heights of the mask scaled to the face size, from top to bottom. For example, 1.0 will place the mask just below the default mask position.
+  , mask_pos_scale   :: Float -- ^ Mask scaling coefficient. For example, 2.0 means double size.
+  } deriving (Show, Generic)
+
+instance ToJSON MaskPosition where
+  toJSON = toJsonDrop 9
+
+instance FromJSON MaskPosition where
+  parseJSON = parseJsonDrop 9
