@@ -59,35 +59,35 @@ type TelegramBotChatsAPI =
          :> Post '[JSON] UnbanChatMemberResponse
     :<|> TelegramToken :> "restrictChatMember"
          :> ReqBody '[JSON] RestrictChatMemberRequest
-         :> Post '[JSON] RestrictChatMemberResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "promoteChatMember"
          :> ReqBody '[JSON] PromoteChatMemberRequest
-         :> Post '[JSON] PromoteChatMemberResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "exportChatInviteLink"
          :> QueryParam "chat_id" Text
-         :> Post '[JSON] ExportChatInviteLinkResponse
+         :> Post '[JSON] (Response Text)
     :<|> TelegramToken :> "setChatPhoto"
          :> MultipartFormDataReqBody SetChatPhotoRequest
-         :> Post '[JSON] SetChatPhotoResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "deleteChatPhoto"
          :> QueryParam "chat_id" Text
-         :> Post '[JSON] DeleteChatPhotoResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "setChatTitle"
          :> QueryParam "chat_id" Text
          :> QueryParam "title" Text
-         :> Post '[JSON] SetChatTitleResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "setChatDescription"
          :> QueryParam "chat_id" Text
          :> QueryParam "description" Text
-         :> Post '[JSON] SetChatDescriptionResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "pinChatMessage"
          :> QueryParam "chat_id" Text
          :> QueryParam "message_id" Int
          :> QueryParam "disable_notification" Bool
-         :> Post '[JSON] PinChatMessageResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "unpinChatMessage"
          :> QueryParam "chat_id" Text
-         :> Post '[JSON] UnpinChatMessageResponse
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "getChat"
          :> QueryParam "chat_id" Text
          :> Post '[JSON] GetChatResponse
@@ -109,15 +109,15 @@ chatsApi = Proxy
 kickChatMember_            :: Token -> Maybe Text -> Maybe Int -> Maybe Int -> ClientM KickChatMemberResponse
 leaveChat_                 :: Token -> Maybe Text -> ClientM LeaveChatResponse
 unbanChatMember_           :: Token -> Maybe Text -> Maybe Int -> ClientM UnbanChatMemberResponse
-restrictChatMember_        :: Token -> RestrictChatMemberRequest -> ClientM RestrictChatMemberResponse
-promoteChatMember_         :: Token -> PromoteChatMemberRequest -> ClientM PromoteChatMemberResponse
-exportChatInviteLink_      :: Token -> Maybe Text -> ClientM ExportChatInviteLinkResponse
-setChatPhoto_              :: Token -> SetChatPhotoRequest -> ClientM SetChatPhotoResponse
-deleteChatPhoto_           :: Token -> Maybe Text -> ClientM DeleteChatPhotoResponse
-setChatTitle_              :: Token -> Maybe Text -> Maybe Text -> ClientM SetChatTitleResponse
-setChatDescription_        :: Token -> Maybe Text -> Maybe Text -> ClientM SetChatDescriptionResponse
-pinChatMessage_            :: Token -> Maybe Text -> Maybe Int -> Maybe Bool -> ClientM PinChatMessageResponse
-unpinChatMessage_          :: Token -> Maybe Text -> ClientM UnpinChatMessageResponse
+restrictChatMember_        :: Token -> RestrictChatMemberRequest -> ClientM (Response Bool)
+promoteChatMember_         :: Token -> PromoteChatMemberRequest -> ClientM (Response Bool)
+exportChatInviteLink_      :: Token -> Maybe Text -> ClientM (Response Text)
+setChatPhoto_              :: Token -> SetChatPhotoRequest -> ClientM (Response Bool)
+deleteChatPhoto_           :: Token -> Maybe Text -> ClientM (Response Bool)
+setChatTitle_              :: Token -> Maybe Text -> Maybe Text -> ClientM (Response Bool)
+setChatDescription_        :: Token -> Maybe Text -> Maybe Text -> ClientM (Response Bool)
+pinChatMessage_            :: Token -> Maybe Text -> Maybe Int -> Maybe Bool -> ClientM (Response Bool)
+unpinChatMessage_          :: Token -> Maybe Text -> ClientM (Response Bool)
 getChat_                   :: Token -> Maybe Text -> ClientM GetChatResponse
 getChatAdministrators_     :: Token -> Maybe Text -> ClientM GetChatAdministratorsResponse
 getChatMembersCount_       :: Token -> Maybe Text -> ClientM GetChatMembersCountResponse
@@ -173,39 +173,39 @@ unbanChatMemberM :: Text -> Int -> TelegramClient UnbanChatMemberResponse
 unbanChatMemberM chatId userId = asking $ \t -> unbanChatMember_ t (Just chatId) (Just userId)
 
 -- | Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for this to work and must have the appropriate admin rights. Pass True for all boolean parameters to lift restrictions from a user. Returns True on success.
-restrictChatMemberM :: RestrictChatMemberRequest -> TelegramClient RestrictChatMemberResponse
+restrictChatMemberM :: RestrictChatMemberRequest -> TelegramClient (Response Bool)
 restrictChatMemberM = run_ restrictChatMember_
 
 -- | Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Pass False for all boolean parameters to demote a user. Returns True on success.
-promoteChatMemberM :: PromoteChatMemberRequest -> TelegramClient PromoteChatMemberResponse
+promoteChatMemberM :: PromoteChatMemberRequest -> TelegramClient (Response Bool)
 promoteChatMemberM = run_ promoteChatMember_
 
 -- | Use this method to export an invite link to a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns exported invite link as String on success.
-exportChatInviteLinkM :: Text -> TelegramClient ExportChatInviteLinkResponse
+exportChatInviteLinkM :: Text -> TelegramClient (Response Text)
 exportChatInviteLinkM chatId = run_ exportChatInviteLink_ (Just chatId)
 
 -- | Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
-setChatPhotoM :: SetChatPhotoRequest -> TelegramClient SetChatPhotoResponse
+setChatPhotoM :: SetChatPhotoRequest -> TelegramClient (Response Bool)
 setChatPhotoM = run_ setChatPhoto_
 
 -- | Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
-deleteChatPhotoM :: Text -> TelegramClient DeleteChatPhotoResponse
+deleteChatPhotoM :: Text -> TelegramClient (Response Bool)
 deleteChatPhotoM chatId = run_ deleteChatPhoto_ (Just chatId)
 
 -- | Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
-setChatTitleM :: Text -> Maybe Text -> TelegramClient SetChatTitleResponse
+setChatTitleM :: Text -> Maybe Text -> TelegramClient (Response Bool)
 setChatTitleM chatId title = asking $ \t -> setChatTitle_ t (Just chatId) title
 
 -- | Use this method to change the description of a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the appropriate admin rights. Returns True on success.
-setChatDescriptionM :: Text -> Maybe Text -> TelegramClient SetChatDescriptionResponse
+setChatDescriptionM :: Text -> Maybe Text -> TelegramClient (Response Bool)
 setChatDescriptionM chatId description = asking $ \t -> setChatDescription_ t (Just chatId) description
 
 -- | Use this method to pin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in the supergroup or 'can_edit_messages' admin right in the channel. Returns True on success.
-pinChatMessageM :: Text -> Int -> Maybe Bool -> TelegramClient PinChatMessageResponse
+pinChatMessageM :: Text -> Int -> Maybe Bool -> TelegramClient (Response Bool)
 pinChatMessageM chatId messageId disableNotifications = asking $ \tkn -> pinChatMessage_ tkn (Just chatId) (Just messageId) disableNotifications
 
 -- | Use this method to unpin a message in a supergroup or a channel. The bot must be an administrator in the chat for this to work and must have the 'can_pin_messages' admin right in the supergroup or 'can_edit_messages' admin right in the channel. Returns True on success.
-unpinChatMessageM :: Text -> TelegramClient UnpinChatMessageResponse
+unpinChatMessageM :: Text -> TelegramClient (Response Bool)
 unpinChatMessageM chatId = run_ unpinChatMessage_ (Just chatId)
 
 -- | Use this method to get up to date information about the chat (current name of the user for one-on-one conversations, current username of a user, group or channel, etc.)

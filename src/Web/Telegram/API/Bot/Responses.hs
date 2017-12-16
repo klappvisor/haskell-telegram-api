@@ -19,15 +19,6 @@ module Web.Telegram.API.Bot.Responses
     , KickChatMemberResponse
     , LeaveChatResponse
     , UnbanChatMemberResponse
-    , RestrictChatMemberResponse
-    , PromoteChatMemberResponse
-    , ExportChatInviteLinkResponse
-    , SetChatPhotoResponse
-    , DeleteChatPhotoResponse
-    , SetChatTitleResponse
-    , SetChatDescriptionResponse
-    , PinChatMessageResponse
-    , UnpinChatMessageResponse
     , GetChatResponse
     , GetChatAdministratorsResponse
     , GetChatMembersCountResponse
@@ -93,24 +84,6 @@ type LeaveChatResponse = Response Bool
 
 -- | This object represents 'unbanChatMember' response
 type UnbanChatMemberResponse = Response Bool
-
-type RestrictChatMemberResponse = Response Bool
-
-type PromoteChatMemberResponse = Response Bool
-
-type ExportChatInviteLinkResponse = Response Text
-
-type SetChatPhotoResponse = Response Bool
-
-type DeleteChatPhotoResponse = Response Bool
-
-type SetChatTitleResponse = Response Bool
-
-type SetChatDescriptionResponse = Response Bool
-
-type PinChatMessageResponse = Response Bool
-
-type UnpinChatMessageResponse = Response Bool
 
 type GetChatResponse = Response Chat
 
