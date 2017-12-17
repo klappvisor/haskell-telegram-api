@@ -14,6 +14,7 @@ module Web.Telegram.API.Bot.API.Core
   , asking
   , runClient
   , runClient'
+  , runTelegramClient
   , telegramBaseUrl
   ) where
 
@@ -44,6 +45,10 @@ runClient' tcm token = runClientM (runReaderT tcm token)
 -- | Runs 'TelegramClient'
 runClient :: TelegramClient a -> Token -> Manager -> IO (Either ServantError a)
 runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl)
+
+-- | Runs 'TelegramClient'
+runTelegramClient :: Token -> Manager -> TelegramClient a -> IO (Either ServantError a)
+runTelegramClient token manager tcm = runClient tcm token manager
 
 asking :: Monad m => (t -> m b) -> ReaderT t m b
 asking op = ask >>= \t -> lift $ op t

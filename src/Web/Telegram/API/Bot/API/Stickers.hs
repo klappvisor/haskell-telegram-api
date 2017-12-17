@@ -9,7 +9,7 @@ module Web.Telegram.API.Bot.API.Stickers
   , createNewStickerSetM
   , createNewStickerSetM'
   , addStickerToSetM
-  , addStickerToSetM'
+  , uploadStickerToSetM
   , setStickerPositionInSetM
   , deleteStickerFromSetM
     -- * API
@@ -99,8 +99,8 @@ createNewStickerSetM' = run_ createNewStickerSet_'
 addStickerToSetM :: AddStickerToSetRequest Text -> TelegramClient (Response Bool)
 addStickerToSetM = run_ addStickerToSet_
 
-addStickerToSetM' :: AddStickerToSetRequest FileUpload -> TelegramClient (Response Bool)
-addStickerToSetM' = run_ addStickerToSet_'
+uploadStickerToSetM :: AddStickerToSetRequest FileUpload -> TelegramClient (Response Bool)
+uploadStickerToSetM = run_ addStickerToSet_'
 
 -- | Use this method to move a sticker in a set created by the bot to a specific position.
 setStickerPositionInSetM :: Text -- ^ File identifier of the sticker

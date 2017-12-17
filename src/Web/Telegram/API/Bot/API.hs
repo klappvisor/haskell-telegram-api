@@ -7,6 +7,7 @@ module Web.Telegram.API.Bot.API
     module API
   , runClient
   , runClient'
+  , runTelegramClient
     -- * API
   , TelegramBotAPI
   , api

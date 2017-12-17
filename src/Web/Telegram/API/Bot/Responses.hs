@@ -30,7 +30,6 @@ module Web.Telegram.API.Bot.Responses
 
 import           Data.Aeson
 import           Data.Int                     (Int64)
-import           Data.Text                    (Text)
 import           GHC.Generics
 import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.JsonExt
