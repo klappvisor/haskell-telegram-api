@@ -1,3 +1,10 @@
+## 0.7.1.0
+
+* Added support up to Bot API v3.5: sticker sets, chats administration, live location, etc
+* Added `runTelegramClient` with different than in `runClient` order of arguments. Now possible to write `runTelegramClient token manager $ do`
+* Stop adding request specific responses
+* Stop adding IO calls, use functions with `M` suffix, for example `runClient getWebhookInfoM`
+
 ## 0.7.0.0
 
 * Upgraded to servant-0.11 

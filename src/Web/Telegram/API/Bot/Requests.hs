@@ -41,6 +41,8 @@ module Web.Telegram.API.Bot.Requests
     , UploadStickerFileRequest       (..)
     , CreateNewStickerSetRequest     (..)
     , AddStickerToSetRequest         (..)
+    , EditMessageLiveLocationRequest (..)
+    , StopMessageLiveLocationRequest (..)
      -- * Functions
     , localFileUpload
     , setWebhookRequest
@@ -506,6 +508,7 @@ data SendLocationRequest = SendLocationRequest
     location_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , location_latitude             :: Float -- ^ Latitude of location
   , location_longitude            :: Float -- ^ Longitude of location
+  , location_live_period          :: Maybe Int -- ^ Period in seconds for which the location will be updated, should be between 60 and 86400.
   , location_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , location_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
   , location_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
@@ -518,7 +521,7 @@ instance FromJSON SendLocationRequest where
   parseJSON = parseJsonDrop 9
 
 sendLocationRequest :: ChatId -> Float -> Float -> SendLocationRequest
-sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing
+sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing Nothing
 
 -- | This object represents request for 'sendMediaGroup'
 data SendMediaGroupRequest = SendMediaGroupRequest
@@ -1015,6 +1018,58 @@ instance ToMultipartFormData (AddStickerToSetRequest FileUpload) where
     catMaybes
     [ partLBS "mask_position" . encode <$> add_sticker_to_set_mask_position req
     ]
+
+data EditMessageLiveLocationRequest =
+  EditMessageLiveLocationRequest
+  {
+    edit_live_loc_chat_id      :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , edit_live_loc_latitude     :: Float -- ^ Latitude of new location
+  , edit_live_loc_longitude    :: Float -- ^ Longitude of new location
+  , edit_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | EditMessageLiveLocationMessageRequest
+  {
+    edit_live_loc_message_id   :: Int -- ^ Identifier of the sent message
+  , edit_live_loc_latitude     :: Float -- ^ Latitude of new location
+  , edit_live_loc_longitude    :: Float -- ^ Longitude of new location
+  , edit_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | EditMessageLiveLocationInlineMessageRequest
+  {
+    edit_live_loc_inline_message_id :: Text -- ^ Identifier of the inline message
+  , edit_live_loc_latitude          :: Float -- ^ Latitude of new location
+  , edit_live_loc_longitude         :: Float -- ^ Longitude of new location
+  , edit_live_loc_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON EditMessageLiveLocationRequest where
+  toJSON = toJsonDrop 14
+
+instance FromJSON EditMessageLiveLocationRequest where
+  parseJSON = parseJsonDrop 14
+
+data StopMessageLiveLocationRequest =
+  StopMessageLiveLocationRequest
+  {
+    stop_live_loc_chat_id      :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , stop_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | StopMessageLiveLocationMessageRequest
+  {
+    stop_live_loc_message_id   :: Int -- ^ Identifier of the sent message
+  , stop_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | StopMessageLiveLocationInlineMessageRequest
+  {
+    stop_live_loc_inline_message_id :: Text -- ^ Identifier of the inline message
+  , stop_live_loc_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON StopMessageLiveLocationRequest where
+  toJSON = toJsonDrop 14
+
+instance FromJSON StopMessageLiveLocationRequest where
+  parseJSON = parseJsonDrop 14
 
 tshow :: Show a => a -> Text
 tshow = T.pack . show
