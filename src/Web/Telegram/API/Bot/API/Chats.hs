@@ -28,6 +28,8 @@ module Web.Telegram.API.Bot.API.Chats
   , getChatMembersCountM
   , getChatMember
   , getChatMemberM
+  , setChatStickerSetM
+  , deleteChatStickerSetM
     -- * API
   , TelegramBotChatsAPI
   , chatsApi
@@ -101,6 +103,13 @@ type TelegramBotChatsAPI =
          :> QueryParam "chat_id" Text
          :> QueryParam "user_id" Int
          :> Post '[JSON] GetChatMemberResponse
+    :<|> TelegramToken :> "setChatStickerSet"
+         :> QueryParam "chat_id" Text
+         :> QueryParam "sticker_set_name" Text
+         :> Post '[JSON] (Response Bool)
+    :<|> TelegramToken :> "deleteChatStickerSet"
+         :> QueryParam "chat_id" Text
+         :> Post '[JSON] (Response Bool)
 
 -- | Proxy for Thelegram Bot API to administrate chats
 chatsApi :: Proxy TelegramBotChatsAPI
@@ -122,6 +131,8 @@ getChat_                   :: Token -> Maybe Text -> ClientM GetChatResponse
 getChatAdministrators_     :: Token -> Maybe Text -> ClientM GetChatAdministratorsResponse
 getChatMembersCount_       :: Token -> Maybe Text -> ClientM GetChatMembersCountResponse
 getChatMember_             :: Token -> Maybe Text -> Maybe Int -> ClientM GetChatMemberResponse
+setChatStickerSet_         :: Token -> Maybe Text -> Maybe Text -> ClientM (Response Bool)
+deleteChatStickerSet_      :: Token -> Maybe Text -> ClientM (Response Bool)
 kickChatMember_
   :<|> leaveChat_
   :<|> unbanChatMember_
@@ -137,7 +148,10 @@ kickChatMember_
   :<|> getChat_
   :<|> getChatAdministrators_
   :<|> getChatMembersCount_
-  :<|> getChatMember_ = client chatsApi
+  :<|> getChatMember_
+  :<|> setChatStickerSet_
+  :<|> deleteChatStickerSet_
+    = client chatsApi
 
 -- | Use this method to kick a user from a group or a supergroup. In the case of supergroups, the user will not be able to return to the group on their own using invite links, etc., unless unbanned first. The bot must be an administrator in the group for this to work.
 kickChatMember :: Token
@@ -239,3 +253,12 @@ getChatMember token chatId userId = runClient (getChatMemberM chatId userId) tok
 -- | See 'getChatMember'
 getChatMemberM :: Text -> Int -> TelegramClient GetChatMemberResponse
 getChatMemberM chatId userId = asking $ \t -> getChatMember_ t (Just chatId) (Just userId)
+
+setChatStickerSetM :: Text -- ^ Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
+    -> Text -- ^ Name of the sticker set to be set as the group sticker set
+    -> TelegramClient (Response Bool)
+setChatStickerSetM chatId stickerSetName = asking $ \t -> setChatStickerSet_ t (Just chatId) (Just stickerSetName)
+
+deleteChatStickerSetM :: Text -- ^ Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
+    -> TelegramClient (Response Bool)
+deleteChatStickerSetM chatId = run_ deleteChatStickerSet_ (Just chatId)

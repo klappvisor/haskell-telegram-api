@@ -51,6 +51,7 @@ module Web.Telegram.API.Bot.Data
     , MaskPositionPoint             (..)
     , MaskPosition                  (..)
     , StickerSet                    (..)
+    , InputMedia                    (..)
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
@@ -74,7 +75,8 @@ module Web.Telegram.API.Bot.Data
     , inlineQueryResultCachedSticker
     , inlineQueryResultCachedVideo
     , inlineQueryResultCachedVoice
-
+    , inputMediaPhoto
+    , inputMediaVideo
     ) where
 
 import           Prelude                      hiding (id)
@@ -93,6 +95,7 @@ import           Web.Telegram.API.Bot.JsonExt
 data User = User
   {
     user_id            :: Int        -- ^ Unique identifier for this user or bot
+  , user_is_bot        :: Bool -- ^ True, if this user is a bot
   , user_first_name    :: Text       -- ^ User‘s or bot’s first name
   , user_last_name     :: Maybe Text -- ^ User‘s or bot’s last name
   , user_username      :: Maybe Text -- ^ User‘s or bot’s username
@@ -163,6 +166,9 @@ data Chat = Chat
   , chat_photo                          :: Maybe ChatPhoto -- ^ Chat photo. Returned only in 'getChat'.
   , chat_description                    :: Maybe Text -- ^ Description, for supergroups and channel chats. Returned only in `getChat`.
   , chat_invite_link                    :: Maybe Text -- ^ Chat invite link, for supergroups and channel chats. Returned only in `getChat`.
+  , chat_pinned_message                 :: Maybe Message -- ^ Pinned message, for supergroups. Returned only in 'getChat'.
+  , chat_sticker_set_name               :: Maybe Text -- ^ For supergroups, name of group sticker set. Returned only in 'getChat'.
+  , chat_can_set_sticker_set            :: Maybe Bool -- ^ True, if the bot can change the group sticker set. Returned only in 'getChat'.
   } deriving (Show, Generic)
 
 instance ToJSON Chat where
@@ -870,11 +876,15 @@ data Message = Message
   , forward_from            :: Maybe User -- ^ For forwarded messages, sender of the original message
   , forward_from_chat       :: Maybe Chat -- ^ For messages forwarded from a channel, information about the original channel
   , forward_from_message_id :: Maybe Int -- ^ For forwarded channel posts, identifier of the original message in the channel
+  , forward_signature       :: Maybe Text -- ^ For messages forwarded from channels, signature of the post author if present
   , forward_date            :: Maybe Int -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message        :: Maybe Message -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
   , edit_date               :: Maybe Int -- ^ Date the message was last edited in Unix time
+  , media_group_id          :: Maybe Text -- ^ The unique identifier of a media message group this message belongs to
+  , author_signature        :: Maybe Text -- ^ Signature of the post author for messages in channels
   , text                    :: Maybe Text -- ^ For text messages, the actual UTF-8 text of the message
   , entities                :: Maybe [MessageEntity] -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
+  , caption_entities        :: Maybe [MessageEntity] -- ^ or messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption
   , audio                   :: Maybe Audio -- ^ Message is an audio file, information about the file
   , document                :: Maybe Document -- ^ Message is a general file, information about the file
   , game                    :: Maybe Game -- ^ Message is a game, information about the game
@@ -882,11 +892,13 @@ data Message = Message
   , sticker                 :: Maybe Sticker -- ^ Message is a sticker, information about the sticker
   , video                   :: Maybe Video -- ^ Message is a video, information about the video
   , voice                   :: Maybe Voice -- ^ Message is a voice message, information about the file
+  , video_note              :: Maybe VideoNote -- ^ Message is a video note, information about the video message
   , caption                 :: Maybe Text -- ^ Caption for the photo or video
   , contact                 :: Maybe Contact -- ^ Message is a shared contact, information about the contact
   , location                :: Maybe Location -- ^ Message is a shared location, information about the location
   , venue                   :: Maybe Venue -- ^ Message is a venue, information about the venue
   , new_chat_member         :: Maybe User -- ^ A new member was added to the group, information about them (this member may be the bot itself)
+  , new_chat_members        :: Maybe [User] -- ^ New members that were added to the group or supergroup and information about them (the bot itself may be one of these members)
   , left_chat_member        :: Maybe User -- ^ A member was removed from the group, information about them (this member may be the bot itself)
   , new_chat_title          :: Maybe Text -- ^ A chat title was changed to this value
   , new_chat_photo          :: Maybe [PhotoSize] -- ^ A chat photo was change to this value
@@ -899,8 +911,6 @@ data Message = Message
   , pinned_message          :: Maybe Message -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
   , invoice                 :: Maybe Invoice -- ^  Message is an invoice for a payment, information about the invoice.
   , successful_payment      :: Maybe SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
-  , video_note              :: Maybe VideoNote -- ^ Message is a video note, information about the video message
-  , new_chat_members        :: Maybe [User] -- ^ New members that were added to the group or supergroup and information about them (the bot itself may be one of these members)
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
@@ -1147,3 +1157,44 @@ instance ToJSON MaskPosition where
 
 instance FromJSON MaskPosition where
   parseJSON = parseJsonDrop 9
+
+-- | This object represents the content of a media message to be sent.
+data InputMedia =
+  InputMediaPhoto
+  {
+    input_media_media   :: Text -- ^ File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet
+  , input_media_caption :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
+  }
+  | InputMediaVideo
+  {
+    input_media_media    :: Text -- ^ File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet
+  , input_media_caption  :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
+  , input_media_width    :: Maybe Int -- ^ Video width
+  , input_media_height   :: Maybe Int -- ^ Video height
+  , input_media_duration :: Maybe Int -- ^ Video duration
+  } deriving (Show, Generic)
+
+inputMediaPhoto :: Text -> InputMedia
+inputMediaPhoto media = InputMediaPhoto media Nothing
+
+inputMediaVideo :: Text -> InputMedia
+inputMediaVideo media = InputMediaVideo media Nothing Nothing Nothing Nothing
+
+inputMediaTagModifier :: String -> String
+inputMediaTagModifier "InputMediaPhoto" = "photo"
+inputMediaTagModifier "InputMediaVideo" = "video"
+inputMediaTagModifier x = x
+
+inputMediaJSONOptions :: Options
+inputMediaJSONOptions = defaultOptions {
+    fieldLabelModifier     = drop 12
+  , omitNothingFields      = True
+  , sumEncoding            = TaggedObject { tagFieldName = "type", contentsFieldName = undefined }
+  , constructorTagModifier = inputMediaTagModifier
+  }
+
+instance ToJSON InputMedia where
+  toJSON = genericToJSON inputMediaJSONOptions
+
+instance FromJSON InputMedia where
+  parseJSON = genericParseJSON inputMediaJSONOptions

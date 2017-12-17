@@ -329,4 +329,18 @@ spec token chatId botName = do
         editMessageCaption token editRequest manager
       cpt' `shouldBe` "edited cat picture"
 
+  describe "/sendMediaGroup" $ do
+    it "should send all media in group" $ do
+      let photo1 = (inputMediaPhoto "http://s2.quickmeme.com/img/c9/c94711e0f933eb488e0cb0baa9d3eff1888a27ead4fd6089fd37d8f7d8f45a97.jpg") {
+            input_media_caption = Just "meme"
+          }
+          photo2 = (inputMediaPhoto "http://adit.io/imgs/lenses/go_deeper.png") {
+            input_media_caption = Just "Lenses"
+          }
+          request = sendMediaGroupRequest chatId [ photo1, photo2 ]
+      res <- runTelegramClient token manager $ sendMediaGroupM request
+      success res
+      let Right Response { result = messages } = res
+      length messages `shouldBe` 2
+
     -- it "should edit caption" $ do ... after inline query tests are on place

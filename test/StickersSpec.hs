@@ -6,7 +6,6 @@
 
 module StickersSpec (spec) where
 
-import           Control.Monad
 import           Data.Maybe
 import           Data.Monoid
 import           Data.Text               (Text)
@@ -21,11 +20,13 @@ import           TestCore
 import           Web.Telegram.API.Bot
 
 spec :: Token -> ChatId -> Text -> Spec
-spec token chatId botName = do
+spec token chatId _ = do
   manager <- runIO $ newManager tlsManagerSettings
   dataDir <- runIO getDataDir
-  Right Response { result = meRes } <- runIO $ runTelegramClient token manager getMeM
+
+  res <- runIO $ runTelegramClient token manager getMeM
   let testFile name = dataDir </> "test-data" </> name
+      Right Response { result = meRes } = res
       botUsername = fromMaybe "???" $ user_username meRes
       ChatId chatId' = chatId
       userId :: Int = fromIntegral chatId'
@@ -50,7 +51,7 @@ spec token chatId botName = do
       let stickerSetName = "set_" <> (showText rnd) <> "_by_" <> botUsername
           request = CreateNewStickerSetRequest userId stickerSetName "Haskell Bot API Test Set" stickerFile1 "😃" (Just True) Nothing
       res <- runTelegramClient token manager $ do
-        newSet <- createNewStickerSetM' request
+        _ <- createNewStickerSetM' request
         getStickerSetM stickerSetName
       success res
       let Right Response { result = set } = res
@@ -60,7 +61,7 @@ spec token chatId botName = do
     let setTitle = "Haskell Telegram Bot API Test"
         setName = "sticker_set_by_" <> botUsername
     runIO $ print setName
-    runIO $ runTelegramClient token manager $ do
+    _ <- runIO $ runTelegramClient token manager $ do
       uploadResult <- uploadStickerFileM $ UploadStickerFileRequest userId stickerFile2
       let fileId = (file_id . result) uploadResult
           request = CreateNewStickerSetRequest userId setName setTitle fileId "👍" (Just True) Nothing
@@ -79,8 +80,6 @@ spec token chatId botName = do
         return (set, setAfter)
       stcr_set_contains_masks set `shouldBe` True
       let stickerCount = length . stcr_set_stickers
-      print set
-      print setAfter
       stickerCount set `shouldBe` 2
       stickerCount setAfter `shouldBe` 1
 

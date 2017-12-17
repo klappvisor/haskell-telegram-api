@@ -36,6 +36,7 @@ module Web.Telegram.API.Bot.API.Messages
   , uploadVideoNoteM
   , sendVideoNote
   , sendVideoNoteM
+  , sendMediaGroupM
   , sendLocation
   , sendLocationM
   , sendVenue
@@ -59,6 +60,7 @@ import           Servant.API
 import           Servant.Client
 import           Servant.Client.MultipartFormData
 import           Web.Telegram.API.Bot.API.Core
+import           Web.Telegram.API.Bot.Data
 import           Web.Telegram.API.Bot.Requests
 import           Web.Telegram.API.Bot.Responses
 
@@ -112,6 +114,9 @@ type TelegramBotMessagesAPI =
     :<|> TelegramToken :> "sendVideoNote"
          :> ReqBody '[JSON] (SendVideoNoteRequest Text)
          :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "sendMediaGroup"
+         :> ReqBody '[JSON] SendMediaGroupRequest
+         :> Post '[JSON] (Response [Message])
     :<|> TelegramToken :> "sendLocation"
          :> ReqBody '[JSON] SendLocationRequest
          :> Post '[JSON] MessageResponse
@@ -148,6 +153,7 @@ uploadVoice_               :: Token -> SendVoiceRequest FileUpload -> ClientM Me
 sendVoice_                 :: Token -> SendVoiceRequest Text -> ClientM MessageResponse
 uploadVideoNote_           :: Token -> SendVideoNoteRequest FileUpload -> ClientM MessageResponse
 sendVideoNote_             :: Token -> SendVideoNoteRequest Text -> ClientM MessageResponse
+sendMediaGroup_            :: Token -> SendMediaGroupRequest -> ClientM (Response [Message])
 sendLocation_              :: Token -> SendLocationRequest -> ClientM MessageResponse
 sendVenue_                 :: Token -> SendVenueRequest-> ClientM MessageResponse
 sendContact_               :: Token -> SendContactRequest -> ClientM MessageResponse
@@ -169,6 +175,7 @@ sendMessage_
   :<|> sendVoice_
   :<|> uploadVideoNote_
   :<|> sendVideoNote_
+  :<|> sendMediaGroup_
   :<|> sendLocation_
   :<|> sendVenue_
   :<|> sendContact_
@@ -315,6 +322,9 @@ sendLocation = runM sendLocationM
 -- | See 'sendLocation'
 sendLocationM :: SendLocationRequest -> TelegramClient MessageResponse
 sendLocationM = run_ sendLocation_
+
+sendMediaGroupM :: SendMediaGroupRequest -> TelegramClient (Response [Message])
+sendMediaGroupM = run_ sendMediaGroup_
 
 -- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
 sendVenue :: Token -> SendVenueRequest -> Manager -> IO (Either ServantError MessageResponse)

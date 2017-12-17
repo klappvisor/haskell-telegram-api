@@ -19,6 +19,7 @@ module Web.Telegram.API.Bot.Requests
     , SendVideoRequest               (..)
     , SendVoiceRequest               (..)
     , SendVideoNoteRequest           (..)
+    , SendMediaGroupRequest          (..)
     , SendLocationRequest            (..)
     , SendVenueRequest               (..)
     , SendContactRequest             (..)
@@ -61,6 +62,7 @@ module Web.Telegram.API.Bot.Requests
     , uploadVoiceRequest
     , sendVideoNoteRequest
     , uploadVideoNoteRequest
+    , sendMediaGroupRequest
     , sendLocationRequest
     , sendVenueRequest
     , sendContactRequest
@@ -104,6 +106,7 @@ import           Web.Telegram.API.Bot.Data             (CurrencyCode,
                                                         InlineKeyboardButton,
                                                         InlineKeyboardMarkup,
                                                         InlineQueryResult,
+                                                        InputMedia,
                                                         KeyboardButton,
                                                         LabeledPrice,
                                                         MaskPosition, ParseMode,
@@ -517,6 +520,24 @@ instance FromJSON SendLocationRequest where
 sendLocationRequest :: ChatId -> Float -> Float -> SendLocationRequest
 sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing
 
+-- | This object represents request for 'sendMediaGroup'
+data SendMediaGroupRequest = SendMediaGroupRequest
+  {
+    media_group_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , media_group_media                :: [InputMedia] -- ^ Array describing photos and videos to be sent, must include 2–10 items
+  , media_group_disable_notification :: Maybe Bool -- ^ Sends the messages silently. Users will receive a notification with no sound.
+  , media_group_reply_to_message_id  :: Maybe Int -- ^ If the messages are a reply, ID of the original message
+  } deriving(Show, Generic)
+
+instance ToJSON SendMediaGroupRequest where
+  toJSON = toJsonDrop 12
+
+instance FromJSON SendMediaGroupRequest where
+  parseJSON = parseJsonDrop 12
+
+sendMediaGroupRequest :: ChatId -> [InputMedia] -> SendMediaGroupRequest
+sendMediaGroupRequest chatId inputMediaArray = SendMediaGroupRequest chatId inputMediaArray Nothing Nothing
+
 -- | This object represents request for 'sendVenue'
 data SendVenueRequest = SendVenueRequest
   {
@@ -801,6 +822,7 @@ data SendInvoiceRequest = SendInvoiceRequest
   , snd_inv_start_parameter       :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
   , snd_inv_currency              :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
   , snd_inv_prices                :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+  , snd_inv_provider_data         :: Maybe Text -- ^ JSON-encoded data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.
   , snd_inv_photo_url             :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
   , snd_inv_photo_size            :: Maybe Int -- ^ Photo size
   , snd_inv_photo_width           :: Maybe Int -- ^ Photo width
@@ -831,7 +853,7 @@ sendInvoiceRequest :: Int64 -- ^ Unique identifier for the target private chat
   -> [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
   -> SendInvoiceRequest
 sendInvoiceRequest chatId title description payload providerToken startParameter currency prices
-  = SendInvoiceRequest chatId title description payload providerToken startParameter currency prices Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+  = SendInvoiceRequest chatId title description payload providerToken startParameter currency prices Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 data AnswerShippingQueryRequest
   -- | If you sent an invoice requesting a shipping address and the parameter is_flexible was specified, the Bot API will send an Update with a shipping_query field to the bot. Use this method to reply to shipping queries. On success, True is returned.
