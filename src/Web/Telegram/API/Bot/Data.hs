@@ -8,6 +8,7 @@ module Web.Telegram.API.Bot.Data
       User                          (..)
     , LanguageCode                  (..)
     , ChatMember                    (..)
+    , ChatPhoto                     (..)
     , Chat                          (..)
     , Message                       (..)
     , MessageEntity                 (..)
@@ -47,6 +48,10 @@ module Web.Telegram.API.Bot.Data
     , SuccessfulPayment             (..)
     , ShippingQuery                 (..)
     , PreCheckoutQuery              (..)
+    , MaskPositionPoint             (..)
+    , MaskPosition                  (..)
+    , StickerSet                    (..)
+    , InputMedia                    (..)
       -- * Functions
     , inlineKeyboardButton
     , keyboardButton
@@ -70,7 +75,8 @@ module Web.Telegram.API.Bot.Data
     , inlineQueryResultCachedSticker
     , inlineQueryResultCachedVideo
     , inlineQueryResultCachedVoice
-
+    , inputMediaPhoto
+    , inputMediaVideo
     ) where
 
 import           Prelude                      hiding (id)
@@ -89,6 +95,7 @@ import           Web.Telegram.API.Bot.JsonExt
 data User = User
   {
     user_id            :: Int        -- ^ Unique identifier for this user or bot
+  , user_is_bot        :: Bool -- ^ True, if this user is a bot
   , user_first_name    :: Text       -- ^ User‘s or bot’s first name
   , user_last_name     :: Maybe Text -- ^ User‘s or bot’s last name
   , user_username      :: Maybe Text -- ^ User‘s or bot’s username
@@ -156,6 +163,12 @@ data Chat = Chat
   , chat_first_name                     :: Maybe Text -- ^ First name of the other party in a private chat
   , chat_last_name                      :: Maybe Text -- ^ Last name of the other party in a private chat
   , chat_all_members_are_administrators :: Maybe Bool -- ^ True if a group has ‘All Members Are Admins’ enabled.
+  , chat_photo                          :: Maybe ChatPhoto -- ^ Chat photo. Returned only in 'getChat'.
+  , chat_description                    :: Maybe Text -- ^ Description, for supergroups and channel chats. Returned only in `getChat`.
+  , chat_invite_link                    :: Maybe Text -- ^ Chat invite link, for supergroups and channel chats. Returned only in `getChat`.
+  , chat_pinned_message                 :: Maybe Message -- ^ Pinned message, for supergroups. Returned only in 'getChat'.
+  , chat_sticker_set_name               :: Maybe Text -- ^ For supergroups, name of group sticker set. Returned only in 'getChat'.
+  , chat_can_set_sticker_set            :: Maybe Bool -- ^ True, if the bot can change the group sticker set. Returned only in 'getChat'.
   } deriving (Show, Generic)
 
 instance ToJSON Chat where
@@ -279,12 +292,14 @@ instance FromJSON Animation where
 -- | This object represents a sticker.
 data Sticker = Sticker
   {
-    sticker_file_id   :: Text             -- ^ Unique identifier for this file
-  , sticker_width     :: Int              -- ^ Sticker width
-  , sticker_height    :: Int              -- ^ Sticker height
-  , sticker_thumb     :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
-  , sticker_emoji     :: Maybe Text       -- ^ Emoji associated with the sticker
-  , sticker_file_size :: Maybe Int        -- ^ File size
+    sticker_file_id       :: Text             -- ^ Unique identifier for this file
+  , sticker_width         :: Int              -- ^ Sticker width
+  , sticker_height        :: Int              -- ^ Sticker height
+  , sticker_thumb         :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
+  , sticker_emoji         :: Maybe Text       -- ^ Emoji associated with the sticker
+  , sticker_set_name      :: Maybe Text
+  , sticker_mask_position :: Maybe MaskPosition
+  , sticker_file_size     :: Maybe Int        -- ^ File size
   } deriving (Show, Generic)
 
 instance ToJSON Sticker where
@@ -815,8 +830,22 @@ data UserProfilePhotos = UserProfilePhotos
 
 data ChatMember = ChatMember
   {
-    cm_user   :: User -- ^ Information about the user
-  , cm_status :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+    cm_user                      :: User -- ^ Information about the user
+  , cm_status                    :: Text -- ^ The member's status in the chat. Can be “creator”, “administrator”, “member”, “left” or “kicked”
+  , cm_until_date                :: Maybe Integer -- ^ Restictred and kicked only. Date when restrictions will be lifted for this user, unix time
+  , cm_can_be_edited             :: Maybe Bool -- ^ Administrators only. True, if the bot is allowed to edit administrator privileges of that user
+  , cm_can_change_info           :: Maybe Bool -- ^ Administrators only. True, if the administrator can change the chat title, photo and other settings
+  , cm_can_post_messages         :: Maybe Bool -- ^ Administrators only. True, if the administrator can post in the channel, channels only
+  , cm_can_edit_messages         :: Maybe Bool -- ^ Administrators only. True, if the administrator can edit messages of other users and can pin messages, channels only
+  , cm_can_delete_messages       :: Maybe Bool -- ^ Administrators only. True, if the administrator can delete messages of other users
+  , cm_can_invite_users          :: Maybe Bool -- ^ Administrators only. True, if the administrator can invite new users to the chat
+  , cm_can_restrict_members      :: Maybe Bool -- ^ Administrators only. True, if the administrator can restrict, ban or unban chat members
+  , cm_can_pin_messages          :: Maybe Bool -- ^ Administrators only. True, if the administrator can pin messages, supergroups only
+  , cm_can_promote_members       :: Maybe Bool -- ^ Administrators only. True, if the administrator can add new administrators with a subset of his own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by the user)
+  , cm_can_send_messages         :: Maybe Bool -- ^ Restricted only. True, if the user can send text messages, contacts, locations and venues
+  , cm_can_send_media_messages   :: Maybe Bool -- ^ Restricted only. True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages
+  , cm_can_send_other_messages   :: Maybe Bool -- ^ Restricted only. True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
+  , cm_can_add_web_page_previews :: Maybe Bool -- ^ Restricted only. True, if user may add web page previews to his messages, implies can_send_media_messages
   } deriving (Show, Generic)
 
 instance ToJSON ChatMember where
@@ -824,6 +853,18 @@ instance ToJSON ChatMember where
 
 instance FromJSON ChatMember where
   parseJSON = parseJsonDrop 3
+
+data ChatPhoto = ChatPhoto
+  {
+    chat_photo_small_file_id :: Text -- ^ Unique file identifier of small (160x160) chat photo. This file_id can be used only for photo download.
+  , chat_photo_big_file_id   :: Text -- ^ Unique file identifier of big (640x640) chat photo. This file_id can be used only for photo download.
+  } deriving (Show, Generic)
+
+instance ToJSON ChatPhoto where
+  toJSON = toJsonDrop 11
+
+instance FromJSON ChatPhoto where
+  parseJSON = parseJsonDrop 11
 
 -- | This object represents a message.
 data Message = Message
@@ -835,11 +876,15 @@ data Message = Message
   , forward_from            :: Maybe User -- ^ For forwarded messages, sender of the original message
   , forward_from_chat       :: Maybe Chat -- ^ For messages forwarded from a channel, information about the original channel
   , forward_from_message_id :: Maybe Int -- ^ For forwarded channel posts, identifier of the original message in the channel
+  , forward_signature       :: Maybe Text -- ^ For messages forwarded from channels, signature of the post author if present
   , forward_date            :: Maybe Int -- ^ For forwarded messages, date the original message was sent in Unix time
   , reply_to_message        :: Maybe Message -- ^ For replies, the original message. Note that the 'Message' object in this field will not contain further 'reply_to_message' fields even if it itself is a reply.
   , edit_date               :: Maybe Int -- ^ Date the message was last edited in Unix time
+  , media_group_id          :: Maybe Text -- ^ The unique identifier of a media message group this message belongs to
+  , author_signature        :: Maybe Text -- ^ Signature of the post author for messages in channels
   , text                    :: Maybe Text -- ^ For text messages, the actual UTF-8 text of the message
   , entities                :: Maybe [MessageEntity] -- ^ For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
+  , caption_entities        :: Maybe [MessageEntity] -- ^ or messages with a caption, special entities like usernames, URLs, bot commands, etc. that appear in the caption
   , audio                   :: Maybe Audio -- ^ Message is an audio file, information about the file
   , document                :: Maybe Document -- ^ Message is a general file, information about the file
   , game                    :: Maybe Game -- ^ Message is a game, information about the game
@@ -847,11 +892,13 @@ data Message = Message
   , sticker                 :: Maybe Sticker -- ^ Message is a sticker, information about the sticker
   , video                   :: Maybe Video -- ^ Message is a video, information about the video
   , voice                   :: Maybe Voice -- ^ Message is a voice message, information about the file
+  , video_note              :: Maybe VideoNote -- ^ Message is a video note, information about the video message
   , caption                 :: Maybe Text -- ^ Caption for the photo or video
   , contact                 :: Maybe Contact -- ^ Message is a shared contact, information about the contact
   , location                :: Maybe Location -- ^ Message is a shared location, information about the location
   , venue                   :: Maybe Venue -- ^ Message is a venue, information about the venue
   , new_chat_member         :: Maybe User -- ^ A new member was added to the group, information about them (this member may be the bot itself)
+  , new_chat_members        :: Maybe [User] -- ^ New members that were added to the group or supergroup and information about them (the bot itself may be one of these members)
   , left_chat_member        :: Maybe User -- ^ A member was removed from the group, information about them (this member may be the bot itself)
   , new_chat_title          :: Maybe Text -- ^ A chat title was changed to this value
   , new_chat_photo          :: Maybe [PhotoSize] -- ^ A chat photo was change to this value
@@ -864,8 +911,6 @@ data Message = Message
   , pinned_message          :: Maybe Message -- ^ Specified message was pinned. Note that the Message object in this field will not contain further reply_to_message fields even if it is itself a reply.
   , invoice                 :: Maybe Invoice -- ^  Message is an invoice for a payment, information about the invoice.
   , successful_payment      :: Maybe SuccessfulPayment -- ^  Message is a service message about a successful payment, information about the payment.
-  , video_note              :: Maybe VideoNote -- ^ Message is a video note, information about the video message
-  , new_chat_members        :: Maybe [User] -- ^ New members that were added to the group or supergroup and information about them (the bot itself may be one of these members)
   } deriving (FromJSON, ToJSON, Show, Generic)
 
 -- | This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
@@ -1066,3 +1111,90 @@ instance ToJSON PreCheckoutQuery where
 
 instance FromJSON PreCheckoutQuery where
   parseJSON = parseJsonDrop 8
+
+data StickerSet = StickerSet
+  {
+    stcr_set_name           :: Text -- ^ Sticker set name
+  , stcr_set_title          :: Text -- ^ Sticker set title
+  , stcr_set_contains_masks :: Bool -- ^ True, if the sticker set contains masks
+  , stcr_set_stickers       :: [Sticker] -- ^ List of all set stickers
+  } deriving (Show, Generic)
+
+instance ToJSON StickerSet where
+  toJSON = toJsonDrop 9
+
+instance FromJSON StickerSet where
+  parseJSON = parseJsonDrop 9
+
+data MaskPositionPoint = Forehead
+  | Eyes
+  | Mouth
+  | Chin deriving (Show, Generic)
+
+instance ToJSON MaskPositionPoint where
+  toJSON Forehead = "forehead"
+  toJSON Eyes = "eyes"
+  toJSON Mouth = "mouth"
+  toJSON Chin = "chin"
+
+instance FromJSON MaskPositionPoint where
+  parseJSON "forehead" = pure Forehead
+  parseJSON "eyes" = pure Eyes
+  parseJSON "mouth" = pure Mouth
+  parseJSON "chin" = pure Chin
+  parseJSON _ = fail $ "Failed to parse MaskPositionPoint"
+
+data MaskPosition = MaskPosition
+  {
+    mask_pos_point   :: MaskPositionPoint -- ^ The part of the face relative to which the mask should be placed
+  , mask_pos_x_shift :: Float -- ^ Shift by X-axis measured in widths of the mask scaled to the face size, from left to right. For example, choosing -1.0 will place mask just to the left of the default mask position.
+  , mask_pos_y_shift :: Float -- ^ Shift by Y-axis measured in heights of the mask scaled to the face size, from top to bottom. For example, 1.0 will place the mask just below the default mask position.
+  , mask_pos_scale   :: Float -- ^ Mask scaling coefficient. For example, 2.0 means double size.
+  } deriving (Show, Generic)
+
+instance ToJSON MaskPosition where
+  toJSON = toJsonDrop 9
+
+instance FromJSON MaskPosition where
+  parseJSON = parseJsonDrop 9
+
+-- | This object represents the content of a media message to be sent.
+data InputMedia =
+  InputMediaPhoto
+  {
+    input_media_media   :: Text -- ^ File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet
+  , input_media_caption :: Maybe Text -- ^ Caption of the photo to be sent, 0-200 characters
+  }
+  | InputMediaVideo
+  {
+    input_media_media    :: Text -- ^ File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet
+  , input_media_caption  :: Maybe Text -- ^ Caption of the video to be sent, 0-200 characters
+  , input_media_width    :: Maybe Int -- ^ Video width
+  , input_media_height   :: Maybe Int -- ^ Video height
+  , input_media_duration :: Maybe Int -- ^ Video duration
+  } deriving (Show, Generic)
+
+inputMediaPhoto :: Text -> InputMedia
+inputMediaPhoto media = InputMediaPhoto media Nothing
+
+inputMediaVideo :: Text -> InputMedia
+inputMediaVideo media = InputMediaVideo media Nothing Nothing Nothing Nothing
+
+inputMediaTagModifier :: String -> String
+inputMediaTagModifier "InputMediaPhoto" = "photo"
+inputMediaTagModifier "InputMediaVideo" = "video"
+inputMediaTagModifier x = x
+
+inputMediaJSONOptions :: Options
+inputMediaJSONOptions = defaultOptions {
+    fieldLabelModifier     = drop 12
+  , omitNothingFields      = True
+  , sumEncoding            = TaggedObject { tagFieldName = "type", contentsFieldName = undefined }
+  , constructorTagModifier = inputMediaTagModifier
+  }
+
+instance ToJSON InputMedia where
+  toJSON = genericToJSON inputMediaJSONOptions
+
+instance FromJSON InputMedia where
+  parseJSON = genericParseJSON inputMediaJSONOptions

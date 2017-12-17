@@ -7,6 +7,7 @@ module Web.Telegram.API.Bot.API
     module API
   , runClient
   , runClient'
+  , runTelegramClient
     -- * API
   , TelegramBotAPI
   , api
@@ -22,9 +23,10 @@ import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.API.Edit     as API
 import           Web.Telegram.API.Bot.API.Get      as API
 import           Web.Telegram.API.Bot.API.Messages as API
-import           Web.Telegram.API.Bot.API.Queries  as API
-import           Web.Telegram.API.Bot.API.Updates  as API
 import           Web.Telegram.API.Bot.API.Payments as API
+import           Web.Telegram.API.Bot.API.Queries  as API
+import           Web.Telegram.API.Bot.API.Stickers as API
+import           Web.Telegram.API.Bot.API.Updates  as API
 
 type TelegramBotAPI =
        TelegramBotMessagesAPI
@@ -34,6 +36,7 @@ type TelegramBotAPI =
   :<|> TelegramBotQueriesAPI
   :<|> TelegramBotGetAPI
   :<|> TelegramBotPaymentsAPI
+  :<|> TelegramBotStickersAPI
 
 -- | Proxy for Thelegram Bot API
 api :: Proxy TelegramBotAPI

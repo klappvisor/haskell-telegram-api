@@ -16,6 +16,8 @@ module Web.Telegram.API.Bot.API.Edit
   , editInlineMessageCaptionM
   , editInlineMessageReplyMarkup
   , editInlineMessageReplyMarkupM
+  , editMessageLiveLocationM
+  , stopMessageLiveLocationM
     -- * API
   , TelegramBotEditAPI
   , editApi
@@ -23,7 +25,7 @@ module Web.Telegram.API.Bot.API.Edit
   ) where
 
 import           Data.Proxy
-import           Network.HTTP.Client              (Manager)
+import           Network.HTTP.Client            (Manager)
 import           Servant.API
 import           Servant.Client
 import           Web.Telegram.API.Bot.API.Core
@@ -50,6 +52,12 @@ type TelegramBotEditAPI =
     :<|> TelegramToken :> "editMessageReplyMarkup"
          :> ReqBody '[JSON] EditMessageReplyMarkupRequest
          :> Post '[JSON] (Response Bool)
+    :<|> TelegramToken :> "editMessageLiveLocation"
+         :> ReqBody '[JSON] EditMessageLiveLocationRequest
+         :> Post '[JSON] (Response Bool)
+    :<|> TelegramToken :> "stopMessageLiveLocation"
+         :> ReqBody '[JSON] StopMessageLiveLocationRequest
+         :> Post '[JSON] (Response Bool)
 
 
 -- | Proxy for Thelegram Bot API
@@ -62,12 +70,16 @@ editMessageReplyMarkup_    :: Token -> EditMessageReplyMarkupRequest -> ClientM 
 editMessageText__          :: Token -> EditMessageTextRequest -> ClientM (Response Bool)
 editMessageCaption__       :: Token -> EditMessageCaptionRequest -> ClientM (Response Bool)
 editMessageReplyMarkup__   :: Token -> EditMessageReplyMarkupRequest -> ClientM (Response Bool)
+editMessageLiveLocation_   :: Token -> EditMessageLiveLocationRequest -> ClientM (Response Bool)
+stopMessageLiveLocation_   :: Token -> StopMessageLiveLocationRequest -> ClientM (Response Bool)
 editMessageText_
   :<|> editMessageCaption_
   :<|> editMessageReplyMarkup_
   :<|> editMessageText__
   :<|> editMessageCaption__
   :<|> editMessageReplyMarkup__
+  :<|> editMessageLiveLocation_
+  :<|> stopMessageLiveLocation_
      = client editApi
 
 -- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
@@ -116,3 +128,11 @@ editInlineMessageReplyMarkup = runM editInlineMessageReplyMarkupM
 -- | See 'editInlineMessageReplyMarkup'
 editInlineMessageReplyMarkupM :: EditMessageReplyMarkupRequest -> TelegramClient (Response Bool)
 editInlineMessageReplyMarkupM = run_ editMessageReplyMarkup__
+
+-- | Use this method to edit live location messages sent by the bot or via the bot (for inline bots). A location can be edited until its live_period expires or editing is explicitly disabled by a call to 'stopMessageLiveLocationM'.
+editMessageLiveLocationM :: EditMessageLiveLocationRequest -> TelegramClient (Response Bool)
+editMessageLiveLocationM = run_ editMessageLiveLocation_
+
+-- | Use this method to stop updating a live location message sent by the bot or via the bot (for inline bots) before live_period expires.
+stopMessageLiveLocationM :: StopMessageLiveLocationRequest -> TelegramClient (Response Bool)
+stopMessageLiveLocationM = run_ stopMessageLiveLocation_

@@ -7,24 +7,18 @@ module MainSpec (spec) where
 
 import           Control.Concurrent
 import           Control.Monad
-import           Data.Either               (isLeft, isRight)
 import           Data.Monoid
 import           Data.Text                 (Text)
 import qualified Data.Text                 as T
 import           Network.HTTP.Client       (newManager)
 import           Network.HTTP.Client.TLS   (tlsManagerSettings)
 import           Network.HTTP.Types.Status
+import           Paths_telegram_api
 import           Servant.Client
 import           System.FilePath
 import           Test.Hspec
+import           TestCore
 import           Web.Telegram.API.Bot
-
-import           Paths_telegram_api
-
--- to print out remote response if response success not match
-success, nosuccess :: (Show a, Show b) => Either a b -> Expectation
-success   e = e `shouldSatisfy` isRight
-nosuccess e = e `shouldSatisfy` isLeft
 
 spec :: Token -> ChatId -> Text -> Spec
 spec token chatId botName = do
@@ -149,7 +143,7 @@ spec token chatId botName = do
             _audio_performer = Just audioPerformer,
             _audio_title = Just audioTitle
           }
-      res <- uploadAudio token audio manager    
+      res <- uploadAudio token audio manager
       let Right Response {
         result = Message {
           audio = Just Audio {
@@ -175,7 +169,7 @@ spec token chatId botName = do
           stickerReq = uploadStickerRequest chatId fileUpload
       res <- uploadSticker token stickerReq manager
       success res
-      let Right Response { result = Message { sticker = Just sticker } } = res      
+      let Right Response { result = Message { sticker = Just sticker } } = res
       sticker_height sticker `shouldBe` 128
 
   describe "/sendVoice" $
@@ -205,7 +199,7 @@ spec token chatId botName = do
       res <- uploadVideo token videoReq manager
       success res
       let Right Response { result = Message { video = Just video } } = res
-        
+
       video_width video `shouldBe` 560
 
   describe "/sendDocument" $
@@ -334,5 +328,19 @@ spec token chatId botName = do
       Right Response { result = Message { caption = Just cpt' } } <-
         editMessageCaption token editRequest manager
       cpt' `shouldBe` "edited cat picture"
+
+  describe "/sendMediaGroup" $ do
+    it "should send all media in group" $ do
+      let photo1 = (inputMediaPhoto "http://s2.quickmeme.com/img/c9/c94711e0f933eb488e0cb0baa9d3eff1888a27ead4fd6089fd37d8f7d8f45a97.jpg") {
+            input_media_caption = Just "meme"
+          }
+          photo2 = (inputMediaPhoto "http://adit.io/imgs/lenses/go_deeper.png") {
+            input_media_caption = Just "Lenses"
+          }
+          request = sendMediaGroupRequest chatId [ photo1, photo2 ]
+      res <- runTelegramClient token manager $ sendMediaGroupM request
+      success res
+      let Right Response { result = messages } = res
+      length messages `shouldBe` 2
 
     -- it "should edit caption" $ do ... after inline query tests are on place

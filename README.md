@@ -13,7 +13,7 @@ Both `getUpdates` request or webhook can be used to receive updates for your bot
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
 
-**Support of [Bot-3.0 API][bot-3.0]**
+**Support of [Bot-3.5 API][bot-api]**
 
 ## Usage
 
@@ -164,4 +164,4 @@ If everything is fine after running the tests you will receive a few new message
 [telegram-bot-api]: https://core.telegram.org/bots/api
 [servant]: https://haskell-servant.github.io/
 [hspec-args]: https://hspec.github.io/running-specs.html
-[bot-3.0]: https://core.telegram.org/bots/api
+[bot-api]: https://core.telegram.org/bots/api

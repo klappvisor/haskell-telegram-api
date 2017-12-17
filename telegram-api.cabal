@@ -1,5 +1,5 @@
 name:                telegram-api
-version:             0.7.0.0
+version:             0.7.1.0
 synopsis:            Telegram Bot API bindings
 description:         High-level bindings to the Telegram Bot API
 homepage:            http://github.com/klappvisor/haskell-telegram-api#readme
@@ -20,6 +20,8 @@ data-files:          test-data/christmas-cat.jpg
                    , test-data/Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
                    , test-data/concerto-for-2-trumpets-in-c-major.mp3
                    , test-data/wikipedia-telegram.txt
+                   , test-data/sticker_1.png
+                   , test-data/sticker_2.png
 
 extra-source-files:
   README.md
@@ -36,6 +38,7 @@ library
                      , Web.Telegram.API.Bot.API.Updates
                      , Web.Telegram.API.Bot.API.Chats
                      , Web.Telegram.API.Bot.API.Payments
+                     , Web.Telegram.API.Bot.API.Stickers
                      , Web.Telegram.API.Bot.Data
                      , Web.Telegram.API.Bot.Responses
                      , Web.Telegram.API.Bot.Requests
@@ -68,6 +71,8 @@ test-suite telegram-api-test
                      , PaymentsSpec
                      , JsonSpec
                      , UpdatesSpec
+                     , StickersSpec
+                     , TestCore
   build-depends:       base
                      , aeson >= 1.0 && < 1.3
                      , hjpath
@@ -85,6 +90,7 @@ test-suite telegram-api-test
                      , text
                      , transformers
                      , utf8-string
+                     , random
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall -fno-warn-name-shadowing
   default-language:    Haskell2010
 

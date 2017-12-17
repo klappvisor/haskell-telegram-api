@@ -19,6 +19,7 @@ module Web.Telegram.API.Bot.Requests
     , SendVideoRequest               (..)
     , SendVoiceRequest               (..)
     , SendVideoNoteRequest           (..)
+    , SendMediaGroupRequest          (..)
     , SendLocationRequest            (..)
     , SendVenueRequest               (..)
     , SendContactRequest             (..)
@@ -34,6 +35,14 @@ module Web.Telegram.API.Bot.Requests
     , SendInvoiceRequest             (..)
     , AnswerShippingQueryRequest     (..)
     , AnswerPreCheckoutQueryRequest  (..)
+    , RestrictChatMemberRequest      (..)
+    , PromoteChatMemberRequest       (..)
+    , SetChatPhotoRequest            (..)
+    , UploadStickerFileRequest       (..)
+    , CreateNewStickerSetRequest     (..)
+    , AddStickerToSetRequest         (..)
+    , EditMessageLiveLocationRequest (..)
+    , StopMessageLiveLocationRequest (..)
      -- * Functions
     , localFileUpload
     , setWebhookRequest
@@ -55,6 +64,7 @@ module Web.Telegram.API.Bot.Requests
     , uploadVoiceRequest
     , sendVideoNoteRequest
     , uploadVideoNoteRequest
+    , sendMediaGroupRequest
     , sendLocationRequest
     , sendVenueRequest
     , sendContactRequest
@@ -77,6 +87,8 @@ module Web.Telegram.API.Bot.Requests
     , errorShippingQueryRequest
     , okAnswerPrecheckoutQueryRequest
     , errorAnswerPrecheckoutQueryRequest
+    , restrictChatMemberRequest
+    , promoteChatMemberRequest
     ) where
 
 import           Data.Aeson
@@ -96,8 +108,10 @@ import           Web.Telegram.API.Bot.Data             (CurrencyCode,
                                                         InlineKeyboardButton,
                                                         InlineKeyboardMarkup,
                                                         InlineQueryResult,
+                                                        InputMedia,
                                                         KeyboardButton,
-                                                        LabeledPrice, ParseMode,
+                                                        LabeledPrice,
+                                                        MaskPosition, ParseMode,
                                                         ShippingOption)
 import           Web.Telegram.API.Bot.JsonExt
 
@@ -455,13 +469,13 @@ uploadVoiceRequest chatId voice = SendVoiceRequest chatId voice Nothing Nothing 
 
 data SendVideoNoteRequest payload = SendVideoNoteRequest
   {
-    _vid_note_chat_id :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-  , _vid_note_video_note :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
-  , _vid_note_duration :: Maybe Int -- ^ Duration of sent video in seconds
-  , _vid_note_length :: Maybe Int -- ^ Video width and height
+    _vid_note_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , _vid_note_video_note           :: payload -- ^ Video note to send. Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data. More info on Sending Files ». Sending video notes by a URL is currently unsupported
+  , _vid_note_duration             :: Maybe Int -- ^ Duration of sent video in seconds
+  , _vid_note_length               :: Maybe Int -- ^ Video width and height
   , _vid_note_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
-  , _vid_note_reply_to_message_id :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , _vid_note_reply_markup :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
+  , _vid_note_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , _vid_note_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for an inline keyboard, custom reply keyboard, instructions to remove reply keyboard or to force a reply from the user.
   } deriving (Show, Generic)
 
 instance ToJSON (SendVideoNoteRequest Text) where
@@ -494,6 +508,7 @@ data SendLocationRequest = SendLocationRequest
     location_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
   , location_latitude             :: Float -- ^ Latitude of location
   , location_longitude            :: Float -- ^ Longitude of location
+  , location_live_period          :: Maybe Int -- ^ Period in seconds for which the location will be updated, should be between 60 and 86400.
   , location_disable_notification :: Maybe Bool -- ^ Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
   , location_reply_to_message_id  :: Maybe Int -- ^ If the message is a reply, ID of the original message
   , location_reply_markup         :: Maybe ReplyKeyboard -- ^ Additional interface options. A JSON-serialized object for a custom reply keyboard, instructions to hide keyboard or to force a reply from the user.
@@ -506,7 +521,25 @@ instance FromJSON SendLocationRequest where
   parseJSON = parseJsonDrop 9
 
 sendLocationRequest :: ChatId -> Float -> Float -> SendLocationRequest
-sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing
+sendLocationRequest chatId latitude longitude = SendLocationRequest chatId latitude longitude Nothing Nothing Nothing Nothing
+
+-- | This object represents request for 'sendMediaGroup'
+data SendMediaGroupRequest = SendMediaGroupRequest
+  {
+    media_group_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , media_group_media                :: [InputMedia] -- ^ Array describing photos and videos to be sent, must include 2–10 items
+  , media_group_disable_notification :: Maybe Bool -- ^ Sends the messages silently. Users will receive a notification with no sound.
+  , media_group_reply_to_message_id  :: Maybe Int -- ^ If the messages are a reply, ID of the original message
+  } deriving(Show, Generic)
+
+instance ToJSON SendMediaGroupRequest where
+  toJSON = toJsonDrop 12
+
+instance FromJSON SendMediaGroupRequest where
+  parseJSON = parseJsonDrop 12
+
+sendMediaGroupRequest :: ChatId -> [InputMedia] -> SendMediaGroupRequest
+sendMediaGroupRequest chatId inputMediaArray = SendMediaGroupRequest chatId inputMediaArray Nothing Nothing
 
 -- | This object represents request for 'sendVenue'
 data SendVenueRequest = SendVenueRequest
@@ -792,6 +825,7 @@ data SendInvoiceRequest = SendInvoiceRequest
   , snd_inv_start_parameter       :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
   , snd_inv_currency              :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
   , snd_inv_prices                :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+  , snd_inv_provider_data         :: Maybe Text -- ^ JSON-encoded data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.
   , snd_inv_photo_url             :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
   , snd_inv_photo_size            :: Maybe Int -- ^ Photo size
   , snd_inv_photo_width           :: Maybe Int -- ^ Photo width
@@ -822,7 +856,7 @@ sendInvoiceRequest :: Int64 -- ^ Unique identifier for the target private chat
   -> [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
   -> SendInvoiceRequest
 sendInvoiceRequest chatId title description payload providerToken startParameter currency prices
-  = SendInvoiceRequest chatId title description payload providerToken startParameter currency prices Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+  = SendInvoiceRequest chatId title description payload providerToken startParameter currency prices Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 data AnswerShippingQueryRequest
   -- | If you sent an invoice requesting a shipping address and the parameter is_flexible was specified, the Bot API will send an Update with a shipping_query field to the bot. Use this method to reply to shipping queries. On success, True is returned.
@@ -866,6 +900,176 @@ okAnswerPrecheckoutQueryRequest queryId = AnswerPreCheckoutQueryRequest queryId 
 
 errorAnswerPrecheckoutQueryRequest :: Text -> Text -> AnswerPreCheckoutQueryRequest
 errorAnswerPrecheckoutQueryRequest queryId errorMessage = AnswerPreCheckoutQueryRequest queryId False $ Just errorMessage
+
+data RestrictChatMemberRequest = RestrictChatMemberRequest
+  {
+    rcm_chat_id                   :: ChatId -- ^ Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
+  , rcm_user_id                   :: Int -- ^ Unique identifier of the target user
+  , rcm_until_date                :: Maybe Int -- ^ Date when restrictions will be lifted for the user, unix time. If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever
+  , rcm_can_send_messages         :: Maybe Bool -- ^ Pass True, if the user can send text messages, contacts, locations and venues
+  , rcm_can_send_media_messages   :: Maybe Bool -- ^ Pass True, if the user can send audios, documents, photos, videos, video notes and voice notes, implies can_send_messages
+  , rcm_can_send_other_messages   :: Maybe Bool -- ^ Pass True, if the user can send animations, games, stickers and use inline bots, implies can_send_media_messages
+  , rcm_can_add_web_page_previews :: Maybe Bool -- ^ Pass True, if the user may add web page previews to their messages, implies can_send_media_messages
+  } deriving (Show, Generic)
+
+instance ToJSON RestrictChatMemberRequest where
+  toJSON = toJsonDrop 4
+
+instance FromJSON RestrictChatMemberRequest where
+  parseJSON = parseJsonDrop 4
+
+restrictChatMemberRequest :: ChatId -> Int -> RestrictChatMemberRequest
+restrictChatMemberRequest chatId userId = RestrictChatMemberRequest chatId userId Nothing Nothing Nothing Nothing Nothing
+
+data PromoteChatMemberRequest = PromoteChatMemberRequest
+  {
+    pcmr_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , pcmr_user_id              :: Int -- ^ Unique identifier of the target user
+  , pcmr_can_change_info      :: Maybe Bool -- ^ Pass True, if the administrator can change chat title, photo and other settings
+  , pcmr_can_post_messages    :: Maybe Bool -- ^ Pass True, if the administrator can create channel posts, channels only
+  , pcmr_can_edit_messages    :: Maybe Bool -- ^ Pass True, if the administrator can edit messages of other users and can pin messages, channels only
+  , pcmr_can_delete_messages  :: Maybe Bool -- ^ Pass True, if the administrator can delete messages of other users
+  , pcmr_can_invite_users     :: Maybe Bool -- ^ Pass True, if the administrator can invite new users to the chat
+  , pcmr_can_restrict_members :: Maybe Bool -- ^ Pass True, if the administrator can restrict, ban or unban chat members
+  , pcmr_can_pin_messages     :: Maybe Bool -- ^ Pass True, if the administrator can pin messages, supergroups only
+  , pcmr_can_promote_members  :: Maybe Bool -- ^ Pass True, if the administrator can add new administrators with a subset of his own privileges or demote administrators that he has promoted, directly or indirectly (promoted by administrators that were appointed by him)
+  } deriving (Show, Generic)
+
+instance ToJSON PromoteChatMemberRequest where
+  toJSON = toJsonDrop 5
+
+instance FromJSON PromoteChatMemberRequest where
+  parseJSON = parseJsonDrop 5
+
+promoteChatMemberRequest :: ChatId -> Int -> PromoteChatMemberRequest
+promoteChatMemberRequest chatId userId = PromoteChatMemberRequest chatId userId Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+data SetChatPhotoRequest = SetChatPhotoRequest
+  {
+    scp_chat_id :: ChatId
+  , scp_photo   :: FileUpload
+  }
+
+instance ToMultipartFormData SetChatPhotoRequest where
+  toMultipartFormData req =
+    [ utf8Part "chat_id" (chatIdToPart $ scp_chat_id req)
+    , fileUploadToPart "photo" (scp_photo req) ]
+
+data UploadStickerFileRequest = UploadStickerFileRequest
+  {
+    upload_sticker_user_id     :: Int -- ^ User identifier of sticker file owner
+  , upload_sticker_png_sticker :: FileUpload -- ^ Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px.
+  }
+
+instance ToMultipartFormData UploadStickerFileRequest where
+  toMultipartFormData req =
+    [ utf8Part "user_id" (tshow $ upload_sticker_user_id req)
+    , fileUploadToPart "png_sticker" (upload_sticker_png_sticker req) ]
+
+data CreateNewStickerSetRequest payload = CreateNewStickerSetRequest
+  {
+    new_sticker_set_user_id        :: Int -- ^ User identifier of created sticker set owner
+  , new_sticker_set_name           :: Text -- ^ Short name of sticker set, to be used in t.me/addstickers/ URLs (e.g., animals). Can contain only english letters, digits and underscores. Must begin with a letter, can't contain consecutive underscores and must end in “_by_<bot username>”. <bot_username> is case insensitive. 1-64 characters.
+  , new_sticker_set_title          :: Text -- ^ Sticker set title, 1-64 characters
+  , new_sticker_set_png_sticker    :: payload -- ^ Yes 	Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More info on Sending Files »
+  , new_sticker_set_emojis         :: Text -- ^ One or more emoji corresponding to the sticker
+  , new_sticker_set_contains_masks :: Maybe Bool -- ^ Pass True, if a set of mask stickers should be created
+  , new_sticker_set_mask_position  :: Maybe MaskPosition -- ^ A JSON-serialized object for position where the mask should be placed on faces
+  } deriving (Show, Generic)
+
+instance ToJSON (CreateNewStickerSetRequest Text) where
+  toJSON = toJsonDrop 16
+
+instance FromJSON (CreateNewStickerSetRequest Text) where
+  parseJSON = parseJsonDrop 16
+
+instance ToMultipartFormData (CreateNewStickerSetRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "user_id" (tshow $ new_sticker_set_user_id req)
+    , utf8Part "name" $ new_sticker_set_name req
+    , utf8Part "title" $ new_sticker_set_title req
+    , utf8Part "emojis" $ new_sticker_set_emojis req
+    , fileUploadToPart "png_sticker" (new_sticker_set_png_sticker req) ] ++
+    catMaybes
+    [ partLBS "contains_masks" . encode <$> new_sticker_set_contains_masks req
+    , partLBS "mask_position" . encode <$> new_sticker_set_mask_position req ]
+
+data AddStickerToSetRequest payload = AddStickerToSetRequest
+  {
+    add_sticker_to_set_user_id       :: Int -- ^ User identifier of created sticker set owner
+  , add_sticker_to_set_name          :: Text -- ^ Short name of sticker set, to be used in t.me/addstickers/ URLs (e.g., animals). Can contain only english letters, digits and underscores. Must begin with a letter, can't contain consecutive underscores and must end in “_by_<bot username>”. <bot_username> is case insensitive. 1-64 characters.
+  , add_sticker_to_set_png_sticker   :: payload -- ^ Yes 	Png image with the sticker, must be up to 512 kilobytes in size, dimensions must not exceed 512px, and either width or height must be exactly 512px. Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data. More info on Sending Files »
+  , add_sticker_to_set_emojis        :: Text -- ^ One or more emoji corresponding to the sticker
+  , add_sticker_to_set_mask_position :: Maybe MaskPosition -- ^ A JSON-serialized object for position where the mask should be placed on faces
+  } deriving (Show, Generic)
+
+instance ToJSON (AddStickerToSetRequest Text) where
+  toJSON = toJsonDrop 19
+
+instance FromJSON (AddStickerToSetRequest Text) where
+  parseJSON = parseJsonDrop 19
+
+instance ToMultipartFormData (AddStickerToSetRequest FileUpload) where
+  toMultipartFormData req =
+    [ utf8Part "user_id" (tshow $ add_sticker_to_set_user_id req)
+    , utf8Part "name" $ add_sticker_to_set_name req
+    , utf8Part "emojis" $ add_sticker_to_set_emojis req
+    , fileUploadToPart "png_sticker" (add_sticker_to_set_png_sticker req) ] ++
+    catMaybes
+    [ partLBS "mask_position" . encode <$> add_sticker_to_set_mask_position req
+    ]
+
+data EditMessageLiveLocationRequest =
+  EditMessageLiveLocationRequest
+  {
+    edit_live_loc_chat_id      :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , edit_live_loc_latitude     :: Float -- ^ Latitude of new location
+  , edit_live_loc_longitude    :: Float -- ^ Longitude of new location
+  , edit_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | EditMessageLiveLocationMessageRequest
+  {
+    edit_live_loc_message_id   :: Int -- ^ Identifier of the sent message
+  , edit_live_loc_latitude     :: Float -- ^ Latitude of new location
+  , edit_live_loc_longitude    :: Float -- ^ Longitude of new location
+  , edit_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | EditMessageLiveLocationInlineMessageRequest
+  {
+    edit_live_loc_inline_message_id :: Text -- ^ Identifier of the inline message
+  , edit_live_loc_latitude          :: Float -- ^ Latitude of new location
+  , edit_live_loc_longitude         :: Float -- ^ Longitude of new location
+  , edit_live_loc_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON EditMessageLiveLocationRequest where
+  toJSON = toJsonDrop 14
+
+instance FromJSON EditMessageLiveLocationRequest where
+  parseJSON = parseJsonDrop 14
+
+data StopMessageLiveLocationRequest =
+  StopMessageLiveLocationRequest
+  {
+    stop_live_loc_chat_id      :: Text -- ^ Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+  , stop_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | StopMessageLiveLocationMessageRequest
+  {
+    stop_live_loc_message_id   :: Int -- ^ Identifier of the sent message
+  , stop_live_loc_reply_markup :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  }
+  | StopMessageLiveLocationInlineMessageRequest
+  {
+    stop_live_loc_inline_message_id :: Text -- ^ Identifier of the inline message
+  , stop_live_loc_reply_markup      :: Maybe InlineKeyboardMarkup -- ^ An object for a new inline keyboard.
+  } deriving (Show, Generic)
+
+instance ToJSON StopMessageLiveLocationRequest where
+  toJSON = toJsonDrop 14
+
+instance FromJSON StopMessageLiveLocationRequest where
+  parseJSON = parseJsonDrop 14
 
 tshow :: Show a => a -> Text
 tshow = T.pack . show

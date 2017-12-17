@@ -5,23 +5,17 @@
 
 module PaymentsSpec (spec) where
 
-import           Data.Either               (isLeft, isRight)
-import qualified Data.Text                 as T
-import           Data.Text                 (Text)
-import           Network.HTTP.Client       (newManager)
-import           Network.HTTP.Client.TLS   (tlsManagerSettings)
+import           Data.Text               (Text)
+import           Network.HTTP.Client     (newManager)
+import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Test.Hspec
+import           TestCore
 import           Web.Telegram.API.Bot
 
--- to print out remote response if response success not match
-success, nosuccess :: (Show a, Show b) => Either a b -> Expectation
-success   e = e `shouldSatisfy` isRight
-nosuccess e = e `shouldSatisfy` isLeft
-
 spec :: Token -> ChatId -> Text -> Text -> Spec
-spec token (ChatId chatId) _ paymentToken = do
+spec token chatId' _ paymentToken = do
   manager <- runIO $ newManager tlsManagerSettings
-
+  let ChatId chatId = chatId'
   describe "/sendInvoice" $ do
     it "should send invoice" $ do
       let description = "The best portal cannon in known universe"

@@ -12,6 +12,7 @@ import qualified JsonSpec
 import qualified MainSpec
 import           Options.Applicative
 import qualified PaymentsSpec
+import qualified StickersSpec
 import           System.Environment           (lookupEnv, withArgs)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
@@ -75,6 +76,7 @@ runIntegrationSpec (Just token) (Just chatId) (Just botName) (Just paymentToken)
         describe "Main integration tests" $ MainSpec.spec token chatId botName
         describe "Payments integration tests" $ PaymentsSpec.spec token chatId botName paymentToken
         describe "Updates API spec" $ UpdatesSpec.spec token botName
+        describe "Stickers API spec" $ StickersSpec.spec token chatId botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ _ = describe "Integration tests" $
         fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
