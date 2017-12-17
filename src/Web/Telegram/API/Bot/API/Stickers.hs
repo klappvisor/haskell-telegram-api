@@ -106,9 +106,9 @@ uploadStickerToSetM = run_ addStickerToSet_'
 setStickerPositionInSetM :: Text -- ^ File identifier of the sticker
                          -> Int -- ^ New sticker position in the set, zero-based
                          -> TelegramClient (Response Bool)
-setStickerPositionInSetM sticker position = asking $ \t -> setStickerPositionInSet_ t (Just sticker) (Just position)
+setStickerPositionInSetM fileId position = asking $ \t -> setStickerPositionInSet_ t (Just fileId) (Just position)
 
 -- | Use this method to delete a sticker from a set created by the bot.
 deleteStickerFromSetM :: Text -- ^ File identifier of the sticker
                       -> TelegramClient (Response Bool)
-deleteStickerFromSetM sticker = run_ deleteStickerFromSet_ (Just sticker)
+deleteStickerFromSetM fileId = run_ deleteStickerFromSet_ (Just fileId)
