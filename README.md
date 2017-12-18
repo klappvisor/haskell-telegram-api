@@ -32,16 +32,17 @@ main :: IO ()
 main = do
   let token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
   manager <- newManager tlsManagerSettings
-  result <- runClient ( do
+  result <- runTelegramClient token manager $ do
     info <- getWebhookInfoM
     let request = setWebhookRequest' "https://example.com/hook"
     isSet <- setWebhookM request
-    getMeM) token manager
+    getMeM
   print result
   print "done!"
 ```
 
-### Running IO directly
+### Running IO directly (planning to depricate this option)
+:warning: This method is about to be depricated. Use `M`- functions with `runTelegramClient`, f.e. `runTelegramClient token manager $  sendMessageM message` 
 
 `getMe` example
 
