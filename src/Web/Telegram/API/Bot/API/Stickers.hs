@@ -21,7 +21,7 @@ module Web.Telegram.API.Bot.API.Stickers
 import           Data.Proxy
 import           Data.Text                        (Text)
 import           Servant.API
-import           Servant.Client
+import           Servant.Client            hiding (Response)
 import           Servant.Client.MultipartFormData
 import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.Data

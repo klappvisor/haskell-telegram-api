@@ -27,7 +27,7 @@ module Web.Telegram.API.Bot.API.Edit
 import           Data.Proxy
 import           Network.HTTP.Client            (Manager)
 import           Servant.API
-import           Servant.Client
+import           Servant.Client          hiding (Response)
 import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.Requests
 import           Web.Telegram.API.Bot.Responses
