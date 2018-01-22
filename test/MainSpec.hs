@@ -14,7 +14,8 @@ import           Network.HTTP.Client       (newManager)
 import           Network.HTTP.Client.TLS   (tlsManagerSettings)
 import           Network.HTTP.Types.Status
 import           Paths_telegram_api
-import           Servant.Client
+import           Servant.Client     hiding (Response)
+import qualified Servant.Client.Core       as Core
 import           System.FilePath
 import           Test.Hspec
 import           TestCore
@@ -41,7 +42,7 @@ spec token chatId botName = do
     it "should return error message" $ do
       res <- sendMessage token (sendMessageRequest (ChatChannel "") "test message") manager
       nosuccess res
-      let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
+      let Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
@@ -99,7 +100,7 @@ spec token chatId botName = do
     it "should forward message" $ do
       res <- forwardMessage token (forwardMessageRequest chatId chatId 123000) manager
       nosuccess res
-      let Left FailureResponse { responseStatus = Status { statusMessage = msg } } = res
+      let Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
 
   describe "/sendPhoto" $ do
@@ -107,7 +108,7 @@ spec token chatId botName = do
       let photo = (sendPhotoRequest (ChatChannel "") "photo_id") {
         photo_caption = Just "photo caption"
       }
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <- sendPhoto token photo manager
+      Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) <- sendPhoto token photo manager
       msg `shouldBe` "Bad Request"
     it "should upload photo and resend it by id" $ do
       let fileUpload = localFileUpload $ testFile "christmas-cat.jpg"
@@ -132,7 +133,7 @@ spec token chatId botName = do
         _audio_performer = Just "performer"
       , _audio_title = Just "title"
       }
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
+      Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
     it "should upload audio and resend it by id" $ do
@@ -264,7 +265,7 @@ spec token chatId botName = do
       fmap (T.take 10) (file_path file) `shouldBe` Just "thumbnails"
 
     it "should return error" $ do
-      Left FailureResponse { responseStatus = Status { statusMessage = msg } } <-
+      Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm" manager
       msg `shouldBe` "Bad Request"
 

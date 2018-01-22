@@ -39,7 +39,7 @@ import           Data.Proxy
 import           Data.Text                        (Text)
 import           Network.HTTP.Client              (Manager)
 import           Servant.API
-import           Servant.Client
+import           Servant.Client            hiding (Response)
 import           Servant.Client.MultipartFormData
 import           Web.Telegram.API.Bot.API.Core
 import           Web.Telegram.API.Bot.Requests
