@@ -817,27 +817,29 @@ editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyM
 
 data SendInvoiceRequest = SendInvoiceRequest
   {
-    snd_inv_chat_id               :: Int64 -- ^ Unique identifier for the target private chat
-  , snd_inv_title                 :: Text -- ^ Product name
-  , snd_inv_description           :: Text -- ^ Product description
-  , snd_inv_payload               :: Text -- ^ Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
-  , snd_inv_provider_token        :: Text -- ^ Payments provider token, obtained via Botfather
-  , snd_inv_start_parameter       :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
-  , snd_inv_currency              :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
-  , snd_inv_prices                :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
-  , snd_inv_provider_data         :: Maybe Text -- ^ JSON-encoded data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.
-  , snd_inv_photo_url             :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
-  , snd_inv_photo_size            :: Maybe Int -- ^ Photo size
-  , snd_inv_photo_width           :: Maybe Int -- ^ Photo width
-  , snd_inv_photo_height          :: Maybe Int -- ^ Photo height
-  , snd_inv_need_name             :: Maybe Bool -- ^ Pass `True`, if you require the user's full name to complete the order
-  , snd_inv_need_phone_number     :: Maybe Bool -- ^ Pass `True`, if you require the user's phone number to complete the order
-  , snd_inv_need_email            :: Maybe Bool -- ^ Pass `True`, if you require the user's email to complete the order
-  , snd_inv_need_shipping_address :: Maybe Bool -- ^ Pass `True`, if you require the user's shipping address to complete the order
-  , snd_inv_is_flexible           :: Maybe Bool -- ^ Pass `True`, if the final price depends on the shipping method
-  , snd_inv_disable_notification  :: Maybe Bool -- ^ Sends the message silently. Users will receive a notification with no sound.
-  , snd_inv_reply_to_message      :: Maybe Int -- ^ If the message is a reply, ID of the original message
-  , snd_inv_reply_markup          :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
+    snd_inv_chat_id                       :: Int64 -- ^ Unique identifier for the target private chat
+  , snd_inv_title                         :: Text -- ^ Product name
+  , snd_inv_description                   :: Text -- ^ Product description
+  , snd_inv_payload                       :: Text -- ^ Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use for your internal processes.
+  , snd_inv_provider_token                :: Text -- ^ Payments provider token, obtained via Botfather
+  , snd_inv_start_parameter               :: Text -- ^ Unique deep-linking parameter that can be used to generate this invoice when used as a start parameter
+  , snd_inv_currency                      :: CurrencyCode -- ^ Three-letter ISO 4217 <https://core.telegram.org/bots/payments#supported-currencies currency> code
+  , snd_inv_prices                        :: [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
+  , snd_inv_provider_data                 :: Maybe Text -- ^ JSON-encoded data about the invoice, which will be shared with the payment provider. A detailed description of required fields should be provided by the payment provider.
+  , snd_inv_photo_url                     :: Maybe Text -- ^ URL of the product photo for the invoice. Can be a photo of the goods or a marketing image for a service. People like it better when they see what they are paying for.
+  , snd_inv_photo_size                    :: Maybe Int -- ^ Photo size
+  , snd_inv_photo_width                   :: Maybe Int -- ^ Photo width
+  , snd_inv_photo_height                  :: Maybe Int -- ^ Photo height
+  , snd_inv_need_name                     :: Maybe Bool -- ^ Pass `True`, if you require the user's full name to complete the order
+  , snd_inv_need_phone_number             :: Maybe Bool -- ^ Pass `True`, if you require the user's phone number to complete the order
+  , snd_inv_need_email                    :: Maybe Bool -- ^ Pass `True`, if you require the user's email to complete the order
+  , snd_inv_need_shipping_address         :: Maybe Bool -- ^ Pass `True`, if you require the user's shipping address to complete the order
+  , snd_inv_send_phone_number_to_provider :: Maybe Bool -- ^ Pass True, if user's phone number should be sent to provider
+  , snd_inv_send_email_to_provider        :: Maybe Bool -- ^ Pass True, if user's email address should be sent to provider
+  , snd_inv_is_flexible                   :: Maybe Bool -- ^ Pass `True`, if the final price depends on the shipping method
+  , snd_inv_disable_notification          :: Maybe Bool -- ^ Sends the message silently. Users will receive a notification with no sound.
+  , snd_inv_reply_to_message              :: Maybe Int -- ^ If the message is a reply, ID of the original message
+  , snd_inv_reply_markup                  :: Maybe InlineKeyboardMarkup -- ^ A JSON-serialized object for an inline keyboard. If empty, one 'Pay total price' button will be shown. If not empty, the first button must be a Pay button.
   } deriving (Show, Generic)
 
 instance ToJSON SendInvoiceRequest where
@@ -856,7 +858,7 @@ sendInvoiceRequest :: Int64 -- ^ Unique identifier for the target private chat
   -> [LabeledPrice] -- ^ Price breakdown, a list of components (e.g. product price, tax, discount, delivery cost, delivery tax, bonus, etc.)
   -> SendInvoiceRequest
 sendInvoiceRequest chatId title description payload providerToken startParameter currency prices
-  = SendInvoiceRequest chatId title description payload providerToken startParameter currency prices Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+  = SendInvoiceRequest chatId title description payload providerToken startParameter currency prices Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 data AnswerShippingQueryRequest
   -- | If you sent an invoice requesting a shipping address and the parameter is_flexible was specified, the Bot API will send an Update with a shipping_query field to the bot. Use this method to reply to shipping queries. On success, True is returned.
