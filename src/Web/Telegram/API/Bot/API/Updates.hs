@@ -35,10 +35,10 @@ import           Web.Telegram.API.Bot.Responses
 type TelegramBotUpdatesAPI =
          TelegramToken :> "getUpdates"
          :> ReqBody '[JSON] GetUpdatesRequest
-         :> Get '[JSON] UpdatesResponse
+         :> Post '[JSON] UpdatesResponse
     :<|> TelegramToken :> "setWebhook"
          :> ReqBody '[JSON] SetWebhookRequest
-         :> Get '[JSON] SetWebhookResponse
+         :> Post '[JSON] SetWebhookResponse
     :<|> TelegramToken :> "setWebhook"
          :> MultipartFormDataReqBody SetWebhookRequest
          :> Post '[JSON] SetWebhookResponse
