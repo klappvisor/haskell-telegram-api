@@ -41,7 +41,7 @@ main = do
   print "done!"
 ```
 
-### Running IO directly (planning to depricate this option)
+### Running IO directly (planning to deprecate this option)
 :warning: This method to interact with a Telegram bot is about to be depricated and all new API calls will only have their `M` versions. You can run them using `runTelegramClient` function, for example `runTelegramClient token manager $ sendMessageM message` or in example below replace `getMe token manager` with `runTelegramClient token manager getMeM` to get the same behavior.
 
 `getMe` example
