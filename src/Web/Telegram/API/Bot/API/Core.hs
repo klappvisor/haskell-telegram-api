@@ -44,7 +44,7 @@ runClient' tcm token = runClientM (runReaderT tcm token)
 
 -- | Runs 'TelegramClient'
 runClient :: TelegramClient a -> Token -> Manager -> IO (Either ServantError a)
-runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl)
+runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl Nothing)
 
 -- | Runs 'TelegramClient'
 runTelegramClient :: Token -> Manager -> TelegramClient a -> IO (Either ServantError a)
@@ -54,7 +54,7 @@ asking :: Monad m => (t -> m b) -> ReaderT t m b
 asking op = ask >>= \t -> lift $ op t
 
 run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ServantError b)
-run b e t r m = runClientM (e t r) (ClientEnv m b)
+run b e t r m = runClientM (e t r) (ClientEnv m b Nothing)
 
 run_ :: Monad m => (a -> b -> m c) -> b -> ReaderT a m c
 run_ act request = asking $ flip act request
