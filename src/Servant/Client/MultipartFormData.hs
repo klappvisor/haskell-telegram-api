@@ -37,7 +37,7 @@ import qualified Network.HTTP.Types.Header             as HTTP
 import           Servant.API
 import           Servant.Client
 import qualified Servant.Client.Core                   as Core
-import           Servant.Client.Internal.HttpClient    (catchConnectionError, clientResponseToReponse,
+import           Servant.Client.Internal.HttpClient    (catchConnectionError, clientResponseToResponse,
                                                         requestToClientRequest)
 
 -- | A type that can be converted to a multipart/form-data value.
@@ -81,7 +81,7 @@ performRequest' requestToClientRequest' reqMethod req = do
           body = Client.responseBody response
           hdrs = Client.responseHeaders response
           status_code = statusCode status
-          coreResponse = clientResponseToReponse response
+          coreResponse = clientResponseToResponse response
       ct <- case lookup "Content-Type" $ Client.responseHeaders response of
                  Nothing -> pure $ "application"//"octet-stream"
                  Just t -> case parseAccept t of
@@ -101,7 +101,7 @@ performRequestCT' requestToClientRequest' ct reqMethod req = do
   let acceptCTS = contentTypes ct
   (_status, respBody, respCT, hdrs, _response) <-
     performRequest' requestToClientRequest' reqMethod (req { Core.requestAccept = Sequence.fromList $ NonEmpty.toList acceptCTS })
-  let coreResponse = clientResponseToReponse _response
+  let coreResponse = clientResponseToResponse _response
   unless (any (matches respCT) acceptCTS) $ throwError $ UnsupportedContentType respCT coreResponse
   case mimeUnrender ct respBody of
     Left err -> throwError $ DecodeFailure (pack err) coreResponse
