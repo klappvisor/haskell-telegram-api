@@ -164,7 +164,7 @@ spec token chatId botName = do
       let sticker = sendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
       Right Response { result = Message { sticker = Just sticker } } <-
         sendSticker token sticker manager
-      sticker_file_id sticker `shouldBe` "CAADAgADGgADkWgMAAGXlYGBiM_d2wI" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
+      sticker_file_id sticker `shouldBe` "CAADAgADGgADkWgMAAFNFIZh3zoKbQI" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
       let fileUpload = localFileUpload $ testFile "haskell-logo.webp"
           stickerReq = uploadStickerRequest chatId fileUpload

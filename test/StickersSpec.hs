@@ -80,8 +80,8 @@ spec token chatId _ = do
         return (set, setAfter)
       stcr_set_contains_masks set `shouldBe` True
       let stickerCount = length . stcr_set_stickers
-      stickerCount set `shouldBe` 2
-      stickerCount setAfter `shouldBe` 1
+      stickerCount set `shouldBe` 3
+      stickerCount setAfter `shouldBe` 2
 
 
 
