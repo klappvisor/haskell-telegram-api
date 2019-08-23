@@ -184,7 +184,7 @@ sendMessage_
      = client messagesApi
 
 -- | Use this method to send text messages. On success, the sent 'Message' is returned.
-sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendMessage :: Token -> SendMessageRequest -> Manager -> IO (Either ClientError MessageResponse)
 sendMessage = runM sendMessageM
 
 -- | See 'sendMessage'
@@ -192,7 +192,7 @@ sendMessageM :: SendMessageRequest -> TelegramClient MessageResponse
 sendMessageM = run_ sendMessage_
 
 -- | Use this method to forward messages of any kind. On success, the sent 'Message' is returned.
-forwardMessage :: Token -> ForwardMessageRequest -> Manager -> IO (Either ServantError MessageResponse)
+forwardMessage :: Token -> ForwardMessageRequest -> Manager -> IO (Either ClientError MessageResponse)
 forwardMessage = runM forwardMessageM
 
 -- | See 'forwardMessage'
@@ -200,7 +200,7 @@ forwardMessageM :: ForwardMessageRequest -> TelegramClient MessageResponse
 forwardMessageM = run_ forwardMessage_
 
 -- | Use this method to upload and send photos. On success, the sent 'Message' is returned.
-uploadPhoto :: Token -> SendPhotoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadPhoto :: Token -> SendPhotoRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadPhoto = runM uploadPhotoM
 
 -- | See 'uploadPhoto'
@@ -208,7 +208,7 @@ uploadPhotoM :: SendPhotoRequest FileUpload -> TelegramClient MessageResponse
 uploadPhotoM = run_ uploadPhoto_
 
 -- | Use this method to send photos that have already been uploaded. On success, the sent 'Message' is returned.
-sendPhoto :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendPhoto :: Token -> SendPhotoRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendPhoto = runM sendPhotoM
 
 -- | See 'sendPhoto'
@@ -218,7 +218,7 @@ sendPhotoM = run_ sendPhoto_
 -- | Use this method to upload and send audio files, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
 --       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
-uploadAudio :: Token -> SendAudioRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadAudio :: Token -> SendAudioRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadAudio = runM uploadAudioM
 
 -- | See 'uploadAudio'
@@ -228,7 +228,7 @@ uploadAudioM = run_ uploadAudio_
 -- | Use this method to send audio files that are already on the Telegram servers, if you want Telegram clients to display them in the music player. Your audio must be in the .mp3 format. On success, the sent 'Message' is returned. Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
 --
 --       For backward compatibility, when the fields __title__ and __performer__ are both empty and the mime-type of the file to be sent is not _audio/mpeg_, the file will be sent as a playable voice message. For this to work, the audio must be in an .ogg file encoded with OPUS. This behavior will be phased out in the future. For sending voice messages, use the 'sendVoice' method instead.
-sendAudio :: Token -> SendAudioRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendAudio :: Token -> SendAudioRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendAudio = runM sendAudioM
 
 -- | See 'sendAudio'
@@ -236,7 +236,7 @@ sendAudioM :: SendAudioRequest Text -> TelegramClient MessageResponse
 sendAudioM = run_ sendAudio_
 
 -- | Use this method to upload and send general files. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
-uploadDocument :: Token -> SendDocumentRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadDocument :: Token -> SendDocumentRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadDocument = runM uploadDocumentM
 
 -- | See 'uploadDocument'
@@ -244,7 +244,7 @@ uploadDocumentM :: SendDocumentRequest FileUpload -> TelegramClient MessageRespo
 uploadDocumentM = run_ uploadDocument_
 
 -- | Use this method to send general files that have already been uploaded. On success, the sent 'Message' is returned. Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
-sendDocument :: Token -> SendDocumentRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendDocument :: Token -> SendDocumentRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendDocument = runM sendDocumentM
 
 -- | See 'sendDocument'
@@ -252,7 +252,7 @@ sendDocumentM :: SendDocumentRequest Text -> TelegramClient MessageResponse
 sendDocumentM = run_ sendDocument_
 
 -- | Use this method to upload and send .webp stickers. On success, the sent 'Message' is returned.
-uploadSticker :: Token -> SendStickerRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadSticker :: Token -> SendStickerRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadSticker = runM uploadStickerM
 
 -- | See 'uploadSticker'
@@ -260,7 +260,7 @@ uploadStickerM :: SendStickerRequest FileUpload -> TelegramClient MessageRespons
 uploadStickerM = run_ uploadSticker_
 
 -- | Use this method to send .webp stickers that are already on the Telegram servers. On success, the sent 'Message' is returned.
-sendSticker :: Token -> SendStickerRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendSticker :: Token -> SendStickerRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendSticker = runM sendStickerM
 
 -- | See 'sendSticker'
@@ -268,7 +268,7 @@ sendStickerM :: SendStickerRequest Text -> TelegramClient MessageResponse
 sendStickerM = run_ sendSticker_
 
 -- | Use this method to upload and send video files. Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
-uploadVideo :: Token -> SendVideoRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadVideo :: Token -> SendVideoRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadVideo = runM uploadVideoM
 
 -- | See 'uploadVideo'
@@ -276,7 +276,7 @@ uploadVideoM :: SendVideoRequest FileUpload -> TelegramClient MessageResponse
 uploadVideoM = run_ uploadVideo_
 
 -- | Use this method to send video files that are already on the Telegram servers. Telegram clients support mp4 videos (other formats may be sent as 'Document'). On success, the sent 'Message' is returned. Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
-sendVideo :: Token -> SendVideoRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendVideo :: Token -> SendVideoRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendVideo = runM sendVideoM
 
 -- | See 'sendVideo'
@@ -284,7 +284,7 @@ sendVideoM :: SendVideoRequest Text -> TelegramClient MessageResponse
 sendVideoM = run_ sendVideo_
 
 -- | Use this method to upload and send audio files, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
-uploadVoice :: Token -> SendVoiceRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadVoice :: Token -> SendVoiceRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadVoice = runM uploadVoiceM
 
 -- | See 'uploadVoice'
@@ -292,7 +292,7 @@ uploadVoiceM :: SendVoiceRequest FileUpload -> TelegramClient MessageResponse
 uploadVoiceM = run_ uploadVoice_
 
 -- | Use this method to send audio files that are already on the telegram server, if you want Telegram clients to display the file as a playable voice message. For this to work, your audio must be in an .ogg file encoded with OPUS (other formats may be sent as 'Audio' or 'Document'). On success, the sent 'Message' is returned. Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
-sendVoice :: Token -> SendVoiceRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendVoice :: Token -> SendVoiceRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendVoice = runM sendVoiceM
 
 -- | See 'sendVoice'
@@ -300,7 +300,7 @@ sendVoiceM :: SendVoiceRequest Text -> TelegramClient MessageResponse
 sendVoiceM = run_ sendVoice_
 
 -- | As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned.
-uploadVideoNote :: Token -> SendVideoNoteRequest FileUpload -> Manager -> IO (Either ServantError MessageResponse)
+uploadVideoNote :: Token -> SendVideoNoteRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
 uploadVideoNote = runM uploadVideoNoteM
 
 -- | See 'uploadVideoNote'
@@ -308,7 +308,7 @@ uploadVideoNoteM :: SendVideoNoteRequest FileUpload -> TelegramClient MessageRes
 uploadVideoNoteM = run_ uploadVideoNote_
 
 -- | As of v.4.0, Telegram clients support rounded square mp4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned.
-sendVideoNote :: Token -> SendVideoNoteRequest Text -> Manager -> IO (Either ServantError MessageResponse)
+sendVideoNote :: Token -> SendVideoNoteRequest Text -> Manager -> IO (Either ClientError MessageResponse)
 sendVideoNote = runM sendVideoNoteM
 
 -- | See 'sendVoice'
@@ -316,7 +316,7 @@ sendVideoNoteM :: SendVideoNoteRequest Text -> TelegramClient MessageResponse
 sendVideoNoteM = run_ sendVideoNote_
 
 -- | Use this method to send point on the map. On success, the sent 'Message' is returned.
-sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendLocation :: Token -> SendLocationRequest -> Manager -> IO (Either ClientError MessageResponse)
 sendLocation = runM sendLocationM
 
 -- | See 'sendLocation'
@@ -327,7 +327,7 @@ sendMediaGroupM :: SendMediaGroupRequest -> TelegramClient (Response [Message])
 sendMediaGroupM = run_ sendMediaGroup_
 
 -- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
-sendVenue :: Token -> SendVenueRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendVenue :: Token -> SendVenueRequest -> Manager -> IO (Either ClientError MessageResponse)
 sendVenue = runM sendVenueM
 
 -- | See 'sendVenue'
@@ -335,7 +335,7 @@ sendVenueM :: SendVenueRequest -> TelegramClient MessageResponse
 sendVenueM = run_ sendVenue_
 
 -- | Use this method to send information about a venue. On success, the sent 'Message' is returned.
-sendContact :: Token -> SendContactRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendContact :: Token -> SendContactRequest -> Manager -> IO (Either ClientError MessageResponse)
 sendContact = runM sendContactM
 
 -- | See 'sendContact'
@@ -345,7 +345,7 @@ sendContactM = run_ sendContact_
 -- | Use this method when you need to tell the user that something is happening on the bot's side.
 --   The status is set for 5 seconds or less (when a message arrives from your bot,
 --   Telegram clients clear its typing status).
-sendChatAction :: Token -> SendChatActionRequest -> Manager -> IO (Either ServantError ChatActionResponse)
+sendChatAction :: Token -> SendChatActionRequest -> Manager -> IO (Either ClientError ChatActionResponse)
 sendChatAction = runM sendChatActionM
 
 -- | See 'sendChatAction'
@@ -353,7 +353,7 @@ sendChatActionM :: SendChatActionRequest -> TelegramClient ChatActionResponse
 sendChatActionM = run_ sendChatAction_
 
 -- | Use this method to send a game. On success, the sent 'Message' is returned.
-sendGame :: Token -> SendGameRequest -> Manager -> IO (Either ServantError MessageResponse)
+sendGame :: Token -> SendGameRequest -> Manager -> IO (Either ClientError MessageResponse)
 sendGame = runM sendGameM
 
 -- | See 'sendGame'

@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators     #-}
 
@@ -7,7 +6,6 @@ module MainSpec (spec) where
 
 import           Control.Concurrent
 import           Control.Monad
-import           Data.Monoid
 import           Data.Text                 (Text)
 import qualified Data.Text                 as T
 import           Network.HTTP.Client       (newManager)
@@ -42,7 +40,7 @@ spec token chatId botName = do
     it "should return error message" $ do
       res <- sendMessage token (sendMessageRequest (ChatChannel "") "test message") manager
       nosuccess res
-      let Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
+      let Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
@@ -100,32 +98,8 @@ spec token chatId botName = do
     it "should forward message" $ do
       res <- forwardMessage token (forwardMessageRequest chatId chatId 123000) manager
       nosuccess res
-      let Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
+      let Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
-
-  describe "/sendPhoto" $ do
-    it "should return error message" $ do
-      let photo = (sendPhotoRequest (ChatChannel "") "photo_id") {
-        photo_caption = Just "photo caption"
-      }
-      Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) <- sendPhoto token photo manager
-      msg `shouldBe` "Bad Request"
-    it "should upload photo and resend it by id" $ do
-      let fileUpload = localFileUpload $ testFile "christmas-cat.jpg"
-      let upload = (uploadPhotoRequest chatId fileUpload) {
-        photo_caption = Just "uploaded photo"
-      }
-      Right Response { result = Message { caption = Just cpt, photo = Just photos } } <-
-        uploadPhoto token upload manager
-      cpt `shouldBe` "uploaded photo"
-      -- resend by id
-      let id = (photo_file_id . last) photos
-      let photo = (sendPhotoRequest chatId id) {
-        photo_caption = Just "photo caption"
-      }
-      Right Response { result = Message { caption = Just cpt } } <-
-        sendPhoto token photo manager
-      cpt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
@@ -133,7 +107,7 @@ spec token chatId botName = do
         _audio_performer = Just "performer"
       , _audio_title = Just "title"
       }
-      Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
+      Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
         sendAudio token audio manager
       msg `shouldBe` "Bad Request"
     it "should upload audio and resend it by id" $ do
@@ -265,7 +239,7 @@ spec token chatId botName = do
       fmap (T.take 10) (file_path file) `shouldBe` Just "thumbnails"
 
     it "should return error" $ do
-      Left (FailureResponse Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
+      Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
         getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAmm" manager
       msg `shouldBe` "Bad Request"
 

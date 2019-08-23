@@ -51,7 +51,7 @@ getMe_
 
 -- | A simple method for testing your bot's auth token. Requires no parameters.
 --   Returns basic information about the bot in form of a 'User' object.
-getMe :: Token -> Manager -> IO (Either ServantError GetMeResponse)
+getMe :: Token -> Manager -> IO (Either ClientError GetMeResponse)
 getMe = runClient getMeM
 
 -- | See `getMe`
@@ -59,7 +59,7 @@ getMeM :: TelegramClient GetMeResponse
 getMeM = asking getMe_
 
 -- | Use this method to get basic info about a file and prepare it for downloading. For the moment, bots can download files of up to 20MB in size. On success, a 'File' object is returned. The file can then be downloaded via the link @https://api.telegram.org/file/bot<token>/<file_path>@, where @<file_path>@ is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. When the link expires, a new one can be requested by calling getFile again.
-getFile :: Token -> Text -> Manager -> IO (Either ServantError FileResponse)
+getFile :: Token -> Text -> Manager -> IO (Either ClientError FileResponse)
 getFile token fileId = runClient (getFileM fileId) token
 
 -- | See 'getFile'
@@ -67,7 +67,7 @@ getFileM :: Text -> TelegramClient FileResponse
 getFileM fileId = run_ getFile_ (Just fileId)
 
 -- | Use this method to get a list of profile pictures for a user. Returns a 'UserProfilePhotos' object.
-getUserProfilePhotos :: Token -> Integer -> Maybe Int -> Maybe Int -> Manager -> IO (Either ServantError UserProfilePhotosResponse)
+getUserProfilePhotos :: Token -> Integer -> Maybe Int -> Maybe Int -> Manager -> IO (Either ClientError UserProfilePhotosResponse)
 getUserProfilePhotos token userId offset limit = runClient (getUserProfilePhotosM userId offset limit) token
 
 -- | See 'getUserProfilePhotos'

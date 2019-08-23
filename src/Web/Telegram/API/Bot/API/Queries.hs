@@ -42,7 +42,7 @@ answerInlineQuery_ :<|> answerCallbackQuery_
      = client queriesApi
 
 -- | Use this method to send answers to an inline query. No more than 50 results per query are allowed.
-answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ServantError InlineQueryResponse)
+answerInlineQuery :: Token -> AnswerInlineQueryRequest -> Manager -> IO (Either ClientError InlineQueryResponse)
 answerInlineQuery = runM answerInlineQueryM
 
 -- | See 'answerInlineQuery'
@@ -50,7 +50,7 @@ answerInlineQueryM :: AnswerInlineQueryRequest -> TelegramClient InlineQueryResp
 answerInlineQueryM = run_ answerInlineQuery_
 
 -- | Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
-answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> IO (Either ServantError CallbackQueryResponse)
+answerCallbackQuery :: Token -> AnswerCallbackQueryRequest -> Manager -> IO (Either ClientError CallbackQueryResponse)
 answerCallbackQuery = runM answerCallbackQueryM
 
 -- | See 'answerCallbackQuery'
