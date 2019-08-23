@@ -101,6 +101,30 @@ spec token chatId botName = do
       let Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
 
+  describe "/sendPhoto" $ do
+    it "should return error message" $ do
+      let photo = (sendPhotoRequest (ChatChannel "") "photo_id") {
+        photo_caption = Just "photo caption"
+      }
+      Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) <- sendPhoto token photo manager
+      msg `shouldBe` "Bad Request"
+    it "should upload photo and resend it by id" $ do
+      let fileUpload = localFileUpload $ testFile "christmas-cat.jpg"
+      let upload = (uploadPhotoRequest chatId fileUpload) {
+        photo_caption = Just "uploaded photo"
+      }
+      Right Response { result = Message { caption = Just cpt, photo = Just photos } } <-
+        uploadPhoto token upload manager
+      cpt `shouldBe` "uploaded photo"
+      -- resend by id
+      let id = (photo_file_id . last) photos
+      let photo = (sendPhotoRequest chatId id) {
+        photo_caption = Just "photo caption"
+      }
+      Right Response { result = Message { caption = Just cpt } } <-
+        sendPhoto token photo manager
+      cpt `shouldBe` "photo caption"
+
   describe "/sendAudio" $ do
     it "should return error message" $ do
       let audio = (sendAudioRequest (ChatChannel "") "audio_id") {

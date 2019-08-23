@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Main (main) where
 
@@ -16,6 +17,7 @@ import qualified StickersSpec
 import           System.Environment           (lookupEnv, withArgs)
 import           Test.Hspec
 import qualified Text.PrettyPrint.ANSI.Leijen as PP
+import           Text.Read                    (readMaybe)
 import qualified UpdatesSpec
 import           Web.Telegram.API.Bot
 
@@ -89,5 +91,5 @@ description = Just $
 
 readChatId :: String -> ChatId
 readChatId s@('@':_) = ChatChannel $ T.pack s
-readChatId s         | all isDigit s = ChatId (read s)
-readChatId _         = error "ChatId must be either Integer or String in form '@channel'"
+readChatId (readMaybe -> Just s) = ChatId s
+readChatId _ = error "ChatId must be either Integer or String in form '@channel'"
