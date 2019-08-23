@@ -18,14 +18,15 @@ import           Control.Monad
 import           Control.Monad.Error.Class
 import           Control.Monad.IO.Class
 import           Control.Monad.Reader.Class
-import           Data.ByteString.Lazy                  hiding (elem, filter,
-                                                        map, null, pack, any)
+import           Data.Bifunctor                        (bimap)
+import           Data.Binary.Builder                   (toLazyByteString)
+import           Data.ByteString.Lazy                  hiding (pack, any)
 import           Data.Proxy
 import qualified Data.List.NonEmpty                    as NonEmpty
 import qualified Data.Sequence                         as Sequence
 import           Data.Text                             (pack)
 import           Data.Typeable                         (Typeable)
-import           Network.HTTP.Client                   hiding (Proxy, path)
+import           Network.HTTP.Client                   hiding (Proxy)
 import qualified Network.HTTP.Client                   as Client
 import           Network.HTTP.Client.MultipartFormData
 import           Network.HTTP.Media
@@ -37,9 +38,6 @@ import           Servant.Client
 import qualified Servant.Client.Core                   as Core
 import           Servant.Client.Internal.HttpClient    (catchConnectionError, clientResponseToResponse,
                                                         requestToClientRequest)
-import Data.Binary.Builder (toLazyByteString)
-import Data.Bifunctor (bimap)
-import qualified Data.ByteString.Lazy as LBS
 
 -- | A type that can be converted to a multipart/form-data value.
 class ToMultipartFormData a where
@@ -89,7 +87,7 @@ performRequest' requestToClientRequest' reqMethod req = do
                    Nothing -> throwError $ InvalidContentTypeHeader coreResponse
                    Just t' -> pure t'
       unless (status_code >= 200 && status_code < 300) $
-        let builtReq = bimap (const ()) (\b -> (reqHost, LBS.toStrict (toLazyByteString b))) req in
+        let builtReq = bimap (const ()) (\b -> (reqHost, toStrict (toLazyByteString b))) req in
         throwError $ FailureResponse builtReq coreResponse
       return (status_code, body, ct, hdrs, response)
 
