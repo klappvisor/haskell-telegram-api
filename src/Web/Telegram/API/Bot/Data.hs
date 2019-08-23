@@ -82,7 +82,6 @@ module Web.Telegram.API.Bot.Data
 import           Prelude                      hiding (id)
 
 import           Data.Aeson
-import           Data.Aeson.Types
 import qualified Data.Char                    as Char
 import           Data.Int                     (Int64)
 import           Data.List

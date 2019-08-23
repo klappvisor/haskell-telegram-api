@@ -39,25 +39,25 @@ telegramBaseUrl :: BaseUrl
 telegramBaseUrl = BaseUrl Https "api.telegram.org" 443 ""
 
 -- | Allows to run 'TelegramClient' against arbitrary url
-runClient' :: TelegramClient a -> Token -> ClientEnv -> IO (Either ServantError a)
+runClient' :: TelegramClient a -> Token -> ClientEnv -> IO (Either ClientError a)
 runClient' tcm token = runClientM (runReaderT tcm token)
 
 -- | Runs 'TelegramClient'
-runClient :: TelegramClient a -> Token -> Manager -> IO (Either ServantError a)
-runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl)
+runClient :: TelegramClient a -> Token -> Manager -> IO (Either ClientError a)
+runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl Nothing)
 
 -- | Runs 'TelegramClient'
-runTelegramClient :: Token -> Manager -> TelegramClient a -> IO (Either ServantError a)
+runTelegramClient :: Token -> Manager -> TelegramClient a -> IO (Either ClientError a)
 runTelegramClient token manager tcm = runClient tcm token manager
 
 asking :: Monad m => (t -> m b) -> ReaderT t m b
 asking op = ask >>= \t -> lift $ op t
 
-run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ServantError b)
-run b e t r m = runClientM (e t r) (ClientEnv m b)
+run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ClientError b)
+run b e t r m = runClientM (e t r) (ClientEnv m b Nothing)
 
 run_ :: Monad m => (a -> b -> m c) -> b -> ReaderT a m c
 run_ act request = asking $ flip act request
 
-runM :: (r -> TelegramClient a) -> Token -> r -> Manager -> IO (Either ServantError a)
+runM :: (r -> TelegramClient a) -> Token -> r -> Manager -> IO (Either ClientError a)
 runM tcm token request = runClient (tcm request) token

@@ -69,7 +69,7 @@ getUpdates
     -> Maybe Int -- ^ limit
     -> Maybe Int -- ^ timeout
     -> Manager
-    -> IO (Either ServantError UpdatesResponse)
+    -> IO (Either ClientError UpdatesResponse)
 getUpdates token offset limit timeout = runClient (getUpdatesM request) token
     where request = GetUpdatesRequest offset limit timeout Nothing
 
@@ -87,7 +87,7 @@ getUpdatesM = run_ getUpdates_
 setWebhook :: Token
     -> Maybe Text -- ^ HTTPS url to send updates to. Use an empty string to remove webhook integration
     -> Manager
-    -> IO (Either ServantError SetWebhookResponse)
+    -> IO (Either ClientError SetWebhookResponse)
 setWebhook token url = runClient (setWebhookM request) token
     where request = setWebhookRequest' $ fromMaybe empty url
 
@@ -98,7 +98,7 @@ setWebhookM = run_ setWebhook_
 -- | Use this method to specify a url and receive incoming updates via an outgoing webhook. Whenever there is an update for the bot, we will send an HTTPS POST request to the specified url, containing a JSON-serialized 'Update'. In case of an unsuccessful request, we will give up after a reasonable amount of attempts.
 --
 --       If you'd like to make sure that the Webhook request comes from Telegram, we recommend using a secret path in the URL, e.g. @https://www.example.com/<token>@. Since nobody else knows your bot‘s token, you can be pretty sure it’s us.
-setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ServantError SetWebhookResponse)
+setWebhookWithCertificate :: Token -> SetWebhookRequest -> Manager -> IO (Either ClientError SetWebhookResponse)
 setWebhookWithCertificate = runM setWebhookWithCertificateM
 
 -- | See 'setWebhookWithCertificate'
@@ -106,7 +106,7 @@ setWebhookWithCertificateM :: SetWebhookRequest -> TelegramClient SetWebhookResp
 setWebhookWithCertificateM = run_ setWebhookWithCert_
 
 -- | Use this method to remove webhook integration if you decide to switch back to 'getUpdates'. Returns True on success.
-deleteWebhook :: Token -> Manager -> IO (Either ServantError (Response Bool))
+deleteWebhook :: Token -> Manager -> IO (Either ClientError (Response Bool))
 deleteWebhook = runClient deleteWebhookM
 
 -- | See 'deleteWebhook'
@@ -114,7 +114,7 @@ deleteWebhookM :: TelegramClient (Response Bool)
 deleteWebhookM = asking deleteWebhook_
 
 -- | Contains information about the current status of a webhook.
-getWebhookInfo :: Token -> Manager -> IO (Either ServantError GetWebhookInfoResponse)
+getWebhookInfo :: Token -> Manager -> IO (Either ClientError GetWebhookInfoResponse)
 getWebhookInfo = runClient getWebhookInfoM
 
 -- | See 'getWebhookInfo'

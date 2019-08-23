@@ -83,7 +83,7 @@ editMessageText_
      = client editApi
 
 -- | Use this method to edit text messages sent by the bot. On success, the edited 'Message' is returned, otherwise True is returned.
-editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError MessageResponse)
+editMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ClientError MessageResponse)
 editMessageText = runM editMessageTextM
 
 -- | See 'editMessageText'
@@ -91,7 +91,7 @@ editMessageTextM :: EditMessageTextRequest -> TelegramClient MessageResponse
 editMessageTextM = run_ editMessageText_
 
 -- | Use this method to edit captions of messages sent by the bot. On success, the edited 'Message' is returned.
-editMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError MessageResponse)
+editMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ClientError MessageResponse)
 editMessageCaption = runM editMessageCaptionM
 
 -- | See 'editMessageCaption'
@@ -99,14 +99,14 @@ editMessageCaptionM :: EditMessageCaptionRequest -> TelegramClient MessageRespon
 editMessageCaptionM = run_ editMessageCaption_
 
 -- | Use this method to edit only the reply markup of messages sent by the bot. On success, the edited 'Message' is returned.
-editMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError MessageResponse)
+editMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ClientError MessageResponse)
 editMessageReplyMarkup = runM editMessageReplyMarkupM
 
 editMessageReplyMarkupM :: EditMessageReplyMarkupRequest -> TelegramClient MessageResponse
 editMessageReplyMarkupM = run_ editMessageReplyMarkup_
 
 -- | Use this method to edit text messages sent via the bot (for inline bots).
-editInlineMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ServantError (Response Bool))
+editInlineMessageText :: Token -> EditMessageTextRequest -> Manager -> IO (Either ClientError (Response Bool))
 editInlineMessageText = runM editInlineMessageTextM
 
 -- | See 'editInlineMessageText'
@@ -114,7 +114,7 @@ editInlineMessageTextM :: EditMessageTextRequest -> TelegramClient (Response Boo
 editInlineMessageTextM = run_ editMessageText__
 
 -- | Use this method to edit captions of messages sent via the bot (for inline bots).
-editInlineMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ServantError (Response Bool))
+editInlineMessageCaption :: Token -> EditMessageCaptionRequest -> Manager -> IO (Either ClientError (Response Bool))
 editInlineMessageCaption = runM editInlineMessageCaptionM
 
 -- | See 'editInlineMessageCaption'
@@ -122,7 +122,7 @@ editInlineMessageCaptionM :: EditMessageCaptionRequest -> TelegramClient (Respon
 editInlineMessageCaptionM = run_ editMessageCaption__
 
 -- | Use this method to edit only the reply markup of messages sent via the bot (for inline bots).
-editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ServantError (Response Bool))
+editInlineMessageReplyMarkup :: Token -> EditMessageReplyMarkupRequest -> Manager -> IO (Either ClientError (Response Bool))
 editInlineMessageReplyMarkup = runM editInlineMessageReplyMarkupM
 
 -- | See 'editInlineMessageReplyMarkup'
