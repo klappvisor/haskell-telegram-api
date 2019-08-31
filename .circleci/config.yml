@@ -1,0 +1,31 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: fpco/stack-build:lts
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore Cached Dependencies
+          keys:
+            - haskell-telegram-api-v1-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
+            - haskell-telegram-api-v1-{{ checksum "stack.yaml" }}
+      - run:
+          name: Resolve/Update Dependencies
+          command: stack --no-terminal setup
+      - run:
+          name: Run tests
+          command: echo $CI_PULL_REQUEST ; if [[ ! -z $CI_PULL_REQUEST ]] ; then stack test; else stack test --test-arguments "--integration --chatid $CHAT_ID --botname $BOT_NAME"; fi
+      - run:
+          name: Install executable
+          command: stack --no-terminal sdist
+      - save_cache:
+          name: Cache Dependencies
+          key: haskell-telegram-api-v1-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
+          paths:
+            - "/root/.stack"
+            - ".stack-work"
+      - store_artifacts:
+          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+          path: ".stack-work/dist"
+          destination: circleci-demo-haskell-exe
