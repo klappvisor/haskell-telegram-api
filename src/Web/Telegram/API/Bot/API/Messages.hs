@@ -20,6 +20,8 @@ module Web.Telegram.API.Bot.API.Messages
   , uploadDocumentM
   , sendDocument
   , sendDocumentM
+  , deleteMessage
+  , deleteMessageM
   , uploadSticker
   , uploadStickerM
   , sendSticker
@@ -90,6 +92,9 @@ type TelegramBotMessagesAPI =
     :<|> TelegramToken :> "sendDocument"
          :> ReqBody '[JSON] (SendDocumentRequest Text)
          :> Post '[JSON] MessageResponse
+    :<|> TelegramToken :> "deleteMessage"
+         :> ReqBody '[JSON] DeleteMessageRequest
+         :> Post '[JSON] Bool
     :<|> TelegramToken :> "sendSticker"
          :> MultipartFormDataReqBody (SendStickerRequest FileUpload)
          :> Post '[JSON] MessageResponse
@@ -145,6 +150,7 @@ uploadAudio_               :: Token -> SendAudioRequest FileUpload -> ClientM Me
 sendAudio_                 :: Token -> SendAudioRequest Text -> ClientM MessageResponse
 uploadDocument_            :: Token -> SendDocumentRequest FileUpload -> ClientM MessageResponse
 sendDocument_              :: Token -> SendDocumentRequest Text -> ClientM MessageResponse
+deleteMessage_             :: Token -> DeleteMessageRequest -> ClientM Bool
 uploadSticker_             :: Token -> SendStickerRequest FileUpload -> ClientM MessageResponse
 sendSticker_               :: Token -> SendStickerRequest Text -> ClientM MessageResponse
 uploadVideo_               :: Token -> SendVideoRequest FileUpload -> ClientM MessageResponse
@@ -167,6 +173,7 @@ sendMessage_
   :<|> sendAudio_
   :<|> uploadDocument_
   :<|> sendDocument_
+  :<|> deleteMessage_
   :<|> uploadSticker_
   :<|> sendSticker_
   :<|> uploadVideo_
@@ -250,6 +257,22 @@ sendDocument = runM sendDocumentM
 -- | See 'sendDocument'
 sendDocumentM :: SendDocumentRequest Text -> TelegramClient MessageResponse
 sendDocumentM = run_ sendDocument_
+
+-- |Use this method to delete a message, including service messages, with the following limitations:
+-- - A message can only be deleted if it was sent less than 48 hours ago.
+-- - A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
+-- - Bots can delete outgoing messages in private chats, groups, and supergroups.
+-- - Bots can delete incoming messages in private chats.
+-- - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+-- - If the bot is an administrator of a group, it can delete any message there.
+-- - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
+-- Returns True on success.
+deleteMessage :: Token -> DeleteMessageRequest -> Manager -> IO (Either ClientError Bool)
+deleteMessage = runM deleteMessageM
+
+-- | See 'deleteMessage'
+deleteMessageM :: DeleteMessageRequest -> TelegramClient Bool
+deleteMessageM = run_ deleteMessage_
 
 -- | Use this method to upload and send .webp stickers. On success, the sent 'Message' is returned.
 uploadSticker :: Token -> SendStickerRequest FileUpload -> Manager -> IO (Either ClientError MessageResponse)
