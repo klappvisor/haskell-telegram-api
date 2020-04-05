@@ -51,7 +51,7 @@ library
                      , http-api-data
                      , http-client
                      , servant
-                     , servant-client == 0.16
+                     , servant-client == 0.16.*
                      , servant-client-core
                      , mtl
                      , text
