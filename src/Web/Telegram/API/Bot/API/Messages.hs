@@ -94,7 +94,7 @@ type TelegramBotMessagesAPI =
          :> Post '[JSON] MessageResponse
     :<|> TelegramToken :> "deleteMessage"
          :> ReqBody '[JSON] DeleteMessageRequest
-         :> Post '[JSON] Bool
+         :> Post '[JSON] (Response Bool)
     :<|> TelegramToken :> "sendSticker"
          :> MultipartFormDataReqBody (SendStickerRequest FileUpload)
          :> Post '[JSON] MessageResponse
@@ -150,7 +150,7 @@ uploadAudio_               :: Token -> SendAudioRequest FileUpload -> ClientM Me
 sendAudio_                 :: Token -> SendAudioRequest Text -> ClientM MessageResponse
 uploadDocument_            :: Token -> SendDocumentRequest FileUpload -> ClientM MessageResponse
 sendDocument_              :: Token -> SendDocumentRequest Text -> ClientM MessageResponse
-deleteMessage_             :: Token -> DeleteMessageRequest -> ClientM Bool
+deleteMessage_             :: Token -> DeleteMessageRequest -> ClientM (Response Bool)
 uploadSticker_             :: Token -> SendStickerRequest FileUpload -> ClientM MessageResponse
 sendSticker_               :: Token -> SendStickerRequest Text -> ClientM MessageResponse
 uploadVideo_               :: Token -> SendVideoRequest FileUpload -> ClientM MessageResponse
@@ -267,11 +267,11 @@ sendDocumentM = run_ sendDocument_
 -- - If the bot is an administrator of a group, it can delete any message there.
 -- - If the bot has can_delete_messages permission in a supergroup or a channel, it can delete any message there.
 -- Returns True on success.
-deleteMessage :: Token -> DeleteMessageRequest -> Manager -> IO (Either ClientError Bool)
+deleteMessage :: Token -> DeleteMessageRequest -> Manager -> IO (Either ClientError (Response Bool))
 deleteMessage = runM deleteMessageM
 
 -- | See 'deleteMessage'
-deleteMessageM :: DeleteMessageRequest -> TelegramClient Bool
+deleteMessageM :: DeleteMessageRequest -> TelegramClient (Response Bool)
 deleteMessageM = run_ deleteMessage_
 
 -- | Use this method to upload and send .webp stickers. On success, the sent 'Message' is returned.
