@@ -15,6 +15,7 @@ module Web.Telegram.API.Bot.Requests
     , SendPhotoRequest               (..)
     , SendAudioRequest               (..)
     , SendDocumentRequest            (..)
+    , DeleteMessageRequest           (..)
     , SendStickerRequest             (..)
     , SendVideoRequest               (..)
     , SendVoiceRequest               (..)
@@ -56,6 +57,7 @@ module Web.Telegram.API.Bot.Requests
     , uploadAudioRequest
     , sendDocumentRequest
     , uploadDocumentRequest
+    , deleteMessageRequest
     , sendStickerRequest
     , uploadStickerRequest
     , sendVideoRequest
@@ -395,6 +397,23 @@ sendDocumentRequest chatId document = SendDocumentRequest chatId document Nothin
 
 uploadDocumentRequest :: ChatId -> FileUpload -> SendDocumentRequest FileUpload
 uploadDocumentRequest chatId document = SendDocumentRequest chatId document Nothing Nothing Nothing Nothing
+
+-- | This object represents request for 'deleteMessage'
+data DeleteMessageRequest = DeleteMessageRequest
+  {
+    _delete_chat_id              :: ChatId -- ^ Unique identifier for the target chat or username of the target channel (in the format @@channelusername@)
+  , _delete_message_id           :: Int    -- ^ Identifier of the message to delete
+  } deriving (Show, Generic)
+
+instance ToJSON DeleteMessageRequest where
+  toJSON = toJsonDrop 2
+
+instance FromJSON DeleteMessageRequest where
+  parseJSON = parseJsonDrop 2
+
+deleteMessageRequest :: ChatId -> Int -> DeleteMessageRequest
+deleteMessageRequest chatId messageId = DeleteMessageRequest chatId messageId
+
 
 -- | This object represents request for 'sendVideo'
 data SendVideoRequest payload = SendVideoRequest
