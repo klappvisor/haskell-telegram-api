@@ -162,7 +162,7 @@ spec token chatId botName = do
       let sticker = sendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
       Right Response { result = Message { sticker = Just sticker } } <-
         sendSticker token sticker manager
-      sticker_file_id sticker `shouldBe` "CAADAgADGgADkWgMAAFNFIZh3zoKbRYE" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
+      sticker_file_unique_id sticker `shouldBe` "AgADGgADkWgMAAE" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
       let fileUpload = localFileUpload $ testFile "haskell-logo.webp"
           stickerReq = uploadStickerRequest chatId fileUpload
@@ -258,8 +258,9 @@ spec token chatId botName = do
 
   describe "/getFile" $ do
     it "should get file" $ do
-      Right Response { result = file } <-
-        getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC" manager
+      res <- getFile token "AAQEABMXDZEwAARC0Kj3twkzNcMkAAIC" manager
+      success res
+      Right Response { result = file } <- pure res
       fmap (T.take 10) (file_path file) `shouldBe` Just "thumbnails"
 
     it "should return error" $ do

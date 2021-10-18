@@ -290,16 +290,17 @@ instance FromJSON Animation where
 
 -- | This object represents a sticker.
 data Sticker = Sticker
-  {
-    sticker_file_id       :: Text             -- ^ Unique identifier for this file
-  , sticker_width         :: Int              -- ^ Sticker width
-  , sticker_height        :: Int              -- ^ Sticker height
-  , sticker_thumb         :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
-  , sticker_emoji         :: Maybe Text       -- ^ Emoji associated with the sticker
-  , sticker_set_name      :: Maybe Text
-  , sticker_mask_position :: Maybe MaskPosition
-  , sticker_file_size     :: Maybe Int        -- ^ File size
-  } deriving (Show, Generic)
+  { sticker_file_id        :: Text             -- ^ Unique identifier for this file
+  , sticker_file_unique_id :: Text
+  , sticker_width          :: Int              -- ^ Sticker width
+  , sticker_height         :: Int              -- ^ Sticker height
+  , sticker_thumb          :: Maybe PhotoSize  -- ^ Sticker thumbnail in .webp or .jpg format
+  , sticker_emoji          :: Maybe Text       -- ^ Emoji associated with the sticker
+  , sticker_set_name       :: Maybe Text
+  , sticker_mask_position  :: Maybe MaskPosition
+  , sticker_file_size      :: Maybe Int        -- ^ File size
+  }
+  deriving (Show, Generic)
 
 instance ToJSON Sticker where
   toJSON = toJsonDrop 8
