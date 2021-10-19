@@ -12,11 +12,7 @@ copyright:           Alexey Rodiontsev (c) 2016
 category:            Web
 build-type:          Simple
 -- extra-source-files:
-tested-with:         GHC == 8.6.5
-                   , GHC == 8.8.4
-                   , GHC == 8.10.5
-                   , GHC == 8.10.7
-                   , GHC == 9.0.1
+tested-with:         GHC == {8.6.5, 8.8.4, 8.10.5, 8.10.7, 9.0.1}
 data-files:          test-data/christmas-cat.jpg
                    , test-data/cert.pem
                    , test-data/haskell-logo.webp
