@@ -5,7 +5,6 @@
 module Main (main) where
 
 import           Data.Maybe                   (fromMaybe)
-import           Data.Monoid                  ((<>))
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified JsonSpec
@@ -80,7 +79,7 @@ runIntegrationSpec (Just token) (Just chatId) (Just botName) (Just paymentToken)
         describe "Stickers API spec" $ StickersSpec.spec token chatId botName
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ _ = describe "Integration tests" $
-        fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
+        error "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
 
 description ::  Maybe PP.Doc
 description = Just $

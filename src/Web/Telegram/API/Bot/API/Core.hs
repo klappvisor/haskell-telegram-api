@@ -23,9 +23,9 @@ import           Control.Monad.Trans.Reader
 import           Data.Text                  (Text)
 import           Network.HTTP.Client        (Manager)
 import           Servant.API
-import           Servant.Client             (BaseUrl (BaseUrl),
-                                             ClientEnv (ClientEnv), ClientError,
-                                             ClientM, Scheme (Https),
+import           Servant.Client             (BaseUrl (BaseUrl), ClientEnv,
+                                             ClientError, ClientM,
+                                             Scheme (Https), mkClientEnv,
                                              runClientM)
 
 -- | Telegram Bot's Token
@@ -46,7 +46,7 @@ runClient' tcm token = runClientM (runReaderT tcm token)
 
 -- | Runs 'TelegramClient'
 runClient :: TelegramClient a -> Token -> Manager -> IO (Either ClientError a)
-runClient tcm token manager = runClient' tcm token (ClientEnv manager telegramBaseUrl Nothing)
+runClient tcm token manager = runClient' tcm token (mkClientEnv manager telegramBaseUrl)
 
 -- | Runs 'TelegramClient'
 runTelegramClient :: Token -> Manager -> TelegramClient a -> IO (Either ClientError a)
@@ -56,7 +56,7 @@ asking :: Monad m => (t -> m b) -> ReaderT t m b
 asking op = ask >>= \t -> lift $ op t
 
 run :: BaseUrl -> (Token -> a -> ClientM b) -> Token -> a -> Manager -> IO (Either ClientError b)
-run b e t r m = runClientM (e t r) (ClientEnv m b Nothing)
+run b e t r m = runClientM (e t r) (mkClientEnv m b)
 
 run_ :: Monad m => (a -> b -> m c) -> b -> ReaderT a m c
 run_ act request = asking $ flip act request
