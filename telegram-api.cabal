@@ -48,10 +48,9 @@ library
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , containers
-                     , http-api-data
                      , http-client
                      , servant
-                     , servant-client >= 0.16 && < 0.19
+                     , servant-client >= 0.16 && < 0.20
                      , servant-client-core
                      , mtl
                      , text

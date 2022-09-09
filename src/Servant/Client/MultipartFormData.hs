@@ -34,7 +34,12 @@ import           Network.HTTP.Types
 import qualified Network.HTTP.Types                    as H
 import qualified Network.HTTP.Types.Header             as HTTP
 import           Servant.API
-import           Servant.Client
+import           Servant.Client                        (BaseUrl,
+                                                        ClientError (DecodeFailure, FailureResponse, InvalidContentTypeHeader, UnsupportedContentType),
+                                                        ClientM, HasClient,
+                                                        baseUrl,
+                                                        makeClientRequest,
+                                                        manager)
 import qualified Servant.Client.Core                   as Core
 import           Servant.Client.Internal.HttpClient    (catchConnectionError,
                                                         clientResponseToResponse)
