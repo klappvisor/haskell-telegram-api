@@ -732,7 +732,7 @@ inlineQueryResultCachedVoice id fileId title = InlineQueryResultCachedVoice id f
 inlineQueryResultCachedAudio :: Text -> Text -> InlineQueryResult
 inlineQueryResultCachedAudio id fileId = InlineQueryResultCachedAudio id fileId Nothing Nothing Nothing
 
-data InlineKeyboardMarkup = InlineKeyboardMarkup
+newtype InlineKeyboardMarkup = InlineKeyboardMarkup
   {
     inline_keyboard :: [[InlineKeyboardButton]]
   } deriving (FromJSON, ToJSON, Show, Generic)
@@ -1141,7 +1141,7 @@ instance FromJSON MaskPositionPoint where
   parseJSON "eyes" = pure Eyes
   parseJSON "mouth" = pure Mouth
   parseJSON "chin" = pure Chin
-  parseJSON _ = fail $ "Failed to parse MaskPositionPoint"
+  parseJSON _ = fail "Failed to parse MaskPositionPoint"
 
 data MaskPosition = MaskPosition
   {

@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE TypeOperators              #-}
 
 module Web.Telegram.API.Bot.API.Core
   (  -- * Types
@@ -24,7 +23,10 @@ import           Control.Monad.Trans.Reader
 import           Data.Text                  (Text)
 import           Network.HTTP.Client        (Manager)
 import           Servant.API
-import           Servant.Client
+import           Servant.Client             (BaseUrl (BaseUrl),
+                                             ClientEnv (ClientEnv), ClientError,
+                                             ClientM, Scheme (Https),
+                                             runClientM)
 
 -- | Telegram Bot's Token
 newtype Token = Token Text

@@ -76,6 +76,7 @@ test-suite telegram-api-test
                      , UpdatesSpec
                      , StickersSpec
                      , TestCore
+                     , Paths_telegram_api
   build-depends:       base
                      , aeson
                      , hjpath

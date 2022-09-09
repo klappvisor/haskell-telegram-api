@@ -50,12 +50,16 @@ data MultipartFormDataReqBody a
 
 instance (Core.RunClient m, ToMultipartFormData b, MimeUnrender ct a, cts' ~ (ct ': cts)
   ) => HasClient m (MultipartFormDataReqBody b :> Post cts' a) where
-  type Client m (MultipartFormDataReqBody b :> Post cts' a) = b-> ClientM a
+
+  type Client m (MultipartFormDataReqBody b :> Post cts' a) = b -> ClientM a
+
   clientWithRoute _pm Proxy req reqData =
     let requestToClientRequest' req' baseurl' = do
           let requestWithoutBody = requestToClientRequest baseurl' req'
           formDataBody (toMultipartFormData reqData) requestWithoutBody
     in snd <$> performRequestCT' requestToClientRequest' (Proxy :: Proxy ct) H.methodPost req
+
+  hoistClientMonad _ _ _ _ = error "unreachable"
 
 -- copied `performRequest` from servant-0.11, then modified so it takes a variant of `requestToClientRequest`
 -- as an argument.

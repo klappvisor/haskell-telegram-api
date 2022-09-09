@@ -1,8 +1,10 @@
-{-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
+{-# LANGUAGE DataKinds                #-}
+{-# LANGUAGE DisambiguateRecordFields #-}
+{-# LANGUAGE OverloadedStrings        #-}
 
 module MainSpec (spec) where
+
+import           Prelude                   hiding (id)
 
 import           Control.Concurrent
 import           Control.Monad
@@ -12,7 +14,7 @@ import           Network.HTTP.Client       (newManager)
 import           Network.HTTP.Client.TLS   (tlsManagerSettings)
 import           Network.HTTP.Types.Status
 import           Paths_telegram_api
-import           Servant.Client     hiding (Response)
+import           Servant.Client            (ClientError (FailureResponse))
 import qualified Servant.Client.Core       as Core
 import           System.FilePath
 import           Test.Hspec
@@ -56,19 +58,19 @@ spec token chatId botName = do
       let kbA = keyboardButton "A"
           kbB = keyboardButton "B"
           kbC = keyboardButton "C"
-      let message = (sendMessageRequest chatId "set keyboard") {
+      let msg = (sendMessageRequest chatId "set keyboard") {
         message_reply_markup = Just $ replyKeyboardMarkup [[kbA, kbB, kbC]]
       }
-      res <- sendMessage token message manager
+      res <- sendMessage token msg manager
       success res
       let Right Response { result = m } = res
       text m `shouldBe` Just "set keyboard"
 
     it "should remove keyboard" $ do
-      let message = (sendMessageRequest chatId "remove keyboard") {
+      let msg = (sendMessageRequest chatId "remove keyboard") {
         message_reply_markup = Just replyKeyboardHide
       }
-      res <- sendMessage token message manager
+      res <- sendMessage token msg manager
       success res
       let Right Response { result = m } = res
       text m `shouldBe` Just "remove keyboard"
@@ -77,19 +79,19 @@ spec token chatId botName = do
       let kbA = (inlineKeyboardButton "A") { ikb_callback_data = Just "A" }
           kbB = (inlineKeyboardButton "B") { ikb_callback_data = Just "B" }
           kbC = (inlineKeyboardButton "C") { ikb_callback_data = Just "C" }
-      let message = (sendMessageRequest chatId "set inline keyboard") {
+      let msg = (sendMessageRequest chatId "set inline keyboard") {
         message_reply_markup = Just $ inlineKeyboardMarkup [[kbA, kbB, kbC]]
       }
-      res <- sendMessage token message manager
+      res <- sendMessage token msg manager
       success res
       let Right Response { result = m } = res
       text m `shouldBe` Just "set inline keyboard"
 
     it "should force reply" $ do
-      let message = (sendMessageRequest chatId "force reply") {
+      let msg = (sendMessageRequest chatId "force reply") {
         message_reply_markup = Just forceReply
       }
-      res <- sendMessage token message manager
+      res <- sendMessage token msg manager
       success res
       let Right Response { result = m } = res
       text m `shouldBe` Just "force reply"
@@ -103,73 +105,73 @@ spec token chatId botName = do
 
   describe "/sendPhoto" $ do
     it "should return error message" $ do
-      let photo = (sendPhotoRequest (ChatChannel "") "photo_id") {
+      let photoReq = (sendPhotoRequest (ChatChannel "") "photo_id") {
         photo_caption = Just "photo caption"
       }
-      Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) <- sendPhoto token photo manager
+      Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) <- sendPhoto token photoReq manager
       msg `shouldBe` "Bad Request"
     it "should upload photo and resend it by id" $ do
       let fileUpload = localFileUpload $ testFile "christmas-cat.jpg"
       let upload = (uploadPhotoRequest chatId fileUpload) {
         photo_caption = Just "uploaded photo"
       }
-      Right Response { result = Message { caption = Just cpt, photo = Just photos } } <-
+      Right Response { result = Message { caption = Just cpt, photo = Just photos' } } <-
         uploadPhoto token upload manager
       cpt `shouldBe` "uploaded photo"
       -- resend by id
-      let id = (photo_file_id . last) photos
-      let photo = (sendPhotoRequest chatId id) {
+      let id = (photo_file_id . last) photos'
+      let photoReq = (sendPhotoRequest chatId id) {
         photo_caption = Just "photo caption"
       }
-      Right Response { result = Message { caption = Just cpt } } <-
-        sendPhoto token photo manager
-      cpt `shouldBe` "photo caption"
+      Right Response { result = Message { caption = Just capt } } <-
+        sendPhoto token photoReq manager
+      capt `shouldBe` "photo caption"
 
   describe "/sendAudio" $ do
     it "should return error message" $ do
-      let audio = (sendAudioRequest (ChatChannel "") "audio_id") {
+      let audioReq = (sendAudioRequest (ChatChannel "") "audio_id") {
         _audio_performer = Just "performer"
       , _audio_title = Just "title"
       }
       Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) <-
-        sendAudio token audio manager
+        sendAudio token audioReq manager
       msg `shouldBe` "Bad Request"
     it "should upload audio and resend it by id" $ do
       let fileUpload = localFileUpload $ testFile "concerto-for-2-trumpets-in-c-major.mp3"
           audioTitle = "Concerto for 2 Trumpets in C major, RV. 537 (Rondeau arr.) All."
           audioPerformer = "Michel Rondeau"
-          audio = (uploadAudioRequest chatId fileUpload) {
+          audio1 = (uploadAudioRequest chatId fileUpload) {
             _audio_performer = Just audioPerformer,
             _audio_title = Just audioTitle
           }
-      res <- uploadAudio token audio manager
+      res <- uploadAudio token audio1 manager
       let Right Response {
         result = Message {
           audio = Just Audio {
-            audio_file_id = file_id, audio_title = Just title, audio_performer = Just performer
+            audio_file_id = fileId, audio_title = Just title, audio_performer = Just performer
           }
         }
       } = res
       title `shouldBe` audioTitle
       performer `shouldBe` audioPerformer
-      let audio = sendAudioRequest chatId file_id
+      let audio2 = sendAudioRequest chatId fileId
       Right Response { result = Message { audio = Just Audio { audio_title = Just title' } } } <-
-        sendAudio token audio manager
+        sendAudio token audio2 manager
       title' `shouldBe` audioTitle
 
   describe "/sendSticker" $ do
     it "should send sticker" $ do
-      let sticker = sendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
-      Right Response { result = Message { sticker = Just sticker } } <-
-        sendSticker token sticker manager
-      sticker_file_id sticker `shouldBe` "CAADAgADGgADkWgMAAFNFIZh3zoKbRYE" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
+      let stickerReq = sendStickerRequest chatId "BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
+      Right Response { result = Message { sticker = Just stickerFileId } } <-
+        sendSticker token stickerReq manager
+      sticker_file_id stickerFileId `shouldBe` "CAADAgADGgADkWgMAAFNFIZh3zoKbRYE" --"BQADAgADGgADkWgMAAGXlYGBiM_d2wI"
     it "should upload sticker" $ do
       let fileUpload = localFileUpload $ testFile "haskell-logo.webp"
           stickerReq = uploadStickerRequest chatId fileUpload
       res <- uploadSticker token stickerReq manager
       success res
-      let Right Response { result = Message { sticker = Just sticker } } = res
-      sticker_height sticker `shouldBe` 128
+      let Right Response { result = Message { sticker = Just stickerFile } } = res
+      sticker_height stickerFile `shouldBe` 128
 
   describe "/sendVoice" $
     it "should upload voice" $ do
@@ -178,8 +180,8 @@ spec token chatId botName = do
           voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
       res <- uploadVoice token voiceReq manager
       success res
-      let Right Response { result = Message { voice = Just voice } } = res
-      voice_duration voice `shouldBe` 10
+      let Right Response { result = Message { voice = Just voiceFile } } = res
+      voice_duration voiceFile `shouldBe` 10
   describe "/sendVideoNote" $
     it "should upload video note" $ do
       let fileUpload = localFileUpload $ testFile "lego-square.mp4"
@@ -187,8 +189,8 @@ spec token chatId botName = do
             { _vid_note_length = Just 320 }
       res <- uploadVideoNote token videoNoteReq manager
       success res
-      let Right Response { result = Message { video_note = Just video } } = res
-      vid_note_duration video `shouldBe` 6
+      let Right Response { result = Message { video_note = Just videoFile } } = res
+      vid_note_duration videoFile `shouldBe` 6
 
   describe "/sendVideo" $
     it "should upload video" $ do
@@ -197,40 +199,40 @@ spec token chatId botName = do
           videoReq = uploadVideoRequest chatId fileUpload
       res <- uploadVideo token videoReq manager
       success res
-      let Right Response { result = Message { video = Just video } } = res
+      let Right Response { result = Message { video = Just videoFile } } = res
 
-      video_width video `shouldBe` 560
+      video_width videoFile `shouldBe` 560
 
   describe "/sendDocument" $
     it "should upload document" $ do
       let fileUpload = localFileUpload $ testFile "wikipedia-telegram.txt"
           documentReq = uploadDocumentRequest chatId fileUpload
-      Right Response { result = Message { document = Just document } } <-
+      Right Response { result = Message { document = Just file } } <-
         uploadDocument token documentReq manager
-      doc_mime_type document `shouldBe` Just "text/plain"
-      doc_file_name document `shouldBe` Just "wikipedia-telegram.txt"
+      doc_mime_type file `shouldBe` Just "text/plain"
+      doc_file_name file `shouldBe` Just "wikipedia-telegram.txt"
 
   describe "/sendLocation" $
     it "should send location" $ do
-      let location = sendLocationRequest chatId 52.38 4.9
+      let locationReq = sendLocationRequest chatId 52.38 4.9
       Right Response { result = Message { location = Just loc } } <-
-        sendLocation token location manager
+        sendLocation token locationReq manager
       latitude loc `shouldSatisfy` liftM2 (&&) (> 52) (< 52.4)
       longitude loc `shouldSatisfy` liftM2 (&&) (> 4.89) (< 5)
 
   describe "/sendVenue" $
     it "should send a venue" $ do
-      let venue = sendVenueRequest chatId 52.38 4.9 "Amsterdam Centraal" "Amsterdam"
+      let venueReq = sendVenueRequest chatId 52.38 4.9 "Amsterdam Centraal" "Amsterdam"
       Right Response { result = Message { location = Just loc } } <-
-        sendVenue token venue manager
+        sendVenue token venueReq manager
       latitude loc `shouldSatisfy` liftM2 (&&) (> 52) (< 52.4)
       longitude loc `shouldSatisfy` liftM2 (&&) (> 4.89) (< 5)
 
   describe "/sendContact" $
     it "should send a contact" $ do
-      let contact = sendContactRequest chatId "06-18035176" "Hilbert"
+      let contactReq = sendContactRequest chatId "06-18035176" "Hilbert"
       Right Response { result = Message { contact = Just con } } <-
-        sendContact token contact manager
+        sendContact token contactReq manager
       -- Telegram seems to remove any non numeric characters from the sent phone number (at least it removed my '-')
       contact_phone_number con `shouldBe` "0618035176"
       contact_first_name con `shouldBe` "Hilbert"
@@ -269,10 +271,10 @@ spec token chatId botName = do
 
   describe "/getUserProfilePhotos" $
    it "should get user profile photos" $ do
-     Right Response { result = photos } <- do
+     Right Response { result = profilePhotos } <- do
        let ChatId userId = chatId
        getUserProfilePhotos token (fromIntegral userId) Nothing Nothing manager
-     total_count photos `shouldSatisfy` (>= 0)
+     total_count profilePhotos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook and /getWebhookInfo" $ do
     it "should set webhook with certificate" $ do

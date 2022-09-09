@@ -1,7 +1,5 @@
 {-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
 
 module UpdatesSpec (spec) where
 
@@ -30,13 +28,13 @@ spec token botName = do
     let url = "https://example.com/bot"
     it "able to get and set webhook" $ do
       res <- runTelegramClient token manager $ do
-          info <- getWebhookInfoM
-          liftIO $ (whi_url . result) info `shouldBe` ""
+          info1 <- getWebhookInfoM
+          liftIO $ (whi_url . result) info1 `shouldBe` ""
           liftIO $ threadDelay $ 2 * 1000 * 1000 -- to avoid Too many request error
           set <- setWebhookM $ setWebhookRequest' url
           liftIO $ result set `shouldBe` True
-          info <- getWebhookInfoM
-          liftIO $ (whi_url . result) info `shouldBe` url
+          info2 <- getWebhookInfoM
+          liftIO $ (whi_url . result) info2 `shouldBe` url
           liftIO $ threadDelay $ 2 * 1000 * 1000 -- to avoid Too many request error
           del <- deleteWebhookM
           liftIO $ result del `shouldBe` True

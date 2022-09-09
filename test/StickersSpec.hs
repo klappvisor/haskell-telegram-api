@@ -1,13 +1,10 @@
 {-# LANGUAGE DataKinds           #-}
-{-# LANGUAGE DeriveAnyClass      #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators       #-}
 
 module StickersSpec (spec) where
 
 import           Data.Maybe
-import           Data.Monoid
 import           Data.Text               (Text)
 import qualified Data.Text               as T
 import           Network.HTTP.Client     (newManager)
@@ -36,25 +33,25 @@ spec token chatId _ = do
   describe "/getStickerSet" $ do
     it "should get sticker set" $ do
       let stickerName = "non_existing_test_set_by_" <> botUsername
-      res <- runTelegramClient token manager $ getStickerSetM stickerName
-      nosuccess res
+      res' <- runTelegramClient token manager $ getStickerSetM stickerName
+      nosuccess res'
 
   describe "/uploadStickerFile" $ do
     it "should upload sticker PNG" $ do
       let uploadRequest = UploadStickerFileRequest userId stickerFile1
-      Right res <- runTelegramClient token manager $ uploadStickerFileM uploadRequest
-      (T.null . file_id . result) res `shouldBe` False
+      Right res' <- runTelegramClient token manager $ uploadStickerFileM uploadRequest
+      (T.null . file_id . result) res' `shouldBe` False
 
   describe "/createNewStickerSet" $ do
     it "should create sticker set" $ do
       rnd :: Integer <- randomRIO (10000, 99999)
-      let stickerSetName = "set_" <> (showText rnd) <> "_by_" <> botUsername
+      let stickerSetName = "set_" <> showText rnd <> "_by_" <> botUsername
           request = CreateNewStickerSetRequest userId stickerSetName "Haskell Bot API Test Set" stickerFile1 "😃" (Just True) Nothing
-      res <- runTelegramClient token manager $ do
+      res' <- runTelegramClient token manager $ do
         _ <- createNewStickerSetM' request
         getStickerSetM stickerSetName
-      success res
-      let Right Response { result = set } = res
+      success res'
+      let Right Response { result = set } = res'
       stcr_set_name set `shouldBe` stickerSetName
 
   describe "StickerSet CRUD" $ do

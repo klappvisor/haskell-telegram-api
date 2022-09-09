@@ -1,10 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 module Main (main) where
 
-import           Data.Char                    (isDigit)
 import           Data.Maybe                   (fromMaybe)
 import           Data.Monoid                  ((<>))
 import           Data.Text                    (Text)
@@ -85,9 +84,9 @@ runIntegrationSpec _ _ _ _ = describe "Integration tests" $
 
 description ::  Maybe PP.Doc
 description = Just $
-           (PP.text "Run the haskell-telegram-api tests")
-    PP.<$> ((PP.text "Running with stack: ") PP.<> (PP.text "stack test --test-arguments=\"--integration -c 1235122 -b MyTeleBot -- -m send\""))
-    PP.<$> ((PP.red . PP.text $ "WARNING: ") PP.<> (PP.text "the HSPEC_ARGS are optional but if present MUST be at the end and seperated from the other options with a -- "))
+           PP.text "Run the haskell-telegram-api tests"
+    PP.<$> (PP.text "Running with stack: " PP.<> PP.text "stack test --test-arguments=\"--integration -c 1235122 -b MyTeleBot -- -m send\"")
+    PP.<$> (PP.red (PP.text "WARNING: ") PP.<> PP.text "the HSPEC_ARGS are optional but if present MUST be at the end and seperated from the other options with a -- ")
 
 readChatId :: String -> ChatId
 readChatId s@('@':_) = ChatChannel $ T.pack s

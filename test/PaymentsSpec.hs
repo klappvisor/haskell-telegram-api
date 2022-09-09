@@ -1,7 +1,5 @@
 {-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
 
 module PaymentsSpec (spec) where
 
@@ -32,5 +30,5 @@ spec token chatId' _ paymentToken = do
       res <- runClient (sendInvoiceM invoiceRequest) token manager
       success res
       let Right Response { result = m } = res
-      inv_title <$> (invoice m) `shouldBe` Just "Portal cannon"
+      inv_title <$> invoice m `shouldBe` Just "Portal cannon"
 
