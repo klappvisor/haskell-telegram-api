@@ -74,9 +74,9 @@ runSpec' integration token chatId botName paymentToken = do
 runIntegrationSpec :: Maybe Token -> Maybe ChatId -> Maybe Text -> Maybe Text -> SpecWith ()
 runIntegrationSpec (Just token) (Just chatId) (Just botName) (Just paymentToken) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
-        describe "Payments integration tests" $ PaymentsSpec.spec token chatId botName paymentToken
+        describe "Payments integration tests" $ PaymentsSpec.spec token chatId paymentToken
         describe "Updates API spec" $ UpdatesSpec.spec token botName
-        describe "Stickers API spec" $ StickersSpec.spec token chatId botName
+        describe "Stickers API spec" $ StickersSpec.spec token chatId
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ _ = describe "Integration tests" $
         error "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"

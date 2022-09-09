@@ -5,7 +5,6 @@
 module StickersSpec (spec) where
 
 import           Data.Maybe
-import           Data.Text               (Text)
 import qualified Data.Text               as T
 import           Network.HTTP.Client     (newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
@@ -16,8 +15,8 @@ import           Test.Hspec
 import           TestCore
 import           Web.Telegram.API.Bot
 
-spec :: Token -> ChatId -> Text -> Spec
-spec token chatId@(ChatId chatId') _ = do
+spec :: Token -> ChatId -> Spec
+spec token chatId@(ChatId chatId') = do
   manager <- runIO $ newManager tlsManagerSettings
   dataDir <- runIO getDataDir
 
@@ -83,4 +82,4 @@ spec token chatId@(ChatId chatId') _ = do
       stickerCount set `shouldBe` 2
       stickerCount setAfter `shouldBe` 1
 
-spec _ (ChatChannel _) _ = error "not implemented"
+spec _ (ChatChannel _) = error "not implemented"

@@ -10,8 +10,8 @@ import           Test.Hspec
 import           TestCore
 import           Web.Telegram.API.Bot
 
-spec :: Token -> ChatId -> Text -> Text -> Spec
-spec token (ChatId chatId) _ paymentToken = do
+spec :: Token -> ChatId -> Text -> Spec
+spec token (ChatId chatId) paymentToken = do
   manager <- runIO $ newManager tlsManagerSettings
   describe "/sendInvoice" $ do
     it "should send invoice" $ do
@@ -31,4 +31,4 @@ spec token (ChatId chatId) _ paymentToken = do
       success res
       inv_title <$> invoice m `shouldBe` Just "Portal cannon"
 
-spec _ (ChatChannel _) _ _ = error "not implemented"
+spec _ (ChatChannel _) _ = error "not implemented"
