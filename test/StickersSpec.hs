@@ -17,15 +17,18 @@ import           TestCore
 import           Web.Telegram.API.Bot
 
 spec :: Token -> ChatId -> Text -> Spec
-spec token chatId _ = do
+spec token chatId@(ChatId chatId') _ = do
   manager <- runIO $ newManager tlsManagerSettings
   dataDir <- runIO getDataDir
 
-  res <- runIO $ runTelegramClient token manager getMeM
+  meRes <-
+    runIO $ do
+      Right Response { result = meRes } <-
+        runTelegramClient token manager getMeM
+      pure meRes
+
   let testFile name = dataDir </> "test-data" </> name
-      Right Response { result = meRes } = res
       botUsername = fromMaybe "???" $ user_username meRes
-      ChatId chatId' = chatId
       userId :: Int = fromIntegral chatId'
       stickerFile1 = localFileUpload $ testFile "sticker_1.png"
       stickerFile2 = localFileUpload $ testFile "sticker_2.png"
@@ -47,11 +50,11 @@ spec token chatId _ = do
       rnd :: Integer <- randomRIO (10000, 99999)
       let stickerSetName = "set_" <> showText rnd <> "_by_" <> botUsername
           request = CreateNewStickerSetRequest userId stickerSetName "Haskell Bot API Test Set" stickerFile1 "😃" (Just True) Nothing
-      res' <- runTelegramClient token manager $ do
-        _ <- createNewStickerSetM' request
-        getStickerSetM stickerSetName
+      res'@(Right Response { result = set }) <-
+        runTelegramClient token manager $ do
+          _ <- createNewStickerSetM' request
+          getStickerSetM stickerSetName
       success res'
-      let Right Response { result = set } = res'
       stcr_set_name set `shouldBe` stickerSetName
 
   describe "StickerSet CRUD" $ do
@@ -80,5 +83,4 @@ spec token chatId _ = do
       stickerCount set `shouldBe` 2
       stickerCount setAfter `shouldBe` 1
 
-
-
+spec _ (ChatChannel _) _ = error "not implemented"

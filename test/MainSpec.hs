@@ -22,7 +22,7 @@ import           TestCore
 import           Web.Telegram.API.Bot
 
 spec :: Token -> ChatId -> Text -> Spec
-spec token chatId botName = do
+spec token chatId@(ChatId userId) botName = do
   manager <- runIO $ newManager tlsManagerSettings
   dataDir <- runIO getDataDir
   let testFile name = dataDir </> "test-data" </> name
@@ -34,24 +34,23 @@ spec token chatId botName = do
 
   describe "/sendMessage" $ do
     it "should send message" $ do
-      res <- sendMessage token (sendMessageRequest chatId "test message") manager
+      res@(Right Response { result = m }) <-
+        sendMessage token (sendMessageRequest chatId "test message") manager
       success res
-      let Right Response { result = m } = res
       text m `shouldBe` Just "test message"
 
     it "should return error message" $ do
-      res <- sendMessage token (sendMessageRequest (ChatChannel "") "test message") manager
+      res@(Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } })) <-
+        sendMessage token (sendMessageRequest (ChatChannel "") "test message") manager
       nosuccess res
-      let Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
 
     it "should send message markdown" $ do
       let request = (sendMessageRequest chatId "text *bold* _italic_ [github](github.com/klappvisor/telegram-api)") {
           message_parse_mode = Just Markdown
         }
-      res <- sendMessage token request manager
+      res@(Right Response { result = m }) <- sendMessage token request manager
       success res
-      let Right Response { result = m } = res
       text m `shouldBe` Just "text bold italic github"
 
     it "should set keyboard" $ do
@@ -61,18 +60,16 @@ spec token chatId botName = do
       let msg = (sendMessageRequest chatId "set keyboard") {
         message_reply_markup = Just $ replyKeyboardMarkup [[kbA, kbB, kbC]]
       }
-      res <- sendMessage token msg manager
+      res@(Right Response { result = m }) <- sendMessage token msg manager
       success res
-      let Right Response { result = m } = res
       text m `shouldBe` Just "set keyboard"
 
     it "should remove keyboard" $ do
       let msg = (sendMessageRequest chatId "remove keyboard") {
         message_reply_markup = Just replyKeyboardHide
       }
-      res <- sendMessage token msg manager
+      res@(Right Response { result = m }) <- sendMessage token msg manager
       success res
-      let Right Response { result = m } = res
       text m `shouldBe` Just "remove keyboard"
 
     it "should send message with inline keyboard" $ do
@@ -82,25 +79,23 @@ spec token chatId botName = do
       let msg = (sendMessageRequest chatId "set inline keyboard") {
         message_reply_markup = Just $ inlineKeyboardMarkup [[kbA, kbB, kbC]]
       }
-      res <- sendMessage token msg manager
+      res@(Right Response { result = m }) <- sendMessage token msg manager
       success res
-      let Right Response { result = m } = res
       text m `shouldBe` Just "set inline keyboard"
 
     it "should force reply" $ do
       let msg = (sendMessageRequest chatId "force reply") {
         message_reply_markup = Just forceReply
       }
-      res <- sendMessage token msg manager
+      res@(Right Response { result = m }) <- sendMessage token msg manager
       success res
-      let Right Response { result = m } = res
       text m `shouldBe` Just "force reply"
 
   describe "/forwardMessage" $
     it "should forward message" $ do
-      res <- forwardMessage token (forwardMessageRequest chatId chatId 123000) manager
+      res@(Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } })) <-
+        forwardMessage token (forwardMessageRequest chatId chatId 123000) manager
       nosuccess res
-      let Left (FailureResponse _ Core.Response { responseStatusCode = Status { statusMessage = msg } }) = res
       msg `shouldBe` "Bad Request"
 
   describe "/sendPhoto" $ do
@@ -144,14 +139,15 @@ spec token chatId botName = do
             _audio_performer = Just audioPerformer,
             _audio_title = Just audioTitle
           }
-      res <- uploadAudio token audio1 manager
-      let Right Response {
+      res@(Right Response {
         result = Message {
           audio = Just Audio {
             audio_file_id = fileId, audio_title = Just title, audio_performer = Just performer
           }
         }
-      } = res
+      }) <-
+        uploadAudio token audio1 manager
+      success res
       title `shouldBe` audioTitle
       performer `shouldBe` audioPerformer
       let audio2 = sendAudioRequest chatId fileId
@@ -168,9 +164,9 @@ spec token chatId botName = do
     it "should upload sticker" $ do
       let fileUpload = localFileUpload $ testFile "haskell-logo.webp"
           stickerReq = uploadStickerRequest chatId fileUpload
-      res <- uploadSticker token stickerReq manager
+      res@(Right Response { result = Message { sticker = Just stickerFile } }) <-
+        uploadSticker token stickerReq manager
       success res
-      let Right Response { result = Message { sticker = Just stickerFile } } = res
       sticker_height stickerFile `shouldBe` 128
 
   describe "/sendVoice" $
@@ -178,18 +174,18 @@ spec token chatId botName = do
       -- audio source: https://commons.wikimedia.org/wiki/File:Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg
       let fileUpload = localFileUpload $ testFile "Possible_PDM_signal_labeled_as_Sputnik_by_NASA.ogg"
           voiceReq = (uploadVoiceRequest chatId fileUpload) { _voice_duration = Just 10 }
-      res <- uploadVoice token voiceReq manager
+      res@(Right Response { result = Message { voice = Just voiceFile } }) <-
+        uploadVoice token voiceReq manager
       success res
-      let Right Response { result = Message { voice = Just voiceFile } } = res
       voice_duration voiceFile `shouldBe` 10
   describe "/sendVideoNote" $
     it "should upload video note" $ do
       let fileUpload = localFileUpload $ testFile "lego-square.mp4"
           videoNoteReq = (uploadVideoNoteRequest chatId fileUpload)
             { _vid_note_length = Just 320 }
-      res <- uploadVideoNote token videoNoteReq manager
+      res@(Right Response { result = Message { video_note = Just videoFile } }) <-
+        uploadVideoNote token videoNoteReq manager
       success res
-      let Right Response { result = Message { video_note = Just videoFile } } = res
       vid_note_duration videoFile `shouldBe` 6
 
   describe "/sendVideo" $
@@ -197,9 +193,9 @@ spec token chatId botName = do
       -- video source: http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5
       let fileUpload = localFileUpload $ testFile "lego-video.mp4"
           videoReq = uploadVideoRequest chatId fileUpload
-      res <- uploadVideo token videoReq manager
+      res@(Right Response { result = Message { video = Just videoFile } }) <-
+        uploadVideo token videoReq manager
       success res
-      let Right Response { result = Message { video = Just videoFile } } = res
 
       video_width videoFile `shouldBe` 560
 
@@ -270,19 +266,18 @@ spec token chatId botName = do
       msg `shouldBe` "Bad Request"
 
   describe "/getUserProfilePhotos" $
-   it "should get user profile photos" $ do
-     Right Response { result = profilePhotos } <- do
-       let ChatId userId = chatId
-       getUserProfilePhotos token (fromIntegral userId) Nothing Nothing manager
-     total_count profilePhotos `shouldSatisfy` (>= 0)
+    it "should get user profile photos" $ do
+      Right Response { result = profilePhotos } <-
+        getUserProfilePhotos token (fromIntegral userId) Nothing Nothing manager
+      total_count profilePhotos `shouldSatisfy` (>= 0)
 
   describe "/setWebhook and /getWebhookInfo" $ do
     it "should set webhook with certificate" $ do
       let cert = localFileUpload $ testFile "cert.pem"
           req = setWebhookRequest "https://example.com/secret_token" cert
-      res <- setWebhookWithCertificate token req manager
+      res@(Right Response { result = val }) <-
+        setWebhookWithCertificate token req manager
       success res
-      let Right Response { result = val } = res
       val `shouldBe` True
 
     it "should set webhook" $ do
@@ -303,9 +298,8 @@ spec token chatId botName = do
     it "should remove webhood with deleteWebhook" $ do
       threadDelay $ 2 * 1000 * 1000
       _ <- setWebhook token (Just "https://example.com/secret_token") manager
-      res <- deleteWebhook token manager
+      res@(Right Response { result = val }) <- deleteWebhook token manager
       success res
-      let Right Response { result = val } = res
       val `shouldBe` True
 
   describe "/editTextMessage" $ do
@@ -339,9 +333,11 @@ spec token chatId botName = do
             input_media_caption = Just "Lenses"
           }
           request = sendMediaGroupRequest chatId [ photo1, photo2 ]
-      res <- runTelegramClient token manager $ sendMediaGroupM request
+      res@(Right Response { result = messages }) <-
+        runTelegramClient token manager $ sendMediaGroupM request
       success res
-      let Right Response { result = messages } = res
       length messages `shouldBe` 2
 
     -- it "should edit caption" $ do ... after inline query tests are on place
+
+spec _ (ChatChannel _) _ = error "not implemented"

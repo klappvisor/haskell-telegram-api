@@ -84,7 +84,7 @@ import           Prelude                      hiding (id)
 import           Data.Aeson
 import qualified Data.Char                    as Char
 import           Data.Int                     (Int64)
-import           Data.List
+import           Data.List                    (isPrefixOf)
 import           Data.Text                    (Text)
 import           GHC.Generics
 
