@@ -4,14 +4,13 @@ module InlineSpec (spec) where
 
 import           Prelude                 hiding (id)
 
-import           Data.Text               (Text)
 import           Network.HTTP.Client     (newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Test.Hspec
 import           Web.Telegram.API.Bot
 
-spec :: Token -> Text -> Spec
-spec token _chatId = do
+spec :: Token -> Spec
+spec token = do
   let inline_query_id = ""
   manager <- runIO $ newManager tlsManagerSettings
   -- Create the tls connection manager
