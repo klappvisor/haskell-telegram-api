@@ -32,6 +32,8 @@ module Web.Telegram.API.Bot.Data
     , InlineQueryResult             (..)
     , InlineKeyboardMarkup          (..)
     , InlineKeyboardButton          (..)
+    , WebAppInfo                    (..)
+    , LoginUrl                      (..)
     , CallbackGame                  (..)
     , CallbackQuery                 (..)
     , ChatType                      (..)
@@ -77,6 +79,7 @@ module Web.Telegram.API.Bot.Data
     , inlineQueryResultCachedVoice
     , inputMediaPhoto
     , inputMediaVideo
+    , loginUrl
     ) where
 
 import           Prelude                      hiding (id)
