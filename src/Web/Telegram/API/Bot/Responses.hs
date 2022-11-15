@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 -- | This module contains responses from Telegram Bot API
 module Web.Telegram.API.Bot.Responses
