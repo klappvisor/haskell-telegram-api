@@ -2,14 +2,15 @@
 
 module InlineSpec (spec) where
 
-import           Data.Text               (Text)
+import           Prelude                 hiding (id)
+
 import           Network.HTTP.Client     (newManager)
 import           Network.HTTP.Client.TLS (tlsManagerSettings)
 import           Test.Hspec
 import           Web.Telegram.API.Bot
 
-spec :: Token -> Text -> Spec
-spec token chatId = do
+spec :: Token -> Spec
+spec token = do
   let inline_query_id = ""
   manager <- runIO $ newManager tlsManagerSettings
   -- Create the tls connection manager
@@ -42,12 +43,22 @@ spec token chatId = do
       Update { inline_query = Just (InlineQuery { query_id = id } ) } <- pure (last updates)
       e <-
         answerInlineQuery token (answerInlineQueryRequest id [inline_video]) manager
-      putStrLn (show e)
+      print e
 
+message_content :: InputMessageContent
 message_content = InputTextMessageContent "test message content" Nothing Nothing
 
+inline_article :: InlineQueryResult
 inline_article = InlineQueryResultArticle "2131341" (Just "text article content") (Just message_content) Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+inline_photo :: InlineQueryResult
 inline_photo = InlineQueryResultPhoto "1430810" "http://vignette3.wikia.nocookie.net/victorious/images/f/f8/NyanCat.jpg" (Just "http://vignette3.wikia.nocookie.net/victorious/images/f/f8/NyanCat.jpg") Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+inline_gif :: InlineQueryResult
 inline_gif = InlineQueryResultGif "131231234" "https://media.giphy.com/media/zEO5eq3ZsEwbS/giphy.gif" Nothing Nothing (Just "https://media.giphy.com/media/zEO5eq3ZsEwbS/100.gif") Nothing Nothing Nothing Nothing Nothing
+
+inline_mpeg :: InlineQueryResult
 inline_mpeg = InlineQueryResultMpeg4Gif "131251234" "https://media.giphy.com/media/zEO5eq3ZsEwbS/giphy.gif" Nothing Nothing (Just "https://media.giphy.com/media/zEO5eq3ZsEwbS/100.gif") Nothing Nothing Nothing Nothing Nothing
+
+inline_video :: InlineQueryResult
 inline_video = InlineQueryResultVideo "123413542" "https://www.youtube.com/embed/TBKN7_vx2xo" "text/html" (Just "https://i.ytimg.com/vi_webp/TBKN7_vx2xo/mqdefault.webp") (Just "Enjoykin — Nyash Myash") Nothing Nothing Nothing Nothing Nothing Nothing Nothing

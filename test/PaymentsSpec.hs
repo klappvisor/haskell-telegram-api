@@ -1,7 +1,5 @@
 {-# LANGUAGE DataKinds         #-}
-{-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators     #-}
 
 module PaymentsSpec (spec) where
 
@@ -12,10 +10,9 @@ import           Test.Hspec
 import           TestCore
 import           Web.Telegram.API.Bot
 
-spec :: Token -> ChatId -> Text -> Text -> Spec
-spec token chatId' _ paymentToken = do
+spec :: Token -> ChatId -> Text -> Spec
+spec token (ChatId chatId) paymentToken = do
   manager <- runIO $ newManager tlsManagerSettings
-  let ChatId chatId = chatId'
   describe "/sendInvoice" $ do
     it "should send invoice" $ do
       let description = "The best portal cannon in known universe"
@@ -29,8 +26,9 @@ spec token chatId' _ paymentToken = do
                    { snd_inv_photo_url = Just "http://farm4.staticflickr.com/3560/3576111171_66c1fc2462_z.jpg"
                    , snd_inv_is_flexible = Just True
                    }
-      res <- runClient (sendInvoiceM invoiceRequest) token manager
+      res@(Right Response { result = m }) <-
+        runClient (sendInvoiceM invoiceRequest) token manager
       success res
-      let Right Response { result = m } = res
-      inv_title <$> (invoice m) `shouldBe` Just "Portal cannon"
+      inv_title <$> invoice m `shouldBe` Just "Portal cannon"
 
+spec _ (ChatChannel _) _ = error "not implemented"

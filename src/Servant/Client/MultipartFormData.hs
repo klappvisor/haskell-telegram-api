@@ -20,9 +20,9 @@ import           Control.Monad.IO.Class
 import           Control.Monad.Reader.Class
 import           Data.Bifunctor                        (bimap)
 import           Data.Binary.Builder                   (toLazyByteString)
-import           Data.ByteString.Lazy                  hiding (pack, any)
-import           Data.Proxy
+import           Data.ByteString.Lazy                  hiding (any, pack)
 import qualified Data.List.NonEmpty                    as NonEmpty
+import           Data.Proxy
 import qualified Data.Sequence                         as Sequence
 import           Data.Text                             (pack)
 import           Data.Typeable                         (Typeable)
@@ -34,10 +34,15 @@ import           Network.HTTP.Types
 import qualified Network.HTTP.Types                    as H
 import qualified Network.HTTP.Types.Header             as HTTP
 import           Servant.API
-import           Servant.Client
+import           Servant.Client                        (BaseUrl,
+                                                        ClientError (DecodeFailure, FailureResponse, InvalidContentTypeHeader, UnsupportedContentType),
+                                                        ClientM, HasClient,
+                                                        baseUrl,
+                                                        makeClientRequest,
+                                                        manager)
 import qualified Servant.Client.Core                   as Core
-import           Servant.Client.Internal.HttpClient    (catchConnectionError, clientResponseToResponse,
-                                                        requestToClientRequest)
+import           Servant.Client.Internal.HttpClient    (catchConnectionError,
+                                                        clientResponseToResponse)
 
 -- | A type that can be converted to a multipart/form-data value.
 class ToMultipartFormData a where
@@ -50,12 +55,17 @@ data MultipartFormDataReqBody a
 
 instance (Core.RunClient m, ToMultipartFormData b, MimeUnrender ct a, cts' ~ (ct ': cts)
   ) => HasClient m (MultipartFormDataReqBody b :> Post cts' a) where
-  type Client m (MultipartFormDataReqBody b :> Post cts' a) = b-> ClientM a
-  clientWithRoute _pm Proxy req reqData =
+
+  type Client m (MultipartFormDataReqBody b :> Post cts' a) = b -> ClientM a
+
+  clientWithRoute _pm Proxy req reqData = do
+    clientEnv <- ask
     let requestToClientRequest' req' baseurl' = do
-          let requestWithoutBody = requestToClientRequest baseurl' req'
+          let requestWithoutBody = makeClientRequest clientEnv baseurl' req'
           formDataBody (toMultipartFormData reqData) requestWithoutBody
-    in snd <$> performRequestCT' requestToClientRequest' (Proxy :: Proxy ct) H.methodPost req
+    snd <$> performRequestCT' requestToClientRequest' (Proxy :: Proxy ct) H.methodPost req
+
+  hoistClientMonad _ _ _ _ = error "unreachable"
 
 -- copied `performRequest` from servant-0.11, then modified so it takes a variant of `requestToClientRequest`
 -- as an argument.
@@ -104,5 +114,5 @@ performRequestCT' requestToClientRequest' ct reqMethod req = do
   let coreResponse = clientResponseToResponse id _response
   unless (any (matches respCT) acceptCTS) $ throwError $ UnsupportedContentType respCT coreResponse
   case mimeUnrender ct respBody of
-    Left err -> throwError $ DecodeFailure (pack err) coreResponse
+    Left err  -> throwError $ DecodeFailure (pack err) coreResponse
     Right val -> return (hdrs, val)

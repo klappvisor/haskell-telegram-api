@@ -1,12 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE ViewPatterns      #-}
 
 module Main (main) where
 
-import           Data.Char                    (isDigit)
 import           Data.Maybe                   (fromMaybe)
-import           Data.Monoid                  ((<>))
 import           Data.Text                    (Text)
 import qualified Data.Text                    as T
 import qualified JsonSpec
@@ -76,18 +74,18 @@ runSpec' integration token chatId botName paymentToken = do
 runIntegrationSpec :: Maybe Token -> Maybe ChatId -> Maybe Text -> Maybe Text -> SpecWith ()
 runIntegrationSpec (Just token) (Just chatId) (Just botName) (Just paymentToken) = do
         describe "Main integration tests" $ MainSpec.spec token chatId botName
-        describe "Payments integration tests" $ PaymentsSpec.spec token chatId botName paymentToken
+        describe "Payments integration tests" $ PaymentsSpec.spec token chatId paymentToken
         describe "Updates API spec" $ UpdatesSpec.spec token botName
-        describe "Stickers API spec" $ StickersSpec.spec token chatId botName
+        describe "Stickers API spec" $ StickersSpec.spec token chatId
             --describe "Inline integration tests" $ InlineSpec.spec token chatId botName
 runIntegrationSpec _ _ _ _ = describe "Integration tests" $
-        fail "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
+        error "Missing required arguments for integration tests. Run stack test --test-arguments \"--help\" for more info"
 
 description ::  Maybe PP.Doc
 description = Just $
-           (PP.text "Run the haskell-telegram-api tests")
-    PP.<$> ((PP.text "Running with stack: ") PP.<> (PP.text "stack test --test-arguments=\"--integration -c 1235122 -b MyTeleBot -- -m send\""))
-    PP.<$> ((PP.red . PP.text $ "WARNING: ") PP.<> (PP.text "the HSPEC_ARGS are optional but if present MUST be at the end and seperated from the other options with a -- "))
+           PP.text "Run the haskell-telegram-api tests"
+    PP.<$> (PP.text "Running with stack: " PP.<> PP.text "stack test --test-arguments=\"--integration -c 1235122 -b MyTeleBot -- -m send\"")
+    PP.<$> (PP.red (PP.text "WARNING: ") PP.<> PP.text "the HSPEC_ARGS are optional but if present MUST be at the end and seperated from the other options with a -- ")
 
 readChatId :: String -> ChatId
 readChatId s@('@':_) = ChatChannel $ T.pack s

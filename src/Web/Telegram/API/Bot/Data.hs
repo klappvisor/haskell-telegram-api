@@ -32,6 +32,8 @@ module Web.Telegram.API.Bot.Data
     , InlineQueryResult             (..)
     , InlineKeyboardMarkup          (..)
     , InlineKeyboardButton          (..)
+    , WebAppInfo                    (..)
+    , LoginUrl                      (..)
     , CallbackGame                  (..)
     , CallbackQuery                 (..)
     , ChatType                      (..)
@@ -77,6 +79,7 @@ module Web.Telegram.API.Bot.Data
     , inlineQueryResultCachedVoice
     , inputMediaPhoto
     , inputMediaVideo
+    , loginUrl
     ) where
 
 import           Prelude                      hiding (id)
@@ -84,7 +87,7 @@ import           Prelude                      hiding (id)
 import           Data.Aeson
 import qualified Data.Char                    as Char
 import           Data.Int                     (Int64)
-import           Data.List
+import           Data.List                    (isPrefixOf)
 import           Data.Text                    (Text)
 import           GHC.Generics
 
@@ -732,7 +735,7 @@ inlineQueryResultCachedVoice id fileId title = InlineQueryResultCachedVoice id f
 inlineQueryResultCachedAudio :: Text -> Text -> InlineQueryResult
 inlineQueryResultCachedAudio id fileId = InlineQueryResultCachedAudio id fileId Nothing Nothing Nothing
 
-data InlineKeyboardMarkup = InlineKeyboardMarkup
+newtype InlineKeyboardMarkup = InlineKeyboardMarkup
   {
     inline_keyboard :: [[InlineKeyboardButton]]
   } deriving (FromJSON, ToJSON, Show, Generic)
@@ -740,11 +743,17 @@ data InlineKeyboardMarkup = InlineKeyboardMarkup
 data InlineKeyboardButton = InlineKeyboardButton
   {
     ikb_text                             :: Text -- ^ Label text on the button
-  , ikb_url                              :: Maybe Text -- ^ HTTP url to be opened when button is pressed
+  , ikb_url                              :: Maybe Text -- ^ HTTP or tg:// URL to be opened when the button is pressed. Links @tg://user?id=<user_id>@ can be used to mention a user by their ID without using a username, if this is allowed by their privacy settings.
   , ikb_callback_data                    :: Maybe Text -- ^ Data to be sent in a callback query to the bot when button is pressed, 1-64 bytes
+  , ikb_web_app                          :: Maybe WebAppInfo -- ^ Description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method 'answerWebAppQuery'. Available only in private chats between a user and the bot.
+  , ikb_login_url                        :: Maybe LoginUrl -- ^ An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the Telegram Login Widget.
   , ikb_switch_inline_query              :: Maybe Text -- ^  If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot‘s username and the specified inline query in the input field. Can be empty, in which case just the bot’s username will be inserted.
+                                                       --
+                                                       -- Note: This offers an easy way for users to start using your bot in inline mode when they are currently in a private chat with it. Especially useful when combined with switch_pm… actions - in this case the user will be automatically returned to the chat they switched from, skipping the chat selection screen.
+  , ikb_switch_inline_query_current_chat :: Maybe Text -- ^ If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field. May be empty, in which case only the bot's username will be inserted.
+                                                       --
+                                                       -- This offers a quick way for the user to open your bot in inline mode in the same chat - good for selecting something from multiple options.
   , ikb_callback_game                    :: Maybe CallbackGame -- ^  Description of the game that will be launched when the user presses the button. NOTE: This type of button must always be the first button in the first row.
-  , ikb_switch_inline_query_current_chat :: Maybe Text -- ^ If set, pressing the button will insert the bot‘s username and the specified inline query in the current chat's input field. Can be empty, in which case only the bot’s username will be inserted.
   , ikb_pay                              :: Maybe Bool -- ^ Specify True, to send a Pay button. NOTE: This type of button must always be the first button in the first row.
   } deriving (Show, Generic)
 
@@ -756,7 +765,43 @@ instance FromJSON InlineKeyboardButton where
 
 inlineKeyboardButton :: Text -> InlineKeyboardButton
 inlineKeyboardButton buttonText =
-  InlineKeyboardButton buttonText Nothing Nothing Nothing Nothing Nothing Nothing
+  InlineKeyboardButton buttonText Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+
+-- | Describes a Web App.
+newtype WebAppInfo = WebAppInfo
+  {
+    wai_url :: Text -- ^ An HTTPS URL of a Web App to be opened with additional data as specified in Initializing Web Apps
+  } deriving (Show, Generic)
+
+instance ToJSON WebAppInfo where
+  toJSON = toJsonDrop 4
+
+instance FromJSON WebAppInfo where
+  parseJSON = parseJsonDrop 4
+
+-- | This object represents a parameter of the inline keyboard button used to automatically authorize a user. Serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in:
+--
+-- Telegram apps support these buttons as of version 5.7.
+--
+-- Sample bot: @discussbot
+data LoginUrl = LoginUrl
+  {
+    lu_url                  :: Text -- ^ An HTTPS URL to be opened with user authorization data added to the query string when the button is pressed. If the user refuses to provide authorization data, the original URL without information about the user will be opened. The data added is the same as described in Receiving authorization data.
+                                    --
+                                    -- NOTE: You must always check the hash of the received data to verify the authentication and the integrity of the data as described in Checking authorization.
+  , lu_forward_text         :: Maybe Text -- ^ New text of the button in forwarded messages.
+  , lu_bot_username         :: Maybe Text -- ^ Username of a bot, which will be used for user authorization. See Setting up a bot for more details. If not specified, the current bot's username will be assumed. The url's domain must be the same as the domain linked with the bot. See Linking your domain to the bot for more details.
+  , lu_request_write_access :: Maybe Bool -- ^ Pass True to request the permission for your bot to send messages to the user.
+  } deriving (Show, Generic)
+
+instance ToJSON LoginUrl where
+  toJSON = toJsonDrop 3
+
+instance FromJSON LoginUrl where
+  parseJSON = parseJsonDrop 3
+
+loginUrl :: Text -> LoginUrl
+loginUrl url = LoginUrl url Nothing Nothing Nothing
 
 data CallbackGame = CallbackGame
   {
@@ -1141,7 +1186,7 @@ instance FromJSON MaskPositionPoint where
   parseJSON "eyes" = pure Eyes
   parseJSON "mouth" = pure Mouth
   parseJSON "chin" = pure Chin
-  parseJSON _ = fail $ "Failed to parse MaskPositionPoint"
+  parseJSON _ = fail "Failed to parse MaskPositionPoint"
 
 data MaskPosition = MaskPosition
   {

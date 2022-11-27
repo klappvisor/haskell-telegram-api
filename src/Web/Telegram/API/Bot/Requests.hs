@@ -255,7 +255,7 @@ instance FromJSON ForwardMessageRequest where
   parseJSON = parseJsonDrop 8
 
 forwardMessageRequest :: ChatId -> ChatId -> Int -> ForwardMessageRequest
-forwardMessageRequest chatId fromChatId forwardMessageId = ForwardMessageRequest chatId fromChatId Nothing forwardMessageId
+forwardMessageRequest chatId fromChatId = ForwardMessageRequest chatId fromChatId Nothing
 
 -- | This object represents request for 'sendPhoto'
 data SendPhotoRequest payload = SendPhotoRequest
@@ -810,10 +810,10 @@ instance FromJSON EditMessageReplyMarkupRequest where
   parseJSON = parseJsonDrop 5
 
 editMessageReplyMarkupRequest :: ChatId -> Int -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
-editMessageReplyMarkupRequest chatId messageId keyboard = EditMessageReplyMarkupRequest (Just chatId) (Just messageId) Nothing keyboard
+editMessageReplyMarkupRequest chatId messageId = EditMessageReplyMarkupRequest (Just chatId) (Just messageId) Nothing
 
 editInlineMessageReplyMarkupRequest :: Text -> Maybe InlineKeyboardMarkup -> EditMessageReplyMarkupRequest
-editInlineMessageReplyMarkupRequest inlineMessageId keyboard = EditMessageReplyMarkupRequest Nothing Nothing (Just inlineMessageId) keyboard
+editInlineMessageReplyMarkupRequest inlineMessageId = EditMessageReplyMarkupRequest Nothing Nothing (Just inlineMessageId)
 
 data SendInvoiceRequest = SendInvoiceRequest
   {
