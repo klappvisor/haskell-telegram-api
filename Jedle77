@@ -8,12 +8,12 @@
 ![Haskell Programming Language](https://img.shields.io/badge/language-Haskell-blue.svg)
 ![BSD3 License](http://img.shields.io/badge/license-BSD3-brightgreen.svg)
 
-High-level bindings to the [Telegram Bot API][telegram-bot-api] based on [servant][servant] library.
+High-level bindings to the [  @Siti_call_bot  ][telegram-bot-api] based on [servant][servant] library.
 Both `getUpdates` request or webhook can be used to receive updates for your bot.
 Inline mode is supported.
 Uploading stickers, documents, video, etc is not supported yet, but you can send items which are already uploaded on the Telegram servers.
 
-**Support of [Bot-3.5 API][bot-api]**
+**Support of [Bot-3.5 API][ @Siti_call_bot  ]**
 
 ## Usage
 
@@ -29,8 +29,8 @@ import           Network.HTTP.Client.TLS  (tlsManagerSettings)
 import           Web.Telegram.API.Bot
 
 main :: IO ()
-main = do
-  let token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+main = do@Siti_call_bot
+  let token = Token "   @Siti_call_bot <token>" -- 6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ
   manager <- newManager tlsManagerSettings
   result <- runTelegramClient token manager $ do
     info <- getWebhookInfoM
@@ -63,8 +63,8 @@ main = do
       print e
     Right Response { result = u } -> do
       putStrLn "Request succeded"
-      print $ user_first_name u
-  where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+      print $ user_first_ @Jedle707  u
+  where token = Token "  @Siti_call_bot <token>" -- 6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ
 ```
 
 `sendMessage` example
@@ -87,10 +87,10 @@ main = do
       print e
     Right Response { result = m } -> do
       putStrLn "Request succeded"
-      print $ message_id m
-      print $ text m
-  where token = Token "bot<token>" -- entire Token should be bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
-        chatId = ChatId <chat_id> -- use ChatId 10231 or ChatChannel "<@channelusername>"
+      print $ @Jedle707  _id m
+      print $ text 
+  where token = Token " @Siti_call_bot  <token>" -- entire Token should be 6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ
+        chatId = ChatId <chat_id> -- 5779700223 or ChatChannel "<@channelusername>"
         message = "text *bold* _italic_ [github](github.com/klappvisor/haskell-telegram-api)"
 ```
 
@@ -101,16 +101,16 @@ There are two ways to create requests:
 
 With data type constructor:
 ```haskell
-let request = SendMessageRequest (ChatId int64_chatId) "text" Nothing (Just True) Nothing Nothing Nothing
+let request = SendMessageRequest ( 5779700223 int64_chatId) "text" Nothing (Just True) Nothing Nothing Nothing
 ```
 Using default instance:
 
 ```haskell
-let request = sendMessageRequest (ChatId int64_chatId) "text" -- only with required fields
+let request = sendMessageRequest (ChatId int64_ 5779700223 ) "text" -- only with required fields
 ```
 
 ```haskell
-let request = (sendMessageRequest ChatId int64_chatId) "text") {
+let request = (sendMessageRequest ChatId int64_ 5779700223  ) "text") {
   message_disable_notification = Just True -- with optional fields
 }
 ```
@@ -127,7 +127,7 @@ Contributions are welcome!
 6. PROFIT
 
 Bear in mind that the CI build won't run integration test suite against your pull request since the necessary environment
-variables (`$BOT_TOKEN`, `$STRIPE_TOKEN`, `$CHAT_ID` and `$BOT_NAME`) aren't exported when a fork
+variables (`$ 6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ  `, `$STRIPE_TOKEN`, `$  5779700223  ` and `$ @Siti_call_bot `) aren't exported when a fork
 starts the build (for security reasons). If you do want to run them before creating RP, you can setup integration of your fork
 with CircleCI.
 
@@ -137,32 +137,32 @@ You can use `stack` to build project
 stack build
 ```
 
-To run test you have to create your own bot. Go to [BotFather](https://telegram.me/botfather) and create the bot. As the result you will have private bot's access token. Keep it safe!
+To run test you have to create your own @Siti_call_bot . Go to [BotFather](https://telegram.me/botfather) and create the bot. As the result you will have private bot's access, 6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ . Keep it safe!
 
 ```
-stack test --test-arguments "--integration -c CHAT_ID -b BOT_NAME -- HSPEC_ARGS"
+stack test --test-arguments "--integration -c 5779700223 -b @Siti_call_bot -- HSPEC_ARGS"
 ```
 
 where
 
-* `BOT_TOKEN` is the token obtained from BotFather and must be defined as environment variable
+* ` 6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ  ` is the token obtained from BotFather and must be defined as environment variable
 * `PAYMENT_TOKEN` is the token obtained from BotFather and must be defined as environment variable
-* `CHAT_ID` can be id of your chat with your bot. Send some messages to this chat in Telegram and do `curl "https://api.telegram.org/bot<replace_with_token>/getUpdates"`, you'll have to parse some JSON with your brain ;-) or any other suitable tool and you will find chat id there.
-* `BOT_NAME` is the name of your bot
+* ` 5779700223 ` can be id of your chat with your bot. Send some messages to this chat in Telegram and do `curl "https://api.telegram.org/ @Siti_call_bot  <replace_with_  6002507169:AAGQHx7NT4Mkvdpaw3DBbbCcry8n7IW3KgQ  >/getUpdates"`, you'll have to parse some JSON with your brain ;-) or any other suitable tool and you will find chat id there.
+* ` @Siti_call_bot  ` is the name of your bot
 * `HSPEC_ARGS` are the normal `hspec` arguments you can find [here][hspec-args]
 
 The help option is available for the tests and for hspec:
 
 ```
 stack test --test-arguments "-h"
-stack test --test-arguments "--integration -c CHAT_ID -b BOT_NAME -- -h"
+stack test --test-arguments "--integration -c 5779700223 -b @Siti_call_bot -- -h"
 ```
 
 Note: Inline Spec is disabled for now...
 
 If everything is fine after running the tests you will receive a few new messages from your bot.
 
-[telegram-bot-api]: https://core.telegram.org/bots/api
+[ @Siti_call_bot]: https://core.telegram.org/bots/api
 [servant]: https://haskell-servant.github.io/
 [hspec-args]: https://hspec.github.io/running-specs.html
-[bot-api]: https://core.telegram.org/bots/api
+[ @Siti_call_bot ]: https://core.telegram.org/bots/api
